@@ -1,24 +1,128 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { motion } from "framer-motion";
 import { DotBackground } from "../components/Background";
+import { useNavigate } from "react-router-dom";
+import api from "../service/api";
+import { toast } from "react-toastify";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("OTP Submitted:", otp);
+
+  useEffect(() => {
+    const savedTime = localStorage.getItem('otpRequestTime');
+    if (savedTime) {
+      const elapsed = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+      const remaining = 120 - elapsed; // 120 seconds (2 minutes)
+  
+      if (remaining > 0) {
+        setTimeLeft(remaining);
+        setShowResendButton(false);
+        startTimer();
+      } else {
+        setShowResendButton(true);
+      }
+    } else {
+      setShowResendButton(true);
+    }
+  }, []);
+
+  const startTimer = () => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(interval);
+          setShowResendButton(true);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   };
 
+  const handleResendOtp = async () => {
+    setLoading(true);
+  
+    const email = localStorage.getItem('userEmail');
+  
+    try {
+      const response = await api.post('/api/resend-otp/', { email });
+      toast.success(response.data.message || 'OTP sent successfully!');
+      setShowResendButton(false);
+      setTimeLeft(120);
+      localStorage.setItem('otpRequestTime', Date.now().toString());
+      startTimer();
+    } catch (err) {
+      toast.error(err.response?.data.error || 'Failed to resend OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const userData = JSON.parse(sessionStorage.getItem('tempUserData'));
+    console.log('userdata', userData)
+    setLoading(true);
+
+    const email = localStorage.getItem("userEmail")
+    console.log(email)
+
+    if (!email){
+        setErrorMessage('No email found. Pleace try again.');
+        setLoading(false);
+        console.log(email)
+        return;
+    }
+
+    try {
+        const response = await api.post('/api/verify-email/', {
+            email,
+            otp,
+            user_data: userData
+        });
+
+       
+        if (response.status === 201) {
+            sessionStorage.removeItem('tempUserData');
+            console.log('Verification successful!');
+            navigate('/signin', { state: { message: 'User created, log in to continue' } });
+        } else{
+      
+            setErrorMessage(response.data.error || "Verification failed. Please check your OTP.");
+            console.log(errorMessage);
+        }
+    } catch (error) {
+        if (error.response && error.response.data) {
+      
+            setErrorMessage(error.response.data.error || "An error occurred. Please try again.");
+            console.log(errorMessage);
+            
+        } else {
+            setErrorMessage("An unexpected error occurred.");
+        }
+    } finally {
+        setLoading(false);
+        console.log('Loading finished');
+    }
+};
   return (
     <DotBackground>
       <div className="max-w-md mt-16 w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-        <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-          Verify Your Account
+      <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+        Verify Your Account
         </h2>
         <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-          We have sent a verification code to your email. Please enter the code below to verify your account.
+        We have sent a verification code to your email. Please enter the code below to verify your account.
         </p>
+
         <form className="my-8" onSubmit={handleSubmit}>
           <div className="mb-4">
             <Label htmlFor="otp">Enter OTP</Label>
@@ -38,10 +142,24 @@ const OtpVerification = () => {
             Verify &rarr;
             <BottomGradient />
           </button>
-
           <div className="text-sm text-neutral-600 dark:text-neutral-300 mt-4">
-            Didn’t receive the code? <a href="#" className="text-cyan-500 hover:underline">Resend</a>
-          </div>
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      {!showResendButton ? (
+        <p className="text-gray-500">You can request a new OTP in {timeLeft} seconds.</p>
+      ) : (
+        <>
+          Didn’t receive the code? 
+          <a 
+            href="#" 
+            onClick={(e) => { e.preventDefault(); handleResendOtp(); }} 
+            className="text-cyan-500 hover:underline"
+          >
+            Resend
+          </a>
+        </>
+      )}
+      {loading && <p>Loading...</p>}
+    </div>
         </form>
       </div>
     </DotBackground>

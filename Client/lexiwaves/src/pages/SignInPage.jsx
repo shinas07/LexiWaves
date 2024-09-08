@@ -21,7 +21,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const response = await api.post('/api/login/', {
+            const response = await api.post('/user/login/', {
                 email,
                 password
             })
@@ -53,7 +53,7 @@ const Login = () => {
 
     return (
         <DotBackground>
-          <div className="max-w-md mt-16 w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+          <div className="max-w-md mt-32 w-full mx-auto rounded-lg md:rounded-2xl p-4 md:p-12 shadow-input bg-white dark:bg-black border broder-black dark:border-neutral-800">
             <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
               Welcome Back to LexiWaves
             </h2>

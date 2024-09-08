@@ -2,7 +2,8 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="bg-neutral-800 text-white py-10">
+    <footer className="bg-neutral-900 text-white py-10 mt-auto border-0 border-solid border-[#262626]">
+
       {/* Social Media Section */}
       <div className="container mx-auto flex justify-center space-x-6 mb-6">
         {/* Social Media Links */}
@@ -20,8 +21,8 @@ function Footer() {
 
       {/* Logo and Rights Section */}
       <div className="container mx-auto flex justify-center items-center">
-        <img src="https://yourprojectlogo.com/logo.png" alt="Project Logo" className="w-10 h-10 mr-4" />
-        <p className="text-gray-400 text-sm">© {new Date().getFullYear()} Your Project Name. All rights reserved.</p>
+        {/* <img src="https://yourprojectlogo.com/logo.png" alt="Project Logo" className="w-10 h-10 mr-4" /> */}
+        <p className="text-gray-400 text-sm">© {new Date().getFullYear()} LexiWaves . All rights reserved.</p>
       </div>
     </footer>
   );
