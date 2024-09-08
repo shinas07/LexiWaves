@@ -1,17 +1,12 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import StudentUser
 
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only = True)
-    confirm_password = serializers.CharField(write_only = True)
 
+class StudentUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields =  ['id', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+        model = StudentUser
+        fields = ['first_name', 'last_name', 'email', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
 
-        def validata(self, data):
-            if CustomUser.objects.filter(email=data['email']).exists():
-                raise serializers.ValidationError('Email already exists')
-            return data
-        
-        
