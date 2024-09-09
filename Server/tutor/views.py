@@ -1,11 +1,11 @@
 from datetime import timedelta
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 # Create your views here.
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import TutorSerializer
+from .serializers import TutorSerializer,TutorDetailsSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -117,9 +117,9 @@ class TutorLoginView(APIView):
         password = request.data.get('password')
         
         try:
-            user = Tutor.objects.get(email=email)
-            if user.check_password(password):
-                refresh = RefreshToken.for_user(user)
+            tutor = Tutor.objects.get(email=email)
+            if tutor.check_password(password):
+                refresh = RefreshToken.for_user(tutor)
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
@@ -129,3 +129,21 @@ class TutorLoginView(APIView):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
         except Tutor.DoesNotExist:
             return Response({'error': 'Tutor does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+class TutorDetails(APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        print('user', user)
+
+        tutor = get_object_or_404(Tutor, email=request.user.email)
+   
+
+        print('tutor', tutor)
+        serializer = TutorDetailsSerializer(data=request.data, context={'tutor': tutor})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
