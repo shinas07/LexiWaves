@@ -2,10 +2,10 @@ from datetime import timedelta
 from django.shortcuts import get_object_or_404, render
 
 # Create your views here.
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import TutorSerializer,TutorDetailsSerializer
+from .serializers import TutorListSerializer, TutorSerializer,TutorDetailsSerializer, TutorLoginSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -15,6 +15,7 @@ from .models import TutorOTPVerification,Tutor
 from django.utils import timezone
 from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 
 def generate_otp():
@@ -109,41 +110,74 @@ class TutorResendOtpView(APIView):
         if 'error' in response:
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(response, status=status.HTTP_200_OK)
-    
+
+from django.contrib.auth import authenticate
 
 class TutorLoginView(APIView):
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = TutorLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            tutor = serializer.validated_data['tutor']
+            refresh = RefreshToken.for_user(tutor)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'message': 'Login successful'
+            }, status=status.HTTP_200_OK)
+        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+# class TutorLoginView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         password = request.data.get('password')
         
-        try:
-            tutor = Tutor.objects.get(email=email)
-            if tutor.check_password(password):
-                refresh = RefreshToken.for_user(tutor)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'message': 'Login successful'
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
-        except Tutor.DoesNotExist:
-            return Response({'error': 'Tutor does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+#         try:
+#             tutor = Tutor.objects.get(email=email)
+#             if tutor.check_password(password):
+#                 refresh = RefreshToken.for_user(tutor)
+#                 return Response({
+#                     'refresh': str(refresh),
+#                     'access': str(refresh.access_token),
+#                     'message': 'Login successful'
+#                 }, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+#         except Tutor.DoesNotExist:
+#             return Response({'error': 'Tutor does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
         
+
+
+from rest_framework.permissions import IsAuthenticated
 
 class TutorDetails(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-        user = request.user
-        print('user', user)
+        print("--- TutorDetails POST method started ---")
+        print("Request user:", request.user)
+        print("Is user authenticated:", request.user.is_authenticated)
+        print("User email:", getattr(request.user, 'email', 'No email attribute'))
 
-        tutor = get_object_or_404(Tutor, email=request.user.email)
-   
 
-        print('tutor', tutor)
-        serializer = TutorDetailsSerializer(data=request.data, context={'tutor': tutor})
+        serializer = TutorDetailsSerializer(data=request.data, context={'request': request})
+        
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            print("Serializer is valid")
+            tutor_details = serializer.save()
+            print("Tutor details saved:", tutor_details)
+            return Response({
+                "message": "Details saved successfully!",
+                "data": TutorDetailsSerializer(tutor_details).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            print("Serializer errors:", serializer.errors)
+            return Response({
+                "error": "Failed to save details. Please try again.",
+                "details": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+# Admin Tutor List
+class TutorListView(generics.ListAPIView):
+    queryset = Tutor.objects.filter(admin_approved=True)
+    serializer_class = TutorListSerializer
