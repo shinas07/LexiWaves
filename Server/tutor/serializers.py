@@ -14,18 +14,48 @@ class TutorSerializer(serializers.ModelSerializer):
     
 
 
+from django.contrib.auth import authenticate
+
+
+class TutorLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        # Check if email and password are provided
+        if not email or not password:
+            raise serializers.ValidationError('Email and password are required.')
+
+        # Authenticate the user
+        tutor = authenticate(email=email, password=password)
+        if tutor is None:
+            raise serializers.ValidationError('Invalid email or password.')
+
+        return {
+            'tutor': tutor,
+            'email': email,
+            'password': password
+        }
+
+
+
+
+
+
 
 
 class TutorDetailsSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=False)
     teaching_license = serializers.FileField(required=False)
     identity_proof = serializers.FileField(required=False)
-    tutor = serializers.PrimaryKeyRelatedField(queryset=Tutor.objects.all(), read_only=False)
+    
 
     class Meta:
         model = TutorDetails
         fields = [
-            'tutor',
             'profile_picture',
             'phone_number',
             'address',
@@ -56,9 +86,10 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
         profile_picture = validated_data.pop('profile_picture', None)
         teaching_license = validated_data.pop('teaching_license', None)
         identity_proof = validated_data.pop('identity_proof', None)
-        tutor = self.context['request'].user.tutor
 
-        # Create the TutorDetails instance
+        # request = self.context.get('request')
+        # tutor = request.user.tutor
+
         tutor_details = TutorDetails.objects.create(**validated_data)
 
         # Handle the file uploads
@@ -107,3 +138,10 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
 #         )
 
 #         return tutor_details
+
+
+class TutorListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tutor
+        fields = '__all__'
+        
