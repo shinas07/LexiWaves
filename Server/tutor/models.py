@@ -24,7 +24,7 @@ class Tutor(AbstractBaseUser):
     lastname = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-
+    admin_approved = models.BooleanField(default=False, null=True,blank=True)
     objects = TutorManager()
 
     USERNAME_FIELD = 'email'
@@ -44,7 +44,7 @@ class TutorOTPVerification(models.Model):
 
 
 class TutorDetails(models.Model):
-    tutor = models.OneToOneField('Tutor', on_delete=models.CASCADE)
+    # tutor = models.OneToOneField('Tutor', on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)  
     phone_number = models.CharField(max_length=20, blank=True, null=True)  
     address = models.TextField(blank=True, null=True) 
@@ -70,7 +70,8 @@ class TutorDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Tutor Details for {self.tutor.firstname}"
+        return f"Tutor Details for {self.phone_number}"
+
 
 
 
