@@ -18,6 +18,7 @@
     "mini-svg-data-uri": "^1.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.1",
     "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
