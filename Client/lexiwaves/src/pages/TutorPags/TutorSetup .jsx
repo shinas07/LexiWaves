@@ -1,12 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { DotBackground } from '../../components/Background';
 
 
 const TutorSetup = () => {
+  const navigate = useNavigate()
+
+
   const handleContinue = () => {
-    // Redirect to the tutor details page or handle the continue action
+    console.log('button cliked');
+    
+    navigate('/tutor-details')
+
   };
 
 
@@ -29,7 +35,7 @@ const TutorSetup = () => {
         <div className="mt-8">
           <button
             onClick={handleContinue}
-            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-12  font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] "
           >
             Continue &rarr;
             <BottomGradient />

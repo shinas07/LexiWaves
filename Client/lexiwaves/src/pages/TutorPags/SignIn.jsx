@@ -28,7 +28,7 @@ const TutorLogin = () => {
 
 
       toast.success("Tutor login successful");
-      navigate("/tutor-details"); // Redirect to the tutor dashboard
+      navigate("/tutor-setup"); // Redirect to the tutor dashboard
     } catch (error) {
       if (error.response && error.response.status === 401) {
         toast.error("Invalid email or password");

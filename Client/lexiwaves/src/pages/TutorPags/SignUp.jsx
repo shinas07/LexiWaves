@@ -10,9 +10,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DotBackground } from "../../components/Background";
 
 
-
-
-
 const TutorSignUP = () => {
     const [formData, setFormData] = useState({
         firstname: '',

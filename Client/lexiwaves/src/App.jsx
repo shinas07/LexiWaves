@@ -14,13 +14,14 @@ import './toastStyles.css'; // Import custom styles
 
 
 
+
 //Tutor pages import
 import TutorSignUP from './pages/TutorPags/SignUp';
-import TutorDashboard from './pages/TutorPags/TutorDashboard';
 import TutorOtpVerification from './pages/TutorPags/TutorOtp';
 import TutorLogin from './pages/TutorPags/SignIn';
-import TutorDetailsPage from './pages/TutorPags/TutorSetup ';
-
+import TutorSetup from './pages/TutorPags/TutorSetup ';
+import TutorHomePage from './pages/TutorPags/TutorDashboard';
+import TutorDetails from './pages/TutorPags/TutorDetails';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -54,13 +55,7 @@ const App = () => {
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('access');
-    sessionStorage.removeItem('refresh');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-  };
-
+ 
   return (
     <div className='dark'>  
         <Router>
@@ -68,13 +63,15 @@ const App = () => {
             <Route path="/" element={<Home/>} />
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/" /> : <SignUPForm />} />
             <Route path="/signin" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+
             <Route path="/otp" element={<OtpVerification />} />
             {/* Tutors routes here */}
             <Route path='/tutor-signup' element={tutorLoggedIn ? <Navigate to="/tutor-dashboard" /> : <TutorSignUP />} />
           <Route path='/tutor-otp' element={<TutorOtpVerification />} />
           <Route path='/tutor-signin' element={tutorLoggedIn ? <Navigate to="/tutor-dashboard" /> : <TutorLogin />} />
-          <Route path='/tutor-dashboard' element={<TutorDashboard />} />
-          <Route path='/tutor-details' element={<TutorDetailsPage />} />
+          <Route path='/tutor-dashboard' element={<TutorHomePage />} />
+          <Route path='/tutor-setup' element={<TutorSetup />} />
+          <Route path='/tutor-details' element={<TutorDetails/>}/>
           </Routes>
           <ToastContainer />
         </Router>
