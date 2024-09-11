@@ -1,38 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
+from accounts.models import User
 
 # Create your models here.
 
-class TutorManager(BaseUserManager):
-    def create_tutor(self, email, firstname, lastname, password=None):
-        if not email:
-            raise ValueError('Tutors must have an email address')
-        tutor = self.model(
-            email=self.normalize_email(email),
-            firstname=firstname,
-            lastname=lastname,
-        )
-        tutor.set_password(password)
-        tutor.save(using=self._db)
-        return tutor
-    
 
-class Tutor(AbstractBaseUser):
-    email = models.EmailField(unique=True)
-    firstname = models.CharField(max_length=50)
-    lastname = models.CharField(max_length=50)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-    admin_approved = models.BooleanField(default=False, null=True,blank=True)
-    objects = TutorManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['firstname', 'lastname']
+class Tutor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tutor_profile')
 
     def __str__(self):
-        return f"{self.firstname} {self.lastname}"
-    
+        return f"Tutor: {self.user.get_full_name()}"
+
+
+
+
 
 class TutorOTPVerification(models.Model):
     email = models.EmailField()
@@ -44,7 +26,7 @@ class TutorOTPVerification(models.Model):
 
 
 class TutorDetails(models.Model):
-    # tutor = models.OneToOneField('Tutor', on_delete=models.CASCADE)
+    tutor = models.OneToOneField('Tutor', on_delete=models.CASCADE,null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)  
     phone_number = models.CharField(max_length=20, blank=True, null=True)  
     address = models.TextField(blank=True, null=True) 
