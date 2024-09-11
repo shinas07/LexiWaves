@@ -13,8 +13,6 @@ import './toastStyles.css'; // Import custom styles
 
 
 
-
-
 //Tutor pages import
 import TutorSignUP from './pages/TutorPags/SignUp';
 import TutorOtpVerification from './pages/TutorPags/TutorOtp';
@@ -22,6 +20,12 @@ import TutorLogin from './pages/TutorPags/SignIn';
 import TutorSetup from './pages/TutorPags/TutorSetup ';
 import TutorHomePage from './pages/TutorPags/TutorDashboard';
 import TutorDetails from './pages/TutorPags/TutorDetails';
+
+// Admin pages import
+import AdminDashboard from './pages/admin/AdminDashboard';
+import StudentsPage from './pages/admin/students';
+import Tutorlist from './pages/admin/tutor';
+import TutorRequests from './pages/admin/TutorApproval';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,6 +76,12 @@ const App = () => {
           <Route path='/tutor-dashboard' element={<TutorHomePage />} />
           <Route path='/tutor-setup' element={<TutorSetup />} />
           <Route path='/tutor-details' element={<TutorDetails/>}/>
+
+          {/* Admin routes here */}
+          <Route path='/admin-dashboard' element={<AdminDashboard/>}/>
+          <Route path='/admin-students-list' element={<StudentsPage/>}/>
+          <Route path='/admin-tutor-list' element={<Tutorlist/>}/>
+          <Route path='/tutor-reqeusts' element={<TutorRequests/>}/>
           </Routes>
           <ToastContainer />
         </Router>

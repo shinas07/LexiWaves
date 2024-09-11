@@ -6,6 +6,9 @@ import { cn } from "../../lib/utils";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import api from "../../service/api";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Modal from "./Modal";
+
 
 const TutorDetails = () => {
   const [formData, setFormData] = useState({
@@ -50,6 +53,9 @@ const TutorDetails = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const validate = () => {
     const errors = {};
@@ -67,25 +73,53 @@ const TutorDetails = () => {
   };
 
   const handleSubmit = async (e) => {
+   
     e.preventDefault();
-    if (!validate()) return;
-    setIsSubmitting(true);
+
+    console.log('form data', formData)
+
+    const token = sessionStorage.getItem('access')
+
 
     try {
-      const response = await api.post('/tutor/details/',formData)
-      console.log(response);
-      toast.success("Details saved successfully!");
+       // Make the API request without sending any token
+       const response = await axios.post('http://localhost:8000/tutor/details/', formData, {
+
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'  // Adjust if you're sending FormData
+      }
+
+      
+
+
+
+       });
+       if (response.status === 201) {
+        setIsModalOpen(true);
+      }
+
+      //  console.log("Details submitted successfully", response.data);
+      //  toast.success("Details saved successfully!");
+      //  setShowModal(true);
+      // setIsModalOpen(true)
+ 
+     
+ 
     } catch (error) {
-        console.log(error)
-      const errorMessage =
-        error.response?.data?.detail ||
-        "Failed to save details. Please try again.";
-    console.log(error.response.data)
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+       console.error("Error submitting details", error);
+       // You can also add error handling logic here if needed
     }
-  };
+
+
+    
+ };
+ 
+
+ 
+
+
+
 
   return (
     <DotBackground>
@@ -390,6 +424,10 @@ const TutorDetails = () => {
         </form>
         <ToastContainer />
       </div>
+    
+
+    <Modal isOpen={isModalOpen} />
+
     </DotBackground>
   );
 };
