@@ -1,7 +1,7 @@
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import StudentUserSerializer 
+from .serializers import StudentUserSerializer, StudentListSerializer
 from .models import StudentUser, OTPVerification
 import random
 from django.core.mail import send_mail
@@ -157,6 +157,11 @@ class UserLoginView(APIView):
                 return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
         except StudentUser.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+# Admin Student List
+class StudentListView(generics.ListAPIView):
+    queryset = StudentUser.objects.all()
+    serializer_class = StudentListSerializer
 
 
 

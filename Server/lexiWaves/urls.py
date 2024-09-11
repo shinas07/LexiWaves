@@ -18,11 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/',include('accounts.urls')),
-    path('tutor/',include('tutor.urls'))
+    path('tutor/',include('tutor.urls')),
+    path('lexi-admin/',include('lexi_admin.urls')),
+    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
 ]
 
 if settings.DEBUG:

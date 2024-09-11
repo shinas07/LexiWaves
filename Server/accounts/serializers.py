@@ -10,3 +10,8 @@ class StudentUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
+
+class StudentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentUser
+        fields = '__all__'
