@@ -1,8 +1,8 @@
 from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import StudentUserSerializer, StudentListSerializer
-from .models import StudentUser, OTPVerification
+from .serializers import UserSerializer, StudentListSerializer
+from .models import  OTPVerification, Student,User
 import random
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -10,29 +10,15 @@ from datetime import timedelta
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-# def send_otp_email(email, otp):
-#     subject = 'Verify you email'
-#     html_message = render_to_string('email_template.html', {'otp': otp})
-#     plain_message = strip_tags(html_message)
-#     from_email = settings.EMAIL_HOST_USER
-#     recipient_list = [email]
-
-#     try:
-#         send_mail(subject,plain_message, from_email, recipient_list,  html_message=html_message, fail_silently=False)
-#         return True
-#     except Exception as e:
-#         print(f"error sending email': {str(e)}")
-#         return False
 
 
 
-# Otp Creation
+# # Otp Creation
 def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
@@ -66,61 +52,54 @@ def create_or_resend_otp(email):
 
 class SignUpView(APIView):
     def post(self, request):
-        serializer = StudentUserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-
             response = create_or_resend_otp(email)
             if 'error' in response:
                 return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(response, status=status.HTTP_200_OK)
-        
+            return Response({
+                'message': 'OTP sent successfully',
+                'user_data': serializer.validated_data
+            }, status=status.HTTP_200_OK)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
 
 
 class VerifyEmailView(APIView):
     def post(self, request):
         email = request.data.get('email')
         otp = request.data.get('otp')
+        user_data = request.data.get('user_data', {})
+
+        if not email or not otp or not user_data:
+            return Response({"error": "Email, OTP, and user data are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            verification = OTPVerification.objects.filter(email=email, otp=otp).latest('created_at')
-            print(verification)
+            verification = OTPVerification.objects.filter(email=email).latest('created_at')
         except OTPVerification.DoesNotExist:
-            print("problem")
+            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if verification.otp != otp:
             return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
         if verification.created_at < timezone.now() - timedelta(minutes=5):
-            print('ssss')
             return Response({"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user_data = request.data.get('user_data', {})
-        print(user_data)
-        if not user_data:
-            return Response({"error": "User data not provided"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user_data = request.data.get('user_data', {})
-            email = request.data.get('email')
-            firstname = user_data.get('first_name')
-            lastname = user_data.get('last_name')
-            password = user_data.get('password')
 
-            if not firstname or not lastname or not email or not password:
-                return Response({"error": "All fields required"}, status=HTTP_400_BAD_REQUEST)
-
-            StudentUser.objects.create_user(
-                first_name=firstname,
-                last_name=lastname,
-                email=email,
-                password=password,
-            )
-            
-            OTPVerification.objects.filter(email=email).delete()
-            return Response({"message": "Email verified and user created successfully"}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(data=user_data)
+        if serializer.is_valid():
+            try:
+                user = serializer.save()
+                Student.objects.create(user=user)
+                OTPVerification.objects.filter(email=email).delete()
+                return Response({"message": "Email verified and user created successfully"}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
 class ResendOtpView(APIView):
@@ -138,13 +117,10 @@ class UserLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        print(email)
-        print(password)
         # Authenticate user
        
         try:
-            user = StudentUser.objects.get(email=email)
-            print('user', user)
+            user = User.objects.get(email=email)
             if user.check_password(password):
                 print('password is checked')
                 refresh = RefreshToken.for_user(user)
@@ -155,13 +131,15 @@ class UserLoginView(APIView):
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
-        except StudentUser.DoesNotExist:
+        except Student.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
         
-# Admin Student List
-class StudentListView(generics.ListAPIView):
-    queryset = StudentUser.objects.all()
-    serializer_class = StudentListSerializer
+# # Admin Student List
+# class StudentListView(generics.ListAPIView):
+#     queryset = StudentUser.objects.all()
+#     serializer_class = StudentListSerializer
+
+
 
 
 
