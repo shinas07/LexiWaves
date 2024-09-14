@@ -1,52 +1,43 @@
-/* toastStyles.css */
-.Toastify__toast {
-    background: black !important; /* Black background */
-    color: white !important; /* White text */
-    border-radius: 10px !important;
-    font-size: 12px; /* Smaller text */
-    padding: 6px 12px; /* Smaller padding */
-    box-shadow: none !important; /* Remove shadow */
-    max-width: 250px; /* Optional: limit width */
-    transition: background-color 0.5s ease-in-out !important;
-    box-shadow: 8px 6px 12px rgba(40, 30, 85, 0.2) !important; 
-  }
-  
-  .Toastify__toast--success {
-    background: black !important; /* Ensure black background for success */
-  }
-  
-  .Toastify__toast--error {
-    background: black !important; /* Ensure black background for error */
-  }
-  
-  .Toastify__toast-container {
-    margin: 0; /* Remove container margins */
-  }
-  
-  .Toastify__toast-body {
-    font-size: 12px; /* Smaller text size */
-  }
-  
+@import 'sonner/dist/index.css';
 
-  
-
-  .Toastify__toast--enter {
-    animation: fadeIn 0.5s ease-in !important;
-    background-color: #333 !important; /* Darker color on appearance */
+.sonner-toast {
+  --normal-bg: rgba(255, 255, 255, 0.9);
+  --normal-border: rgba(0, 0, 0, 0.1);
+  --normal-text: #000000;
+  --success-bg: #28a745;
+  --success-border: #1e7e34;
+  --success-text: #ffffff;
+  --error-bg: #dc3545;
+  --error-border: #bd2130;
+  --error-text: #ffffff;
+  --warning-bg: #ffc107;
+  --warning-border: #d39e00;
+  --warning-text: #000000;
+  --info-bg: #007bff;
+  --info-border: #0056b3;
+  --info-text: #ffffff;
 }
 
-.Toastify__toast--exit {
-    animation: fadeOut 0.5s ease-out !important;
-    background-color: #000 !important;
+.sonner-toast[data-type="success"] {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-text);
 }
 
-/* Define custom animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.sonner-toast[data-type="error"] {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-text);
 }
 
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+.sonner-toast[data-type="warning"] {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-text);
+}
+
+.sonner-toast[data-type="info"] {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info-text);
 }
