@@ -13,9 +13,20 @@ from django.utils.html import strip_tags
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import datetime, timedelta
+from rest_framework.permissions import IsAuthenticated
 
 
 
+
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+
+class GoogleLogin(SocialLoginView): # if you want to use Authorization Code Grant, use this
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http:/localhost:5173"
+    client_class = OAuth2Client
 
 
 # # Otp Creation
@@ -43,7 +54,7 @@ def create_or_resend_otp(email):
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
     )
-
+    print('otp', otp)
     if send_otp_email(email,otp):
         return {"message": "OTP sent to your email. Please verify."}
     else:
@@ -130,10 +141,21 @@ class UserLoginView(APIView):
                     'message': 'Login successful'
                 }, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
-        except Student.DoesNotExist:
+             return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+        except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
+
+    
+
+
+    
+
+
+
+
+
+
 # # Admin Student List
 # class StudentListView(generics.ListAPIView):
 #     queryset = StudentUser.objects.all()
