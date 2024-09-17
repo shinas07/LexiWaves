@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../components/Layout";
 import { FlipWords } from "../components/ui/flip-words";
 import TypewriterEffect from "./TutorPags/TypeWriterEffect";
+import FloatingNavbar from "../components/Navbar";
+
 
 function Home() {
   return (
     <Layout>
-      <div className="relative mt-16 w-full min-h-screen flex flex-col">
+      {/* <FloatingNavbar/> */}
+      <div className="relative mt-32 w-full min-h-screen flex flex-col">
         <div className="flex-grow flex flex-col md:flex-row items-center justify-between px-2 md:px-6">
           {/* Text Section */}
           <div className="max-w-2xl text-left ml-8 md:ml-20 mr-8 md:mr-20 mb-8 md:mb-0">
@@ -38,49 +41,28 @@ function Home() {
             </div>
             <div>
               <img
-                src="https://learningforward.org/wp-content/uploads/2020/05/GettyImages-1220226088-scaled-1-2048x1366.jpg"
+                src="https://images.unsplash.com/photo-1584697964358-3e14ca57658b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Car view"
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
             <div>
               <img
-                src="	https://learningforward.org/wp-content/uploads/2020/05/GettyImages-1220226088-scaled-1-2048x1366.jpg"
+                src="	https://plus.unsplash.com/premium_photo-1663046035793-679dd6138c08?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Coffee"
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
-            <div className="col-span-2">
-              <div className="bg-green-400 rounded-lg p-4 h-full flex items-center justify-center">
-                <p className="text-white text-lg font-semibold">Share your weekend plans</p>
-              </div>
-            </div>
-            {/* <div>
-              <img
-                src="https://learningforward.org/wp-content/uploads/2020/05/GettyImages-1220226088-scaled-1-2048x1366.jpg"
-                alt="Airplane view"
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div> */}
-            <div>
-              <div className="bg-yellow-400 rounded-lg p-4 h-full flex items-center justify-center">
-                <p className="text-black text-lg font-semibold">Newcomer<br />10 courses</p>
-              </div>
-            </div>
-            <div>
-              <img
-                src="https://learningforward.org/wp-content/uploads/2020/05/GettyImages-1220226088-scaled-1-2048x1366.jpg"
-                alt="Garden view"
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
+          
           </div>
         </div>
 
         {/* TypewriterEffect Section */}
+       
         <div className="flex justify-center mt-12">
           <TypewriterEffect />
         </div>
+ 
       </div>
     </Layout>
   );
