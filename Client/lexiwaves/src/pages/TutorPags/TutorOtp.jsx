@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { DotBackground } from "../../components/Background";
 import { useNavigate } from "react-router-dom";
 import api from "../../service/api";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const TutorOtpVerification = () => {
   const [otp, setOtp] = useState("");
@@ -90,7 +90,7 @@ const TutorOtpVerification = () => {
         if (response.status === 201) {
             sessionStorage.removeItem('tempTutorData');
             toast.success('User created, log in to continue')
-            navigate('/signin');
+            navigate('/tutor-signin');
         } else{
       
             setErrorMessage(response.data.error || "Verification failed. Please check your OTP.");
