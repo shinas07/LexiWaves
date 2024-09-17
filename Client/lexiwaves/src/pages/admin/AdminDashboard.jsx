@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Sample Data for Charts
 const salesData = [
@@ -46,23 +47,40 @@ const SimpleLineChart = ({ data }) => (
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('access');
+    console.log('asd')
+    localStorage.removeItem('refresh');
+    navigate('/admin-login')
+  }
 
   return (
     <div className="flex h-screen font-sans bg-gray-900 text-gray-100">
       {/* Sidebar */}
       <aside className={`bg-gray-800 text-white transition-width duration-300 ${sidebarOpen ? 'w-64' : 'w-20'} overflow-hidden`}>
         <div className="p-5">
-          <h2 className={`text-xl font-bold mb-6 ${sidebarOpen ? 'block' : 'hidden'}`}>LexiWaves</h2>
-          <nav className='mt-12'>
-            <ul>
-              {['Dashboard', 'Courses', 'Students', 'Tutors', 'Analytics', 'Messages'].map((item, index) => (
+          <h2 className={`text-xl font-bold mb-6 ${sidebarOpen ? 'block' : 'hidden'}`}>LexiWaves Admin</h2>
+          <nav className='pt-12'>
+          <ul>
+            {[
+                { name: 'Dashboard', link: '/admin-dashboard' },
+                { name: 'Courses', link: '/courses' },
+                { name: 'Students', link: '/admin-students-list' },
+                { name: 'Tutors', link: '/admin-tutor-list' },
+                { name: 'Analytics', link: '/analytics' },
+                // { name: 'Logout', action: Logout }
+            ].map((item, index) => (
                 <li key={index} className="mb-6">
-                  <a href="#" className="text-gray-300 hover:text-gray-400 flex items-center">
-                    <span className={`ml-2 ${sidebarOpen ? 'block' : 'hidden'}`}>{item}</span>
-                  </a>
+                <a href={item.link} className="text-gray-300 hover:text-gray-400 flex items-center">
+                    <span className={`ml-2 ${sidebarOpen ? 'block' : 'hidden'}`}>{item.name}</span>
+                </a>
                 </li>
-              ))}
+            ))}
             </ul>
+            <button className='text-gray-300 hover:text-gray-400 flex items-center pl-2 ' onClick={handleLogout}>Logout</button>
+
           </nav>
         </div>
       </aside>
