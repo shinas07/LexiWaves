@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { DotBackground } from "../../components/Background";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "sonner";
 import { cn } from "../../lib/utils";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import api from "../../service/api";
