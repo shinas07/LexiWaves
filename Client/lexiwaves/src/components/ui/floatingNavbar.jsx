@@ -7,7 +7,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { cn } from "../../lib/utils";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 export const FloatingNav = ({
   navItems,
@@ -16,6 +16,7 @@ export const FloatingNav = ({
   const { scrollYProgress } = useScroll();
 
   const [visible, setVisible] = useState(true);
+  const navigate = useNavigate()
 
   useMotionValueEvent(scrollYProgress, "change", (current) => {
     // Check if current is not undefined and is a number
@@ -33,6 +34,10 @@ export const FloatingNav = ({
       }
     }
   });
+
+  const handleClick = ()=>{
+    navigate('/signin')
+  }
 
   return (
     (<AnimatePresence mode="wait">
@@ -64,10 +69,11 @@ export const FloatingNav = ({
           </Link>
         ))}
         <button
+        onClick={handleClick}
           className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full">
-          <span>Login</span>
+          <span>Sign In</span>
           <span
-            className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent  h-px" />
+            className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-teal-600 to-transparent  h-px" />
         </button>
       </motion.div>
     </AnimatePresence>)
