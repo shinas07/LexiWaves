@@ -5,17 +5,17 @@ import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 // import { }
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "sonner";
 import { DotBackground } from "../../components/Background";
 
 
 const TutorSignUP = () => {
     const [formData, setFormData] = useState({
-        firstname: '',
-        lastname: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
+        user_type:'tutor'
     })
   
 
@@ -27,10 +27,10 @@ const TutorSignUP = () => {
 
     const validate = () => {
         const errors = {};
-        const { firstname, lastname, email, password, confirm_password } = formData;
+        const { first_name, last_name, email, password, confirm_password } = formData;
     
-        if (!firstname.trim()) errors.firstname = "First name is required";
-        if (!lastname.trim()) errors.lastname = "Last name is required";
+        if (!first_name.trim()) errors.first_name = "First name is required";
+        if (!last_name.trim()) errors.last_name = "Last name is required";
         if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) errors.email = "Invalid email address";
         if (password.length < 8) errors.password = "Password must be at least 8 characters";
         if (!password.match(/[!@#$%^&*(),.?":{}|<>]/)) errors.password = "Password must contain a special character";
@@ -77,12 +77,23 @@ const TutorSignUP = () => {
     sessionStorage.setItem('tempTutorData', JSON.stringify(formData));
       navigate('/tutor-otp')
     } catch (error) {
-        const errorMessage = error.response?.data?.detail || 'Signup failed. Please try again.';
-        toast.error(errorMessage); // Display error in a toast
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      let errorMessage = 'Signup failed. Please try again.';
+        
+      if (error.response && error.response.data) {
+          // Handle specific backend error messages
+          const data = error.response.data;
+          if (data.error) {
+              errorMessage = data.error;
+          } else if (data.email) {
+              errorMessage = 'Email already registered.';
+          } else if (data.password) {
+              errorMessage = 'Passwords do not match.';
+          }
+      }
+
+      toast.error(errorMessage);
+    };
+  }
 
   return (
     <DotBackground>
@@ -98,14 +109,14 @@ const TutorSignUP = () => {
       <form className="my-8" onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
             <LabelInputContainer>
-              <Label htmlFor="firstname">First name</Label>
-              <Input id="firstname" value={formData.firstname} onChange={handleChange} placeholder="John" type="text" />
-              {errors.firstname && <p className="text-red-500 text-sm">{errors.firstname}</p>}
+              <Label htmlFor="first_name">First name</Label>
+              <Input id="first_name" value={formData.first_name} onChange={handleChange} placeholder="John" type="text" />
+              {errors.firstname && <p className="text-red-500 text-sm">{errors.first_name}</p>}
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="lastname">Last name</Label>
-              <Input id="lastname" value={formData.lastname} onChange={handleChange} placeholder="Doe" type="text" />
-              {errors.lastname && <p className="text-red-500 text-sm">{errors.lastname}</p>}
+              <Label htmlFor="last_name">Last name</Label>
+              <Input id="last_name" value={formData.last_name} onChange={handleChange} placeholder="Doe" type="text" />
+              {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name}</p>}
             </LabelInputContainer>
           </div>
           <LabelInputContainer className="mb-4">
