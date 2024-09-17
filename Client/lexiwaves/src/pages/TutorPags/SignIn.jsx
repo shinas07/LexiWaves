@@ -4,7 +4,9 @@ import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+
+
 
 
 const TutorLogin = () => {
