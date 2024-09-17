@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { DotBackground } from "../components/Background";
 import { useNavigate } from "react-router-dom";
 import api from "../service/api";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
@@ -52,7 +53,7 @@ const OtpVerification = () => {
     const email = localStorage.getItem('userEmail');
   
     try {
-      const response = await api.post('/api/resend-otp/', { email });
+      const response = await api.post('/user/resend-otp/', { email });
       toast.success(response.data.message || 'OTP sent successfully!');
       setShowResendButton(false);
       setTimeLeft(120);
@@ -83,7 +84,7 @@ const OtpVerification = () => {
     }
 
     try {
-        const response = await api.post('/api/verify-email/', {
+        const response = await api.post('/user/verify-email/', {
             email,
             otp,
             user_data: userData
@@ -93,7 +94,8 @@ const OtpVerification = () => {
         if (response.status === 201) {
             sessionStorage.removeItem('tempUserData');
             console.log('Verification successful!');
-            navigate('/signin', { state: { message: 'User created, log in to continue' } });
+            navigate('/signin');
+            toast.success('Signup successful! Please log in')
         } else{
       
             setErrorMessage(response.data.error || "Verification failed. Please check your OTP.");
