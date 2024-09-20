@@ -10,7 +10,10 @@ from accounts.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import UpdateAPIView
 from django.utils import timezone
-
+from .models import Language
+from .serializers import LanguageSerializer
+from rest_framework import viewsets
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 
@@ -103,3 +106,20 @@ class TutorApprovalUpdateView(UpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LanguageCreateView(APIView):
+    authentication_classes = [JWTAuthentication]  # Use JWTAuthentication for handling access tokens
+    def get(self, request, *args, **kwargs):
+        languages = Language.objects.all()
+        serializer = LanguageSerializer(languages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+    def post(self, request, *args, **kwargs):
+        serializer = LanguageSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"error": "Invalid data", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    

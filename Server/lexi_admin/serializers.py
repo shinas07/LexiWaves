@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from tutor.models import TutorDetails 
 from accounts.models import User
+from .models import Language
 
 
 class StudentListSerializer(serializers.ModelSerializer):
@@ -35,4 +36,7 @@ class TutorRequestSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = '__all__'
