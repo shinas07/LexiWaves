@@ -56,4 +56,38 @@ class TutorDetails(models.Model):
 
 
 
+class Course(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
+    ]
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    thumbnail_url = models.TextField(max_length=1000)
+    video_url = models.TextField(max_length=1000)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    duration = models.PositiveIntegerField(help_text="Duration in hours")
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+    
+
+class Lesson(models.Model):
+    course = models.ForeignKey(Course, related_name='lessons', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True) 
+    video_url = models.TextField(max_length=1000)  
+    order = models.PositiveIntegerField()  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.title} ({self.course.title})'
 

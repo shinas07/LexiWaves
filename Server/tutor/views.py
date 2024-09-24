@@ -1,31 +1,47 @@
 from datetime import timedelta
 from django.shortcuts import get_object_or_404, render
+from django.http import JsonResponse
 
 # Create your views here.
-from rest_framework import status, generics
+from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import  TutorSerializer, TutorDetailsSerializer
+from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from .models import TutorOTPVerification,Tutor
+from .models import TutorOTPVerification,Tutor, Course, TutorDetails
 from django.utils import timezone
 from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import User
 from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import IsAuthenticated
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
+import uuid
 
 
+
+class TokenRefreshView(APIView):
+    def post(self, request):
+        refresh = request.data.get('refresh')
+        try:
+            refresh_token = RefreshToken(refresh)
+            access = str(refresh_token.access_token)
+            return Response({'access': access}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
 
 def send_otp_email(email, otp):
+
     subject = 'Verify you email'
     html_message = render_to_string('otp_temp.html', {'otp': otp})
     plain_message = strip_tags(html_message)
@@ -56,13 +72,13 @@ def create_or_resend_otp(email):
 class TutorSignUpView(APIView):
     def post(self, request):
         serializer = TutorSerializer(data=request.data)
-        print(request.data)
+  
         if serializer.is_valid():
             email = serializer.validated_data['email']
 
             # Generate or resend OTP
             response = create_or_resend_otp(email)
-            print(response)
+   
             if 'error' in response:
                 
                 return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -130,26 +146,38 @@ class TutorResendOtpView(APIView):
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(response, status=status.HTTP_200_OK)
 
-
-
 class TutorLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        print('haai', email,password)
 
         try:
-            # Manually fetch the user based on email
-            tutor = User.objects.get(email=email)
-         
 
-            if tutor.user_type == 'tutor' and check_password(password, tutor.password):
-                refresh = RefreshToken.for_user(tutor)
-                
+            tutor_user = User.objects.get(email=email)
+            
+
+            if tutor_user.user_type == 'tutor' and check_password(password, tutor_user.password):
+                refresh = RefreshToken.for_user(tutor_user)
+
+                try:
+                    tutor = Tutor.objects.get(user=tutor_user)
+                    print("Fetched Tutor:", tutor)
+                    
+          
+                    tutor_details = TutorDetails.objects.get(tutor_id=tutor.id)
+               
+                    print("Tutor Details:", tutor_details)
+                    has_submitted_details = bool(tutor_details.phone_number)
+                    print(has_submitted_details)
+
+                except TutorDetails.DoesNotExist:
+                    has_submitted_details = False
+
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'message': 'Login successful'
+                    'message': 'Login successful',
+                    'has_submitted_details': has_submitted_details
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Invalid user type or password'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -157,12 +185,14 @@ class TutorLoginView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
 
+ 
 
 
-class TutorDetails(APIView):
+class TutorDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        print('tutor details',request.data)
 
         serializer = TutorDetailsSerializer(data=request.data, context={'request': request})
         
@@ -180,3 +210,97 @@ class TutorDetails(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
     
+
+
+
+class CourseCreationViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Extract file data
+        print('POST Data:', request.POST)
+        print('FILES:', request.FILES)
+        thumbnail = request.FILES.get('formData[thumbnail]')
+        video = request.FILES.get('formData[video]')
+        print('Thumbnail:', thumbnail)
+        print('Video:', video)
+
+        if not thumbnail or not video:
+            return Response({'error': 'Both thumbnail and video are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Upload files to S3
+        s3_client = boto3.client('s3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        try:
+            # Upload thumbnail
+            thumbnail_key = f'course_thumbnails/{uuid.uuid4()}-{thumbnail.name}'
+            s3_client.upload_fileobj(thumbnail, settings.AWS_STORAGE_BUCKET_NAME, thumbnail_key)
+            thumbnail_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{thumbnail_key}'
+
+            # Upload video
+            video_key = f'course_videos/{uuid.uuid4()}-{video.name}'
+            s3_client.upload_fileobj(video, settings.AWS_STORAGE_BUCKET_NAME, video_key)
+            video_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{video_key}'
+            print('Uploaded URLs:', thumbnail_url, video_url)
+
+        except ClientError as e:
+            print('S3 Upload Error:', str(e))
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create course object
+        course_data = {
+            'title': request.data.get('formData[title]'),
+            'description': request.data.get('formData[description]'),
+            'category': request.data.get('formData[category]'),
+            'price': request.data.get('formData[price]'),
+            'duration': request.data.get('formData[duration]'),
+            'difficulty': request.data.get('formData[difficulty]'),
+            'thumbnail_url': thumbnail_url,
+            'video_url': video_url
+        }
+        print("Data passed to serializer:", course_data)
+
+        serializer = self.get_serializer(data=course_data)
+        
+        # Debug serializer validation
+        if not serializer.is_valid():
+            print("Serializer validation failed:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        self.perform_create(serializer)
+
+        # Get response headers
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class TutorCreatedCoursesView(generics.ListAPIView):
+    """
+    This view will return a list of courses created by the authenticated tutor.
+    """
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter courses by the logged-in tutor
+        tutor = self.request.user  # Assuming the tutor is linked to the user
+        return Course.objects.filter(tutor=tutor)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            if not queryset.exists():
+                return Response({"message": "You have not created any courses yet."}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Serialize the queryset
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
