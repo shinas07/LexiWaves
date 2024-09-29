@@ -10,9 +10,11 @@ export default function StudentsPage() {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const token = localStorage.getItem("access");
+        const token = localStorage.getItem("accessToken");
+        console.log('token',token);
+        
         const response = await api.get("/lexi-admin/students-list/", {
-          header: {
+          headers: {
             Authorization: `Bearer ${token}`,
           },
         });

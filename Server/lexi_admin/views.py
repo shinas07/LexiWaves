@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from tutor.models import Tutor, TutorDetails
-from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer,TutorRequestSerializer
+from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer, TutorRequestSerializer, StudentCourseEnrollmentListSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -14,6 +14,9 @@ from .models import Language
 from .serializers import LanguageSerializer
 from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404
+from tutor.models import Course
+from .models import StudentCourseEnrollment
 
 # Create your views here.
 
@@ -42,35 +45,38 @@ class AdminLoginView(APIView):
 
 
 class StudentListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        permission_classes = [IsAuthenticated] 
         student = User.objects.filter(user_type='student')
         serializer = StudentListSerializer(student, many=True)
         return Response(serializer.data)
 
 # Admin Tutor List
 class ApprovedTutorListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        permission_classes = [IsAuthenticated]
         tutor = User.objects.filter(user_type='tutor',
         tutor_profile__tutordetails__admin_approved=True)
         serializer = TutorListSerializer(tutor, many=True)
         return Response(serializer.data)
     
 
+
 class TutorApprovalView(generics.ListAPIView):
     queryset = TutorDetails.objects.all()
     serializer_class = TutorDetailsSerializer
 
+#Admin Tutor request List View
 class TutorRequests(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    permission_classes = [IsAuthenticated]  
 
     def get(self, request):
-        tutors = User.objects.filter(user_type='tutor') 
+        tutors = User.objects.filter(user_type='tutor', tutor_profile__tutordetails__admin_approved=False) 
         serializer = TutorRequestSerializer(tutors, many=True) 
         return Response(serializer.data)
 
-from django.shortcuts import get_object_or_404
+
 
 class TutorRequestDetails(APIView):
     permission_classes = [IsAuthenticated]
@@ -82,31 +88,28 @@ class TutorRequestDetails(APIView):
         return Response(serializer.data)
 
 
-# Tutor Approval
-class TutorApprovalUpdateView(UpdateAPIView):
+class TutorApprovalUpdateView(APIView):
     permission_classes = [IsAuthenticated]
-    queryset = TutorDetails.objects.all()
-    serializer_class = TutorDetailsSerializer
-    lookup_field = 'id'
 
-    def get_object(self):
-        # Use 'tutorId' from the URL to get the object
-        tutor_id = self.kwargs.get('tutorId')
-        return TutorDetails.objects.get(id=tutor_id)
+    def patch(self, request, tutor_id):
+        try:
+            tutor = Tutor.objects.get(user__id=tutor_id)
+            tutor_details = TutorDetails.objects.get(tutor=tutor)
 
-    def patch(self, request, *args, **kwargs):
-        tutor_detail = self.get_object()
+            if tutor_details.admin_approved:
+                return Response({"message": "Tutor is already approved."}, status=status.HTTP_400_BAD_REQUEST)
+
+            approval_status = request.data.get('admin_approved', True)
+            tutor_details.admin_approved = approval_status
+            tutor_details.approval_date = timezone.now()
+            tutor_details.save()
+            return Response({"message": "Tutor approval updated successfully."}, status=status.HTTP_200_OK)
+        except TutorDetails.DoesNotExist:
+            return Response({"message": "Tutor details not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
     
+            return Response({"message": "An error occurred while updating tutor approval."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        if 'admin_approved' in request.data:
-            tutor_detail.admin_approved = request.data['admin_approved']
-            tutor_detail.approval_date = timezone.now() if tutor_detail.admin_approved else None
-            tutor_detail.save()
-            serializer = self.get_serializer(tutor_detail)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LanguageCreateView(APIView):
     authentication_classes = [JWTAuthentication]  # Use JWTAuthentication for handling access tokens
@@ -123,3 +126,17 @@ class LanguageCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({"error": "Invalid data", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
+
+# Listing Enrolled Courses and Student
+
+class EnrolledCoursesListView(generics.ListAPIView):
+    queryset = StudentCourseEnrollment.objects.select_related('user', 'course').all()
+    serializer_class = StudentCourseEnrollmentListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # Call the superclass method to get the response
+        response = super().get(request, *args, **kwargs)
+        print(response)
+        return response  # This will return the serialized data as a JSON response
+

@@ -2,8 +2,6 @@ import React, { useEffect } from "react";
 import Layout from "../components/Layout";
 import { FlipWords } from "../components/ui/flip-words";
 import TypewriterEffect from "./TutorPags/TypeWriterEffect";
-import FloatingNavbar from "../components/Navbar";
-
 
 function Home() {
   return (

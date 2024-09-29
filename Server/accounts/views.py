@@ -1,7 +1,11 @@
 from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
+<<<<<<< Updated upstream
 from .serializers import UserSerializer, StudentListSerializer
+=======
+from .serializers import UserSerializer, StudentListSerializer, CourseSerializer,CourseDetailSerializer, StudentCourseEnrollmentSerializer,CourseWatchSerializer
+>>>>>>> Stashed changes
 from .models import  OTPVerification, Student,User
 import random
 from django.core.mail import send_mail
@@ -17,6 +21,7 @@ from datetime import datetime, timedelta
 from rest_framework.permissions import IsAuthenticated
 
 
+from lexi_admin.models import StudentCourseEnrollment
 
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -153,15 +158,136 @@ class UserLoginView(APIView):
 
 
 
+<<<<<<< Updated upstream
+=======
+#Enroll Course Video
+class CourseVideoView(APIView):
+    def get(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+            video_url = course.video_url
+            return Response({"video_url": video_url}, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# Stripe Payment option for user
+
+from django.conf import settings
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+class CreateCheckoutSession(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            course_id = request.data.get('course_id')
+            user = request.user  
+            course = Course.objects.get(id=course_id)
+
+            success_url = f"{settings.FRONTEND_URL}/success?session_id={{CHECKOUT_SESSION_ID}}"
+            cancel_url = f"{settings.FRONTEND_URL}/cancel"
+
+    
+
+            # Create a Stripe checkout session
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[
+                    {
+                        'price_data': {
+                            'currency': 'usd',
+                            'unit_amount': int(course.price * 100),  # Stripe uses cents
+                            'product_data': {
+                                'name': course.title,
+                            },
+                        },
+                        'quantity': 1,
+                    },
+                ],
+                mode='payment',
+                success_url=success_url,
+                cancel_url=cancel_url,
+            )
+
+            StudentCourseEnrollment.objects.create(
+                user=user,
+                course=course,
+                payment_status='completed',
+                amount_paid=course.price
+            )
+
+            return Response({'id': checkout_session.id}, status=status.HTTP_201_CREATED)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print('bad request error', str(e))
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+# User Enrolled Courses
+class UserEnrolledCourses(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class =  StudentCourseEnrollmentSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return StudentCourseEnrollment.objects.filter(user=user).select_related('course').order_by('-created_at')
+    
+
+# User coruseWating
+
+>>>>>>> Stashed changes
 
 
+class WatchCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, courseId):  
+        user = request.user
+        print(user)
+        print(f"User: {user}, Course ID: {courseId}")
+    
+        try:
+            # Check if the user is enrolled in the course and payment is completed
+            enrollment = StudentCourseEnrollment.objects.get(user=user, id=courseId, payment_status='completed')
+           
+            
+        except StudentCourseEnrollment.DoesNotExist:
+            return Response({"error": "You are not enrolled in this course or payment is pending."}, status=status.HTTP_403_FORBIDDEN)
+    
+        try:
+            # Fetch the course along with its lessons
+            course = Course.objects.prefetch_related('lessons').get(id=24)
+            serializer = CourseWatchSerializer(course)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
 
+<<<<<<< Updated upstream
 # # Admin Student List
 # class StudentListView(generics.ListAPIView):
 #     queryset = StudentUser.objects.all()
 #     serializer_class = StudentListSerializer
 
+=======
+# Checking user is already enrolledCourse
+class CheckEnrollmentView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+>>>>>>> Stashed changes
 
+    def get(self, request, courseId):
+        enrollment = StudentCourseEnrollment.objects.filter(user=request.user, course__id=courseId).first()
+        if enrollment:
+            return Response({'enrolled':True}, status=200)
+        return Response({'enrolled':False}, status=200)
 
+# # Course Review Option
+# class CourseReviewView(generics.ListCreateAPIView):
+#     permission_classes = [IsAuthenticated]
 
+#     def get_queryset(self):
+#         course_id = self.kwargs['course_id']
+#         return CourseReview.objects.filter(course__id=course_id)
 
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)

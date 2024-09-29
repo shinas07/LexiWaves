@@ -43,7 +43,7 @@ const Login = () => {
               accessToken: access,  
               refreshToken: refresh 
           }));
-            toast.success('Login succesful!')
+            toast.success('Login successful!')
             navigator('/');
         }catch(error){
             if (error.response && error.response.status === 401) {

@@ -5,8 +5,7 @@ import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
 import { toast } from "sonner";
-
-
+import { useDispatch } from "react-redux";
 
 
 const TutorLogin = () => {
@@ -14,6 +13,7 @@ const TutorLogin = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,14 +23,25 @@ const TutorLogin = () => {
         password,
       });
 
+      // dispatch(tutorLogin({
+      //   user : {email},
+      //   accessToken: response.data.access,
+      //   refreshToken: response.data.refresh,
+      // }))
+      
 
       localStorage.setItem("tutor", JSON.stringify({ email }));
       sessionStorage.setItem("access", response.data.access);
       sessionStorage.setItem("refresh", response.data.refresh);
 
-
-      toast.success("Tutor login successful");
-      navigate("/tutor-setup"); // Redirect to the tutor dashboard
+      console.log('backend responce', response.data.has_submitted_details)
+      if (response.data.has_submitted_details) {
+        toast.success('Tutor Login Successful');
+        navigate("/tutor-dashboard");
+      } else {
+        toast.info('Please complete your details');
+        navigate("/tutor-details");
+      }
     } catch (error) {
       if (error.response && error.response.status === 401) {
         toast.error("Invalid email or password");

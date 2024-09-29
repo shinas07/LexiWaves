@@ -13,9 +13,14 @@ import OtpVerification from "./pages/UserPages.jsx/UserOtpPage";
 
 //User page imports
 import UserAccountPage from "./pages/UserPages.jsx/UserAccountPage";
+import CourseDetail from "./pages/UserPages.jsx/CourseDetails";
+import CourseList from "./pages/UserPages.jsx/CoursePage";
+import CourseVideo from "./pages/UserPages.jsx/CourseVideo";
+import SuccessPage from "./pages/UserPages.jsx/PaymentSuccessPage";
+import UserEnrolledCoursesPage from "./pages/UserPages.jsx/EnrolledCourses";
+import CourseWatchingPage from "./pages/UserPages.jsx/CourseWatching";
+import SettingsPage from "./pages/UserPages.jsx/AccountSettings";
 
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css'; // Import default styles
 
 import { Toaster } from "sonner";
 
@@ -26,6 +31,9 @@ import TutorLogin from "./pages/TutorPags/SignIn";
 import TutorSetup from "./pages/TutorPags/TutorSetup ";
 import TutorHomePage from "./pages/TutorPags/TutorDashboard";
 import TutorDetails from "./pages/TutorPags/TutorDetails";
+import TutorCreatedCourses from "./pages/TutorPags/CreatedCourses";
+import EnrolledCoursesListTutorSide from "./pages/TutorPags/EnrolledCoruseListTutor";
+
 
 // Admin pages import
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -36,9 +44,14 @@ import AdminSignup from "./pages/admin/SignIn";
 import CreateCoursePage from "./pages/TutorPags/CourseCreation";
 import TutorDetail from "./pages/admin/TutorDetail";
 import AdminLanguages from "./pages/admin/LanguageCreate";
+import EnrolledCourses from "./pages/admin/EnrolledCoursesList";
 // import  CustomToaster  from './pages/CustomToaster';
 import { useSelector } from "react-redux";
-import CourseList from "./pages/UserPages.jsx/CoursePage";
+import { ImageOff } from "lucide-react";
+
+
+
+
 //Redux
 const App = () => {
   const isAuthenticatedUser = useSelector((state) => state.auth.isAuthenticated);
@@ -68,14 +81,22 @@ const App = () => {
           <Route path="/user-account" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <UserAccountPage />
             }
           />
+          <Route path="/settings" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <SettingsPage />} />
           <Route path="/courses" element={<CourseList/>}></Route>
+          <Route path="/course/:id" element={<CourseDetail/>}/>
+          <Route path='course-enroll/:id' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseVideo/>}/>
+          <Route path='/success' element={<SuccessPage/>}/>
+          <Route path='/enrolled-courses' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <UserEnrolledCoursesPage/>}/>
+            <Route path="/watch-course/:courseId"  element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseWatchingPage/>}/>
+
+
+
+
+
+
 
           {/* Tutors routes here */}
-
-
-
-       
-
+  
           <Route
           path="/tutor-signup"
           element={<ProtectedRoute><TutorSignUP /></ProtectedRoute>}/>
@@ -90,7 +111,10 @@ const App = () => {
           <Route path="/tutor-details" element={<TutorDetails />} />
           <Route path="/tutor-reqeusts" element={<TutorRequests />} />
           <Route path="/tutor-create-course" element={<CreateCoursePage />} />
-          
+          <Route path="/tutor-course-list" element={<TutorCreatedCourses/>}></Route>
+          <Route path="/tutor-enrolled-course-list" element={<EnrolledCoursesListTutorSide/>}></Route>
+
+            
 
 
 
@@ -104,6 +128,7 @@ const App = () => {
             element={<TutorDetail />}
           />
           <Route path="/admin-language" element={<AdminLanguages/>}/>
+          <Route path='/admin/enrolled-courses/' element={<EnrolledCourses/>}/>
         </Routes>
       </Router>
     </div>

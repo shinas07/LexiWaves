@@ -13,41 +13,41 @@ const TutorDetails = () => {
   const [formData, setFormData] = useState({
     // Personal Information
     profilePicture: null,
-    phoneNumber: "",
+    phone_number: "",
     address: "",
     biography:"",
 
     // Education & Qualifications
     degrees: "",
     certifications: "",
-    educationalInstitutions: "",
-    relevantCourses: "",
+    educational_institutions: "",
+    relevant_courses: "",
 
     // Professional Experience
-    workHistory: "",
-    currentPosition: "",
-    teachingExperience: "",
+    work_history: "",
+    current_position: "",
+    teaching_experience: "",
 
     // Teaching Subjects and Skills
-    subjectsOffered: "",
-    skillLevels: "",
+    subjects_offered: "",
+    skill_levels: "",
 
     // Additional Documents
-    teachingLicense: null,
+    teaching_license: null,
 
     // Fee Structure
-    hourlyRate: "",
-    paymentMethods: "",
+    hourly_rate: "",
+    payment_methods: "",
 
     // Personal Statement
-    personalStatement: "",
+    personal_statement: "",
 
     // Verification Documents
-    identityProof: null,
+    identity_proof: null,
 
     // Consent and Agreements
-    termsOfService: false,
-    privacyPolicy: false,
+    terms_of_service: false,
+    privacy_policy: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -86,7 +86,8 @@ const TutorDetails = () => {
 
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'  // Adjust if you're sending FormData
+          // 'Content-Type': 'application/json'  // Adjust if you're sending FormData
+          'Content-Type': 'multipart/form-data',
       }
 
       
@@ -143,10 +144,10 @@ const TutorDetails = () => {
         />
     </LabelInputContainer>
     <LabelInputContainer>
-        <Label htmlFor="phoneNumber">Phone Number</Label>
+        <Label htmlFor="phone_number">Phone Number</Label>
         <Input
-            id="phoneNumber"
-            value={formData.phoneNumber}
+            id="phone_number"
+            value={formData.phone_number}
             onChange={handleChange}
             placeholder="Your phone number"
             type="tel"
@@ -225,22 +226,22 @@ const TutorDetails = () => {
               />
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="educationalInstitutions">
+              <Label htmlFor="educational_institutions">
                 Educational Institutions
               </Label>
               <Input
-                id="educationalInstitutions"
-                value={formData.educationalInstitutions}
+                id="educational_institutions"
+                value={formData.educational_institutions}
                 onChange={handleChange}
                 placeholder="Institutions attended"
                 type="text"
               />
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="relevantCourses">Relevant Courses</Label>
+              <Label htmlFor="relevant_courses">Relevant Courses</Label>
               <Input
-                id="relevantCourses"
-                value={formData.relevantCourses}
+                id="relevant_courses"
+                value={formData.relevant_courses}
                 onChange={handleChange}
                 placeholder="Additional courses or workshops"
                 type="text"
@@ -254,30 +255,30 @@ const TutorDetails = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="workHistory">Work History</Label>
+              <Label htmlFor="work_history">Work History</Label>
               <Input
-                id="workHistory"
-                value={formData.workHistory}
+                id="work_history"
+                value={formData.work_history}
                 onChange={handleChange}
                 placeholder="Your work history"
                 type="text"
               />
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="currentPosition">Current Position</Label>
+              <Label htmlFor="current_position">Current Position</Label>
               <Input
-                id="currentPosition"
-                value={formData.currentPosition}
+                id="current_position"
+                value={formData.current_position}
                 onChange={handleChange}
                 placeholder="Your current position"
                 type="text"
               />
             </LabelInputContainer>
             <LabelInputContainer className="md:col-span-2">
-              <Label htmlFor="teachingExperience">Teaching Experience</Label>
+              <Label htmlFor="teaching_experience">Teaching Experience</Label>
               <Input
-                id="teachingExperience"
-                value={formData.teachingExperience}
+                id="teaching_experience"
+                value={formData.teaching_experience}
                 onChange={handleChange}
                 placeholder="Your teaching experience"
                 type="text"
@@ -291,20 +292,20 @@ const TutorDetails = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="subjectsOffered">Subjects Offered</Label>
+              <Label htmlFor="subjects_offered">Subjects Offered</Label>
               <Input
-                id="subjectsOffered"
-                value={formData.subjectsOffered}
+                id="subjects_offered"
+                value={formData.subjects_offered}
                 onChange={handleChange}
                 placeholder="Subjects you can teach"
                 type="text"
               />
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="skillLevels">Skill Levels</Label>
+              <Label htmlFor="skill_levels">Skill Levels</Label>
               <Input
-                id="skillLevels"
-                value={formData.skillLevels}
+                id="skill_levels"
+                value={formData.skill_levels}
                 onChange={handleChange}
                 placeholder="Beginner, Intermediate, Advanced"
                 type="text"
@@ -318,8 +319,8 @@ const TutorDetails = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="teachingLicense">Teaching License</Label>
-              <Input id="teachingLicense" onChange={handleChange} type="file" />
+              <Label htmlFor="teaching_license">Teaching License</Label>
+              <Input id="teaching_license" onChange={handleChange} type="file" />
             </LabelInputContainer>
           </div>
 
@@ -329,20 +330,20 @@ const TutorDetails = () => {
           <h3 className="font-semibold text-lg mt-8 mb-4">Fee Structure</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="hourlyRate">Hourly Rate</Label>
+              <Label htmlFor="hourly_rate">Hourly Rate</Label>
               <Input
-                id="hourlyRate"
-                value={formData.hourlyRate}
+                id="hourly_rate"
+                value={formData.hourly_rate}
                 onChange={handleChange}
                 placeholder="Your hourly rate"
                 type="text"
               />
             </LabelInputContainer>
             <LabelInputContainer>
-              <Label htmlFor="paymentMethods">Payment Methods</Label>
+              <Label htmlFor="payment_methods">Payment Methods</Label>
               <Input
-                id="paymentMethods"
-                value={formData.paymentMethods}
+                id="payment_methods"
+                value={formData.payment_methods}
                 onChange={handleChange}
                 placeholder="Accepted payment methods"
                 type="text"
@@ -356,10 +357,10 @@ const TutorDetails = () => {
           </h3>
           <div className="grid grid-cols-1 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="personalStatement">Personal Statement</Label>
+              <Label htmlFor="personal_statement">Personal Statement</Label>
               <textarea
-                id="personalStatement"
-                value={formData.personalStatement}
+                id="personal_statement"
+                value={formData.personal_statement}
                 onChange={handleChange}
                 placeholder="Your teaching philosophy and approach"
                 className="flex h-32 w-full rounded-md bg-background px-3 py-2 text-sm text-white ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-neutral-800"
@@ -373,8 +374,8 @@ const TutorDetails = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="identityProof">Identity Proof</Label>
-              <Input id="identityProof" onChange={handleChange} type="file" />
+              <Label htmlFor="identity_proof">Identity Proof</Label>
+              <Input id="identity_proof" onChange={handleChange} type="file" />
             </LabelInputContainer>
           </div>
 
@@ -386,8 +387,8 @@ const TutorDetails = () => {
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="termsOfService"
-                checked={formData.termsOfService}
+                id="terms_of_service"
+                checked={formData.terms_of_service}
                 onChange={handleChange}
                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
@@ -401,8 +402,8 @@ const TutorDetails = () => {
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="privacyPolicy"
-                checked={formData.privacyPolicy}
+                id="privacy_policy"
+                checked={formData.privacy_policy}
                 onChange={handleChange}
                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
@@ -421,7 +422,7 @@ const TutorDetails = () => {
             </button>
           </div>
         </form>
-        <ToastContainer />
+        {/* <ToastContainer /> */}
       </div>
     
 

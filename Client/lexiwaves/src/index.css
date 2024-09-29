@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 
+html{
+  overflow: scroll;
+}
+
+html::-webkit-scrollbar{
+  display: none;
+}
+
 /* Apply dark mode globally */
 /* .dark {
     @apply bg-gray-900 text-white; /* Example: Set background to dark and text to light */

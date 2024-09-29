@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+# from tutor.models import Course
+
 
 # All user model
 class CustomUserManager(BaseUserManager):
@@ -55,54 +57,19 @@ class Student(models.Model):
         return f"Student: {self.user.get_full_name()}"
 
     
-
-
-
-
-
-
-
-
-# from django.db import models
-# from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-# from django.utils.translation import gettext_lazy as _
-
-# class StudentUserManager(BaseUserManager):
-#     def create_user(self, email, password=None, **extra_fields):
-#         if not email:
-#             raise ValueError(_('The Email field must be set'))
-#         email = self.normalize_email(email)
-#         user = self.model(email=email, **extra_fields)
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
-
-# class StudentUser(AbstractBaseUser, PermissionsMixin):
-#     email = models.EmailField(_('email address'), unique=True)
-#     password = models.CharField(max_length=128)
-#     first_name = models.CharField(max_length=30)
-#     last_name = models.CharField(max_length=30)
-#     is_active = models.BooleanField(default=True)
-#     date_joined = models.DateTimeField(auto_now_add=True)
-
-#     objects = StudentUserManager()
-
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = ['first_name', 'last_name']
-
-#     def __str__(self):
-#         return f"{self.first_name} {self.last_name}"
-
-#     class Meta:
-#         verbose_name = 'Student'
-#         verbose_name_plural = 'Students'
-
-
-
-
-
 class OTPVerification(models.Model):
     email = models.EmailField()
     otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     
+
+# Course Review
+# class CourseReview(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+#     rating = models.PositiveIntegerField()  # Assuming a rating out of 5
+#     comment = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f'Review by {self.user.email} for {self.course.title}'

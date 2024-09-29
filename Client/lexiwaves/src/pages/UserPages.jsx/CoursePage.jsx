@@ -7,6 +7,7 @@ import FloatingNavbar from '../../components/Navbar';
 import { VanishSearchBarUi } from '../../components/ui/vanish-SearchBar';
 
 
+
 const CourseCard = ({ course }) => (
 
   <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105">

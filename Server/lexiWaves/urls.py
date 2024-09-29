@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
+from accounts.views import GoogleLogin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,7 +34,12 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
+
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('dj-rest-auth/google/', GoogleLogin.as_view(), name='google_login')
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer
+from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer,LessonSerializer, CourseWithStudentsSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -23,7 +23,7 @@ import boto3
 from botocore.exceptions import ClientError
 from django.conf import settings
 import uuid
-
+from lexi_admin.models import StudentCourseEnrollment
 
 
 class TokenRefreshView(APIView):
@@ -213,24 +213,34 @@ class TutorDetailsView(APIView):
 
 
 
+
+import json
+
 class CourseCreationViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Extract file data
         print('POST Data:', request.POST)
         print('FILES:', request.FILES)
-        thumbnail = request.FILES.get('formData[thumbnail]')
-        video = request.FILES.get('formData[video]')
-        print('Thumbnail:', thumbnail)
-        print('Video:', video)
 
-        if not thumbnail or not video:
-            return Response({'error': 'Both thumbnail and video are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Extract course data
+        course_data = {
+            'title': request.data.get('title'),
+            'description': request.data.get('description'),
+            'category': request.data.get('category'),
+            'price': request.data.get('price'),
+            'duration': request.data.get('duration'),
+            'difficulty': request.data.get('difficulty'),
+        }
 
-        # Upload files to S3
+        # Upload thumbnail and preview video
+        thumbnail = request.FILES.get('thumbnail')
+        video_url = request.FILES.get('video_url')
+
+        if not thumbnail or not video_url:
+            return Response({'error': 'Both thumbnail and preview video are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
         s3_client = boto3.client('s3',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
@@ -241,49 +251,69 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
             # Upload thumbnail
             thumbnail_key = f'course_thumbnails/{uuid.uuid4()}-{thumbnail.name}'
             s3_client.upload_fileobj(thumbnail, settings.AWS_STORAGE_BUCKET_NAME, thumbnail_key)
-            thumbnail_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{thumbnail_key}'
+            course_data['thumbnail_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{thumbnail_key}'
 
-            # Upload video
-            video_key = f'course_videos/{uuid.uuid4()}-{video.name}'
-            s3_client.upload_fileobj(video, settings.AWS_STORAGE_BUCKET_NAME, video_key)
-            video_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{video_key}'
-            print('Uploaded URLs:', thumbnail_url, video_url)
+            # Upload preview video
+            preview_video_key = f'course_previews/{uuid.uuid4()}-{video_url.name}'
+            s3_client.upload_fileobj(video_url, settings.AWS_STORAGE_BUCKET_NAME, preview_video_key)
+            course_data['video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{preview_video_key}'
+
+            print('Uploaded URLs:', course_data['thumbnail_url'], course_data['video_url'])
 
         except ClientError as e:
             print('S3 Upload Error:', str(e))
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Create course object
-        course_data = {
-            'title': request.data.get('formData[title]'),
-            'description': request.data.get('formData[description]'),
-            'category': request.data.get('formData[category]'),
-            'price': request.data.get('formData[price]'),
-            'duration': request.data.get('formData[duration]'),
-            'difficulty': request.data.get('formData[difficulty]'),
-            'thumbnail_url': thumbnail_url,
-            'video_url': video_url
-        }
-        print("Data passed to serializer:", course_data)
 
-        serializer = self.get_serializer(data=course_data)
+        # Process lessons
         
-        # Debug serializer validation
+        lessons_data = []
+        lessons = request.data.get('lessons')
+        if lessons:
+            lessons = json.loads(lessons)
+            for lesson in lessons:
+                lesson_video = request.FILES.get(f'lesson_{lesson["order"]}_video')
+                if lesson_video:
+                    try:
+                        lesson_video_key = f'lesson_videos/{uuid.uuid4()}-{lesson_video.name}'
+                        s3_client.upload_fileobj(lesson_video, settings.AWS_STORAGE_BUCKET_NAME, lesson_video_key)
+                        # Change this line
+                        lesson['lesson_video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{lesson_video_key}'
+                    except ClientError as e:
+                        print(f'S3 Upload Error for lesson {lesson["order"]} video:', str(e))
+                        return Response({'error': f'Error uploading video for lesson {lesson["order"]}'}, status=status.HTTP_400_BAD_REQUEST)
+                lessons_data.append(lesson)
+        # lesson_count = int(request.data.get('lesson_count', 0))
+        # for i in range(lesson_count):
+        #     lesson = {
+        #         'title': request.data.get(f'lesson_{i}_title'),
+        #         'description': request.data.get(f'lesson_{i}_description'),
+        #         'order': i + 1
+        #     }
+        #     lesson_video = request.FILES.get(f'lesson_{i}_video')
+        #     if lesson_video:
+        #         try:
+        #             lesson_video_key = f'lesson_videos/{uuid.uuid4()}-{lesson_video.name}'
+        #             s3_client.upload_fileobj(lesson_video, settings.AWS_STORAGE_BUCKET_NAME, lesson_video_key)
+        #             lesson['lesson_video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{lesson_video_key}'
+        #         except ClientError as e:
+        #             print(f'S3 Upload Error for lesson {i} video:', str(e))
+        #             return Response({'error': f'Error uploading video for lesson {i+1}'}, status=status.HTTP_400_BAD_REQUEST)
+        #     lessons_data.append(lesson)
+
+        course_data['lessons'] = lessons_data
+
+        serializer = CourseSerializer(data=course_data, context={'request': request})
         if not serializer.is_valid():
             print("Serializer validation failed:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        self.perform_create(serializer)
 
-        # Get response headers
+        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class TutorCreatedCoursesView(generics.ListAPIView):
-    """
-    This view will return a list of courses created by the authenticated tutor.
-    """
+
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
 
@@ -304,3 +334,17 @@ class TutorCreatedCoursesView(generics.ListAPIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+# Listing all Enrolled CourseList
+class EnrolledCoursesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        tutor_courses = Course.objects.filter(tutor=user)
+        enrollments = StudentCourseEnrollment.objects.filter(user=user, course__in=tutor_courses)
+        
+        courses = [enrollment.course for enrollment in enrollments]
+        serializer = CourseWithStudentsSerializer(courses, many=True)
+        return Response(serializer.data)

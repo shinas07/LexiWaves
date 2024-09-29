@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TutorApprovalView, AdminLoginView,StudentListView,ApprovedTutorListView,TutorRequests, TutorRequestDetails, TutorApprovalUpdateView, LanguageCreateView
+from .views import TutorApprovalView, AdminLoginView,StudentListView,ApprovedTutorListView,TutorRequests, TutorRequestDetails, TutorApprovalUpdateView, LanguageCreateView, EnrolledCoursesListView
 
 urlpatterns = [
     path('admin-login/',AdminLoginView.as_view(), name='admin-login'),
@@ -8,8 +8,10 @@ urlpatterns = [
     path('tutor-approval-list/',TutorApprovalView.as_view(), name='tutor-approval'),
     path('tutor-requests/', TutorRequests.as_view(), name='tutor-requests'),
     path('tutor-details/<int:tutor_id>/',TutorRequestDetails.as_view(), name='tutor-details'),
-    path('tutor-details/approve/<int:tutorId>/', TutorApprovalUpdateView.as_view(), name='update-tutor-approval'),
+    path('tutor-approve/<int:tutor_id>/', TutorApprovalUpdateView.as_view(), name='approve-tutor'),
     path('languages/',LanguageCreateView.as_view(), name='language-create'),
+    path('enrolled-courses/',EnrolledCoursesListView.as_view(), name='enrolled-courses'),
+
 
 ]
 

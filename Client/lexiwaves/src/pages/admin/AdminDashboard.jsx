@@ -67,9 +67,10 @@ export default function AdminDashboard() {
             {[
                 { name: 'Dashboard', link: '/admin-dashboard' },
                 { name: 'Courses', link: '/courses' },
+                { name: 'Enrolled Courses', link: '/admin/enrolled-courses' },
                 { name: 'Students', link: '/admin-students-list' },
                 { name: 'Tutors', link: '/admin-tutor-list' },
-                { name: 'Analytics', link: '/analytics' },
+                { name: 'Languages', link: '/admin-language' },
                 // { name: 'Logout', action: Logout }
             ].map((item, index) => (
                 <li key={index} className="mb-6">

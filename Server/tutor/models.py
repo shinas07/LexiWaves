@@ -67,7 +67,7 @@ class Course(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     thumbnail_url = models.TextField(max_length=1000)
-    video_url = models.TextField(max_length=1000)
+    video_url  = models.TextField(max_length=1000)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration = models.PositiveIntegerField(help_text="Duration in hours")
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
@@ -84,7 +84,7 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, related_name='lessons', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True) 
-    video_url = models.TextField(max_length=1000)  
+    lesson_video_url = models.TextField(max_length=1000)  
     order = models.PositiveIntegerField()  
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet,TokenRefreshView, TutorCreatedCoursesView
+from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet,TokenRefreshView, TutorCreatedCoursesView, EnrolledCoursesView
 
 urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
@@ -10,5 +10,6 @@ urlpatterns = [
     path('details/',TutorDetailsView.as_view(), name='tutor-details'),
     path('courses-create/', CourseCreationViewSet.as_view({'post': 'create'}), name='create-course'),
      path('created-courses/', TutorCreatedCoursesView.as_view(), name='tutor_courses'),
+      path('enrolled-courses-list/', EnrolledCoursesView.as_view(), name='enrolled-courses'),
 ]
 
