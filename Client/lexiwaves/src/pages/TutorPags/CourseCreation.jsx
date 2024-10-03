@@ -89,7 +89,8 @@ const CourseCreationForm = () => {
     if (validateForm()) {
       setLoading(true);
       setProgress(0);
-      const accessToken = sessionStorage.getItem('access');
+      const accessToken = localStorage.getItem('accessToken');
+
       try {
         const formDataToSend = new FormData();
         for (const key in formData) {
@@ -128,9 +129,7 @@ const CourseCreationForm = () => {
 
         if (response.status === 201) {
           toast.success('Course created successfully!');
-          setTimeout(()=>{
-            navigate('/courses');
-          },1500)
+          navigate('/tutor-course-list');
         } else {
           console.log('Something went wrong', response);
         }

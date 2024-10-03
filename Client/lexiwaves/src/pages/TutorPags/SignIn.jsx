@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
+import { login } from "../../redux/authSlice";
 
 
 const TutorLogin = () => {
@@ -22,19 +23,17 @@ const TutorLogin = () => {
         email,
         password,
       });
-
-      // dispatch(tutorLogin({
-      //   user : {email},
-      //   accessToken: response.data.access,
-      //   refreshToken: response.data.refresh,
-      // }))
+      
+      dispatch(login({
+        user: { email },
+        accessToken: response.data.access,  
+        refreshToken: response.data.refresh 
+    }));
       
 
       localStorage.setItem("tutor", JSON.stringify({ email }));
-      sessionStorage.setItem("access", response.data.access);
-      sessionStorage.setItem("refresh", response.data.refresh);
-
-      console.log('backend responce', response.data.has_submitted_details)
+      localStorage.setItem("accessToken", response.data.access);
+      localStorage.setItem("refreshToken", response.data.refresh);
       if (response.data.has_submitted_details) {
         toast.success('Tutor Login Successful');
         navigate("/tutor-dashboard");
