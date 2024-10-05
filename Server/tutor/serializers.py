@@ -76,13 +76,11 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['tutor', 'created_at', 'updated_at']
 
     def create(self, validated_data):
-        print('validated_data',validated_data)
         lessons_data = validated_data.pop('lessons', [])
         validated_data['tutor'] = self.context['request'].user
         course = Course.objects.create(**validated_data)
         
         for lesson_data in lessons_data:
-            print(lesson_data)
             Lesson.objects.create(course=course, **lesson_data)
         
         return course
