@@ -7,8 +7,6 @@ import api from "../../service/api";
 import { toast } from "sonner";
 import { login } from "../../redux/authSlice";
 import { useDispatch } from "react-redux";
-import GoogleAuth from "../../components/auth/goggle";
-
 
 
 // import { useLocation, useNavigate } from 'react-router-dom';
@@ -19,13 +17,16 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigator = useNavigate()
     const dispatch = useDispatch()
     // const location = useLocation();
     // const navigate = useNavigate();
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
         try{
             const response = await api.post('/user/login/', {
                 email,
@@ -41,7 +42,7 @@ const Login = () => {
             dispatch(login({
               user: { email },
               accessToken: access,  
-              refreshToken: refresh 
+              refreshToken: refresh
           }));
             toast.success('Login successful!')
             navigator('/');
@@ -51,6 +52,8 @@ const Login = () => {
             } else {
                 toast.error('Login faild. Try again');
             }
+        }finally{
+          setLoading(false)
         }
     };
 
@@ -64,6 +67,7 @@ const Login = () => {
             return () => clearTimeout(timer); 
         }
     }, [message]);
+
     
 
     return (
@@ -72,10 +76,11 @@ const Login = () => {
             <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
               Welcome Back to LexiWaves
             </h2>
-            {/* <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-              Sign in to continue
-            </p> */}
+    
 
+           
+
+     
             <div>
             {message && (
                 <p className="text-green-600 text-sm mt-2">
@@ -100,17 +105,23 @@ const Login = () => {
               <button
                 className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
                 type="submit"
+                disabled={loading} 
               >
-                Sign In &rarr;
+                {loading ? 'Signing In...' : 'Sign In'}
                 <BottomGradient />
               </button>
+              <div className="flex justify-end mt-2">
+    <Link to='/forgot-password' className="text-white hover:underline hover:decoration-cyan-300 text-sm">
+        Forgot password
+    </Link>
+</div>
     
               <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
     
               <div className="flex flex-col space-y-4">
                 {/* <SocialButton icon={<IconBrandGithub />} label="GitHub" /> */}
                 <SocialButton icon={<IconBrandGoogle />} label="Google" />
-                <GoogleAuth />
+               
               </div>
             </form>
     
@@ -197,6 +208,8 @@ const Login = () => {
         </motion.div>
       );
     });
+
+   
     
     const Label = React.forwardRef(({ className, ...props }, ref) => (
       <label

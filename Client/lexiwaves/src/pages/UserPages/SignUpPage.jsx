@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import { IconBrandGithub, IconBrandGoogle, IconBrandOnlyfans } from "@tabler/icons-react";
+import {  IconBrandGoogle } from "@tabler/icons-react";
 import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
@@ -136,7 +136,6 @@ const SignUPForm = () => {
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
           <div className="flex flex-col space-y-4">
-            <SocialButton icon={<IconBrandGithub />} label="GitHub" />
             <SocialButton icon={<IconBrandGoogle />} label="Google" />
           </div>
       </form>
