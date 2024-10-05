@@ -9,15 +9,14 @@ class StudentListSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+
+
+
 class TutorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
         
-# class TutorDetailsListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TutorDetails
-#         fields = '__all__'
 
 
 # Tutor Details for request approval

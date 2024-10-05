@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from tutor.models import Tutor, TutorDetails
-from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer, TutorRequestSerializer, StudentCourseEnrollmentListSerializer
+from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer, TutorRequestSerializer, StudentCourseEnrollmentListSerializer,LanguageSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -11,7 +11,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import UpdateAPIView
 from django.utils import timezone
 from .models import Language
-from .serializers import LanguageSerializer
 from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
@@ -50,10 +49,24 @@ class StudentListView(APIView):
         student = User.objects.filter(user_type='student')
         serializer = StudentListSerializer(student, many=True)
         return Response(serializer.data)
+    
+# Student Block
+class BlockUserView(APIView):
+    def post(self, request, studentId):
+        print(f"Received request data: {request.data}")  # For debugging
+        try:
+            # Retrieve the user using the studentId from the URL
+            user = User.objects.get(id=studentId)
+            user.is_active = False  # or set a custom field for blocking
+            user.save()
 
+            return Response({"message": "User blocked successfully."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 # Admin Tutor List
 class ApprovedTutorListView(APIView):
     permission_classes = [IsAuthenticated]
+
 
     def get(self, request):
         tutor = User.objects.filter(user_type='tutor',
@@ -112,9 +125,10 @@ class TutorApprovalUpdateView(APIView):
         
 
 class LanguageCreateView(APIView):
-    authentication_classes = [JWTAuthentication]  # Use JWTAuthentication for handling access tokens
+    authentication_classes = [JWTAuthentication] 
     def get(self, request, *args, **kwargs):
-        languages = Language.objects.all()
+        languages = Language.objects.all()          
+        print(languages)
         serializer = LanguageSerializer(languages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
