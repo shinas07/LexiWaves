@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 
 
-const TutorDetails = () => {
+const TutorDetailForm = () => {
   const [formData, setFormData] = useState({
     // Personal Information
     profilePicture: null,
@@ -77,7 +77,7 @@ const TutorDetails = () => {
 
     console.log('form data', formData)
 
-    const token = sessionStorage.getItem('access')
+    const token = localStorage.getItem('accessToken')
 
 
     try {
@@ -86,7 +86,6 @@ const TutorDetails = () => {
 
         headers: {
           'Authorization': `Bearer ${token}`,
-          // 'Content-Type': 'application/json'  // Adjust if you're sending FormData
           'Content-Type': 'multipart/form-data',
       }
 
@@ -100,15 +99,15 @@ const TutorDetails = () => {
       }
 
       //  console.log("Details submitted successfully", response.data);
-      //  toast.success("Details saved successfully!");
+       toast.success("Details saved successfully!");
       //  setShowModal(true);
       // setIsModalOpen(true)
  
      
  
     } catch (error) {
-       console.error("Error submitting details", error);
-       // You can also add error handling logic here if needed
+      toast.error('Details is already submited');
+       
     }
 
 
@@ -486,7 +485,7 @@ const LabelInputContainer = ({ children, className }) => {
       {children}
     </div>
   );
-};
+}; 
 
 const Label = React.forwardRef(({ className, ...props }, ref) => (
   <label
@@ -499,4 +498,4 @@ const Label = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 
-export default TutorDetails;
+export default TutorDetailForm;

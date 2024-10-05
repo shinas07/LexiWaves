@@ -16,6 +16,9 @@ const TutorLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -23,6 +26,7 @@ const TutorLogin = () => {
         email,
         password,
       });
+      console.log('tutor all detials',response.data)
       
       dispatch(login({
         user: { email },
@@ -31,23 +35,30 @@ const TutorLogin = () => {
     }));
       
 
-      localStorage.setItem("tutor", JSON.stringify({ email }));
+    
       localStorage.setItem("accessToken", response.data.access);
       localStorage.setItem("refreshToken", response.data.refresh);
-      if (response.data.has_submitted_details) {
-        toast.success('Tutor Login Successful');
-        navigate("/tutor-dashboard");
-      } else {
-        toast.info('Please complete your details');
-        navigate("/tutor-details");
-      }
-    } catch (error) {
+      localStorage.setItem("adminApproved", response.data.admin_approved);
+      localStorage.setItem('hasSubmittedDetails', response.data.has_submitted_details);
+      if (!response.data.has_submitted_details) {
+        console.log('from data needed')
+            navigate('/tutor-details'); 
+        } else if (!response.data.admin_approved) {
+          console.log('admin is not approved')
+            navigate('/waiting-for-approval'); 
+        } else {
+            navigate('/tutor-dashboard'); 
+        }
+  } catch (error) {
+    console.log(error.response)
       if (error.response && error.response.status === 401) {
         toast.error("Invalid email or password");
       } else {
         toast.error("Login failed. Please try again.");
       }
-    }
+  }
+
+    //     localStorage.setItem("tutor", JSON.stringify({ email }));
   };
 
   useEffect(() => {

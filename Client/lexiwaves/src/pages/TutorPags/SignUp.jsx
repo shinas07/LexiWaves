@@ -50,7 +50,7 @@ const TutorSignUP = () => {
               delete updatedErrors[key];
               return updatedErrors;
             });
-          }, 4000); // Adjust the timeout duration (3000 ms = 3 seconds) as needed
+          }, 4000); 
         });
       };
 
@@ -70,7 +70,6 @@ const TutorSignUP = () => {
 
     const { email } = formData
     localStorage.setItem('tutorEmail', email);
-    console.log(formData)
     try {
 
     const response = await api.post('/tutor/signup/', formData);

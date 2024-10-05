@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useDebugValue, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -15,18 +15,60 @@ import {
   Calendar,
   Plus,
 } from 'lucide-react';
+import { logout } from '../../redux/authSlice';
+import { useDispatch } from 'react-redux';
+import api from '../../service/api';
 
 const TutorDashboard = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null);
+  const dispach = useDispatch()
+
+  useEffect(() => {
+    const checkTutorApproval = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await api.get('tutor/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        setLoading(false);
+  
+        // if (response.status === 200 && response.data.detail === "Tutor details missing. Complete your profile.") {
+        //   // Case: Tutor details are missing
+        //   alert('Complete your tutor profile details.');
+        //   navigate('/tutor-details');  // Redirect to tutor details page
+        // } else if (!response.data.profile.admin_approved) {
+        //   // Case: Admin approval pending
+        //   alert('Your account is pending for admin approval.');
+        //   navigate('/pending-approval');  // Redirect to waiting page
+        // } else if (response.status === 200) {
+        //   // Case: Access granted to dashboard (handle as needed)
+        //   console.log('/dashboard')
+        // }
+  
+      } catch (err) {
+        setLoading(false);
+        console.log(response)
+        console.error(err.message);
+      }
+    };
+  
+    checkTutorApproval();
+  }, [navigate]);
+  
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
  
 
   const handleLogout = () => {
-    sessionStorage.removeItem('access');
-    sessionStorage.removeItem('refresh');
+    dispach(logout())
     localStorage.removeItem('tutor');
-    console.log('Logged out');
     navigate("/");
   };
 
