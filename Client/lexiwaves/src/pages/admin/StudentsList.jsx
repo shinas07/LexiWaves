@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import api from "../../service/api";
+import Layout from "./Layout";
+import { toast } from "sonner";
+import { Loader, AlertTriangle } from "lucide-react"; // Make sure to install lucide-react
 
 export default function StudentsPage() {
   const [studentsData, setStudentData] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setErrors] = useState(null);
 
@@ -11,17 +13,16 @@ export default function StudentsPage() {
     const fetchStudentData = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        console.log('token',token);
-        
         const response = await api.get("/lexi-admin/students-list/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setStudentData(response.data);
-        setLoading(false);
+        console.log(response.data)
       } catch (error) {
-        setErrors("Failed to fetch tutor data");
+        setErrors("Failed to fetch student data");
+      } finally {
         setLoading(false);
       }
     };
@@ -30,128 +31,66 @@ export default function StudentsPage() {
   }, []);
 
   const handleBlock = async (studentId) => {
+    console.log(studentId)
     try {
-        const token = localStorage.getItem('access');
-        await api.post(`/lexi-admin/block-student/${studentId}/`, {}, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-    
+      const token = localStorage.getItem("accessToken");
+      await api.post(`/lexi-admin/block-student/${studentId}/`,{
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      toast.success("Student blocked successfully!");
+      // Optionally, refresh the student data
+      setStudentData((prevData) => prevData.filter((student) => student.id !== studentId));
     } catch (error) {
-        console.error('Failed to block user:', error);
+      console.error('Failed to block user:', error);
+      toast.error("Failed to block student.");
     }
-};
+  };
 
   return (
-    <div className="flex h-screen font-sans bg-gray-900 text-white">
-      {/* Sidebar */}
-      <aside
-        className={`bg-gray-800 transition-width duration-300 ${
-          sidebarOpen ? "w-64" : "w-20"
-        } overflow-hidden`}
-      >
-        <div className="p-5">
-          <h2
-            className={`text-xl font-bold mb-6 ${
-              sidebarOpen ? "block" : "hidden"
-            }`}
-          >
-            AdminPanel
-          </h2>
-          <nav>
-            <ul>
-              {["Dashboard", "Courses", "Students", "Tutors", "Messages"].map(
-                (item, index) => (
-                  <li key={index} className="mb-6">
-                    <a
-                      href="/admin-dashboard"
-                      className="text-white hover:text-gray-300 flex items-center"
-                    >
-                      <span
-                        className={`ml-2 ${sidebarOpen ? "block" : "hidden"}`}
-                      >
-                        {item}
-                      </span>
-                    </a>
-                  </li>
-                )
-              )}
-            </ul>
-          </nav>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col bg-gray-900">
-        {/* Header */}
-        <header className="bg-gray-800 shadow p-4 flex justify-between items-center">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-2xl text-white"
-          >
-            {sidebarOpen ? "⮜" : "☰"}
-          </button>
-          <input
-            type="search"
-            placeholder="Search Students..."
-            className="px-4 py-2 border rounded-md focus:outline-none focus:border-indigo-500 bg-gray-700 text-white"
-          />
-          <div className="flex items-center space-x-4">
-            <button className="text-xl text-white">🔔</button>
-            <button className="text-xl text-white">👤</button>
-          </div>
-        </header>
-
+    <Layout>
+      <div className="flex h-screen font-sans text-white">
         {/* Main Student Content */}
-        <main className="p-6 overflow-auto">
-          <h1 className="text-2xl font-bold mb-6">Students</h1>
+        <main className="p-6 w-full overflow-auto">
+          <h1 className="text-3xl font-bold mb-6">Students</h1>
 
-          {loading && <p>Loading tutors...</p>}
-          {error && <p>{error}</p>}
+          {loading && (
+            <div className="flex items-center justify-center h-40">
+              <Loader className="animate-spin h-10 w-10 text-indigo-500" />
+              <span className="ml-2 text-lg">Loading students...</span>
+            </div>
+          )}
+          
+          {error && (
+            <div className="bg-red-500 text-white p-4 rounded-lg flex items-center mb-6">
+              <AlertTriangle className="mr-2" />
+              {error}
+            </div>
+          )}
 
           {!loading && !error && (
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-md overflow-hidden">
               <table className="min-w-full leading-normal">
                 <thead>
                   <tr>
-                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">
-                      Name
-                    </th>
-                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">
-                      Email
-                    </th>
-                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">
-                      Courses
-                    </th>
-                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">
-                      Joined
-                    </th>
-                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">
-                      Action
-                    </th>
+                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Name</th>
+                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Email</th>
+                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Joined</th>
+                    <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {studentsData.length > 0 ? (
-                    studentsData.map((student, index) => (
-                      <tr key={index} className="hover:bg-gray-700">
-                        <td className="px-5 py-5 border-b border-gray-600 text-sm">
-                          {student.first_name}
-                        </td>
-                        <td className="px-5 py-5 border-b border-gray-600 text-sm">
-                          {student.email}
-                        </td>
-                        <td className="px-5 py-5 border-b border-gray-600 text-sm">
-                          {student.courses}
-                        </td>
-                        <td className="px-5 py-5 border-b border-gray-600 text-sm">
-                          {student.date_joined}
-                        </td>
+                    studentsData.map((student) => (
+                      <tr key={student.id} className="hover:bg-gray-700">
+                        <td className="px-5 py-5 border-b border-gray-600 text-sm">{`${student.first_name} ${student.last_name}`}</td>
+                        <td className="px-5 py-5 border-b border-gray-600 text-sm">{student.email}</td>
+                        <td className="px-5 py-5 border-b border-gray-600 text-sm">{new Date(student.date_joined).toLocaleDateString()}</td>
                         <td className="px-5 py-5 border-b border-gray-600 text-sm">
                           <button
                             onClick={() => handleBlock(student.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
                           >
                             Block
                           </button>
@@ -160,7 +99,7 @@ export default function StudentsPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4">No students found</td>
+                      <td colSpan="5" className="text-center py-4">No students found</td>
                     </tr>
                   )}
                 </tbody>
@@ -169,6 +108,6 @@ export default function StudentsPage() {
           )}
         </main>
       </div>
-    </div>
+    </Layout>
   );
 }
