@@ -1,11 +1,7 @@
 from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-<<<<<<< Updated upstream
-from .serializers import UserSerializer, StudentListSerializer
-=======
 from .serializers import UserSerializer, StudentListSerializer, CourseSerializer,CourseDetailSerializer, StudentCourseEnrollmentSerializer,CourseWatchSerializer
->>>>>>> Stashed changes
 from .models import  OTPVerification, Student,User
 import random
 from django.core.mail import send_mail
@@ -18,20 +14,28 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime, timedelta
-from rest_framework.permissions import IsAuthenticated
-
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from tutor.models import Course
+import stripe
+from django.conf import settings
+from django.views import View
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from lexi_admin.models import StudentCourseEnrollment
+from django.conf import settings
+stripe.api_key = settings.STRIPE_SECRET_KEY
+import json
 
 
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
+# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+# from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+# from dj_rest_auth.registration.views import SocialLoginView
 
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:8000/accounts/google/login/callback/"
-    client_class = OAuth2Client
+# class GoogleLogin(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
+#     callback_url = "http://localhost:8000/accounts/google/login/callback/"
+#     client_class = OAuth2Client
 
 
 # # Otp Creation
@@ -39,7 +43,7 @@ def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
 
-def send_otp_email(email, otp):
+def     send_otp_email(email, otp):
     subject = 'Verify you email'
     html_message = render_to_string('email_template.html', {'otp': otp})
     plain_message = strip_tags(html_message)
@@ -59,7 +63,6 @@ def create_or_resend_otp(email):
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
     )
-    print('otp', otp)
     if send_otp_email(email,otp):
         return {"message": "OTP sent to your email. Please verify."}
     else:
@@ -69,7 +72,6 @@ def create_or_resend_otp(email):
 class SignUpView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        print(request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
             response = create_or_resend_otp(email)
@@ -79,7 +81,6 @@ class SignUpView(APIView):
                 'message': 'OTP sent successfully',
                 'user_data': serializer.validated_data
             }, status=status.HTTP_200_OK)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -137,6 +138,8 @@ class UserLoginView(APIView):
        
         try:
             user = User.objects.get(email=email)
+            if not user.is_active:
+                return Response({'error': 'Your account has been blocked. Please contact support for assistance.'}, status=status.HTTP_403_FORBIDDEN)
             if user.check_password(password):
                 print('password is checked')
                 refresh = RefreshToken.for_user(user)
@@ -149,17 +152,88 @@ class UserLoginView(APIView):
              return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
 
+# Forgot password
+@method_decorator(csrf_exempt, name='dispatch')
+class RequestotpView(View):
+    def post(self, request):
+        # Parse JSON data from request body
+        data = json.loads(request.body)
+        email = data.get('email')
+        try:
+            User.objects.get(email=email,user_type='student')
+            otp = generate_otp()
+
+            request.session['otp'] = otp
+            request.session['otp_email'] = email
+
+            if send_otp_email(email, otp):
+                print('otp send successful')
+                return JsonResponse({'message': 'OTP sent successfully!'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User with this email does not exist.'}, status=400)
+
+@method_decorator(csrf_exempt, name='dispatch')    
+class ForgotPassowrdVerifyOtpView(View):
+    def post(self, request):
+        body = json.loads(request.body)
+        email = body.get('email')
+        otp =  body.get('otp')
+        new_password = body.get('newPassword')
+
+        if str(request.session.get('otp')) == str(otp) and request.session.get('otp_email') == email:
+            try:
+                user = User.objects.get(email=email)
+                user.set_password(new_password) 
+                user.save() 
+                del request.session['otp']
+                del request.session['otp_email']
+                return JsonResponse({'message': 'Password changed successfully!'}, status=200)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User with this email does not exist.'}, status=400)
+        else:
+            return JsonResponse({'error': 'Invalid OTP or email.'}, status=400)
+
+
+
+
+# Refresh Token View
+class RefreshTokenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        refresh = request.data.get('refresh')
+        try:
+            token  = RefreshToken(refresh)
+            access_token = str(token.access_token)
+            return Response({"access": access_token}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+
+# Home page Latest Courses
+
+# All Courses list
+class CrouseListView(generics.ListAPIView):
+    queryset = Course.objects.all().order_by('-created_at')
+    serializer_class = CourseSerializer
+
+#Course Details View
+class CourseDetailView(generics.ListAPIView):
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+            serializer = CourseDetailSerializer(course)
+            return Response(serializer.data)
+        except Course.DoesNotExist:
+            return Response({'error':'Course not found'}, status=404)
     
 
 
-    
 
-
-
-<<<<<<< Updated upstream
-=======
 #Enroll Course Video
 class CourseVideoView(APIView):
     def get(self, request, pk):
@@ -171,11 +245,10 @@ class CourseVideoView(APIView):
             return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
+
+
+
 # Stripe Payment option for user
-
-from django.conf import settings
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 class CreateCheckoutSession(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -236,7 +309,6 @@ class UserEnrolledCourses(generics.ListAPIView):
 
 # User coruseWating
 
->>>>>>> Stashed changes
 
 
 class WatchCourseView(APIView):
@@ -263,17 +335,9 @@ class WatchCourseView(APIView):
         except Course.DoesNotExist:
             return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
 
-<<<<<<< Updated upstream
-# # Admin Student List
-# class StudentListView(generics.ListAPIView):
-#     queryset = StudentUser.objects.all()
-#     serializer_class = StudentListSerializer
-
-=======
 # Checking user is already enrolledCourse
 class CheckEnrollmentView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
->>>>>>> Stashed changes
 
     def get(self, request, courseId):
         enrollment = StudentCourseEnrollment.objects.filter(user=request.user, course__id=courseId).first()
@@ -281,13 +345,6 @@ class CheckEnrollmentView(generics.RetrieveAPIView):
             return Response({'enrolled':True}, status=200)
         return Response({'enrolled':False}, status=200)
 
-# # Course Review Option
-# class CourseReviewView(generics.ListCreateAPIView):
-#     permission_classes = [IsAuthenticated]
 
-#     def get_queryset(self):
-#         course_id = self.kwargs['course_id']
-#         return CourseReview.objects.filter(course__id=course_id)
 
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
+
