@@ -20,7 +20,6 @@ const authSlice = createSlice({
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
-      console.log('userlogout')
       
       // Clear tokens from localStorage when the user logs out
       localStorage.removeItem('accessToken');
