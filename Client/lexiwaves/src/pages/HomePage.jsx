@@ -2,8 +2,12 @@ import React, { useEffect } from "react";
 import Layout from "../components/Layout";
 import { FlipWords } from "../components/ui/flip-words";
 import TypewriterEffect from "./TutorPags/TypeWriterEffect";
+import { useSelector } from "react-redux";
+import LatestCourses from "./UserPages/LatestCourse";
 
 function Home() {
+  const isAuthenticatedUser = useSelector((state) => state.auth.isAuthenticated);
+  console.log(isAuthenticatedUser)
   return (
     <Layout>
       {/* <FloatingNavbar/> */}
@@ -56,11 +60,19 @@ function Home() {
         </div>
 
         {/* TypewriterEffect Section */}
+  
        
-        <div className="flex justify-center mt-12">
-          <TypewriterEffect />
-        </div>
- 
+        {!isAuthenticatedUser ? (
+            <div className="flex justify-center mt-12">
+              <TypewriterEffect />
+            </div>
+          ) : (
+            <div className="w-full mt-8 p-4">
+              <div className="flex justify-center mt-12">
+              <LatestCourses /> {/* Show the carousel when user is not logged in */}
+            </div>
+            </div>
+          )}
       </div>
     </Layout>
   );
