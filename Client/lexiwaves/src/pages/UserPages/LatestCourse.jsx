@@ -33,9 +33,9 @@ export function LatestCourses() {
   ));
   return (
     <div className="w-full h-full py-20">
-      <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl mt-4 font-bold text-neutral-800 dark:text-neutral-200">
+      <p className="text-sm md:text-5xl font-semibold text-neutral-600 dark:text-neutral-400 mt-12 ml-8">
         Latest Courses
-      </h2>
+      </p>
       <Carousel items={cards} />
     </div>
   );
