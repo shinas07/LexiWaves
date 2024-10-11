@@ -70,16 +70,15 @@ const OtpVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = JSON.parse(sessionStorage.getItem('tempUserData'));
-    console.log('userdata', userData)
+ 
     setLoading(true);
 
     const email = localStorage.getItem("userEmail")
-    console.log(email)
 
     if (!email){
         setErrorMessage('No email found. Pleace try again.');
         setLoading(false);
-        console.log(email)
+     
         return;
     }
 
@@ -93,26 +92,26 @@ const OtpVerification = () => {
        
         if (response.status === 201) {
             sessionStorage.removeItem('tempUserData');
-            console.log('Verification successful!');
+         
             navigate('/signin');
             toast.success('Signup successful! Please log in')
         } else{
       
             setErrorMessage(response.data.error || "Verification failed. Please check your OTP.");
-            console.log(errorMessage);
+         
         }
     } catch (error) {
         if (error.response && error.response.data) {
       
             setErrorMessage(error.response.data.error || "An error occurred. Please try again.");
-            console.log(errorMessage);
+           
             
         } else {
             setErrorMessage("An unexpected error occurred.");
         }
     } finally {
         setLoading(false);
-        console.log('Loading finished');
+   
     }
 };
   return (
