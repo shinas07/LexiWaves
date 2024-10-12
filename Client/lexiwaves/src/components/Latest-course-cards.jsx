@@ -169,17 +169,17 @@ const handleCardClick = () => {
         />
 
               {/* Content area */}
-      <div className="h-[35%] flex flex-col justify-between p-4 bg-black text-white w-full">
-        <motion.p className="text-sm font-medium text-gray-400 w-full">
+      <div className="h-[35%] flex flex-col justify-start text-white w-full p-4">
+        {/* <motion.p className="text-sm font-medium text-gray-400 w-full">
           {card.category}
-        </motion.p>
-        <motion.h3 className="text-xl font-semibold mt-1">
+        </motion.p> */}
+        <motion.h3 className="text-xl font-semibold mt-2 mb-6">
           {card.title}
         </motion.h3>
-        <motion.p className="text-sm mt-1">
+        <motion.p className="text-sm mb-2">
           Tutor: {card.tutor_name} | Difficulty: {card.difficulty}
         </motion.p>
-        <motion.p className="text-sm mt-1">
+        <motion.p className="text-sm">
           {card.description}
         </motion.p>
       </div>
