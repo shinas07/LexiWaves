@@ -12,11 +12,6 @@ export default function Layout({ children }) {
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-2xl text-gray-700 dark:text-gray-300">
             {sidebarOpen ? '⮜' : '☰'}
           </button>
-          <input
-            type="search"
-            placeholder="Search courses, tutors..."
-            className="px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-neutral-600 rounded-md focus:outline-none focus:border-teal-500"
-          />
           <div className="flex items-center space-x-4">
             <button className="text-xl text-gray-700 dark:text-gray-300">🔔</button>
             <button className="text-xl text-gray-700 dark:text-gray-300">👤</button>
