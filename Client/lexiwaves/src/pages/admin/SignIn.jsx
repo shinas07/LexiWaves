@@ -9,6 +9,7 @@ const AdminSignup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false)
     const navigator = useNavigate();
 
 
@@ -23,6 +24,7 @@ const AdminSignup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
         try {
             const response = await api.post('/lexi-admin/admin-login/', {
                 email,
@@ -30,11 +32,13 @@ const AdminSignup = () => {
             });
             localStorage.setItem('accessToken', response.data.access);
             localStorage.setItem('refreshToken', response.data.refresh);
-            toast.success('Signup successful');
+            toast.success('SignIn successful');
             navigator('/admin-dashboard');
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'An error occurred, try again'
             toast.error(errorMessage);
+        }finally{
+            setLoading(false)
         }
     };
 
@@ -88,7 +92,7 @@ const AdminSignup = () => {
                         className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
                         type="submit"
                     >
-                        Sign Up &rarr;
+                           {loading ? 'Sign In....' : 'Sign In ➔'}
                         <BottomGradient />
                     </button>
 
