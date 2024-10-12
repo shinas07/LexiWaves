@@ -1,6 +1,6 @@
 from django.urls import path
 from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView, Student ,ResendOtpView,RefreshTokenView
-from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView,ResendOtpView,CrouseListView,CourseDetailView, CourseVideoView,CreateCheckoutSession, UserEnrolledCourses, WatchCourseView, CheckEnrollmentView, RequestotpView,ForgotPassowrdVerifyOtpView
+from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView,ResendOtpView,CrouseListView,CourseDetailView, CourseVideoView,CreateCheckoutSession, UserEnrolledCourses, WatchCourseView, CheckEnrollmentView, RequestotpView,ForgotPassowrdVerifyOtpView, UserProfileView
 
 urlpatterns = [ 
 
@@ -11,13 +11,14 @@ urlpatterns = [
     path('refresh-token/', RefreshTokenView.as_view(), name='refresh_token'),
     path('password-change-otp/',RequestotpView.as_view(), name='request-otp'),
     path('password-verify-otp/',ForgotPassowrdVerifyOtpView.as_view(), name='verify_otp'),
+    path('profile/', UserProfileView.as_view(), name='user-profile'),
     
 
     # path('students-list/',StudentListView.as_view(),name='students-list'),
     
 
     path('courses/',CrouseListView.as_view(), name='course-list'),
-    path('course/<int:course_id>/', CourseDetailView.as_view(), name='course_detail'),
+    path('course/details/<int:course_id>/', CourseDetailView.as_view(), name='course_detail'),
     path('courses/video/<int:pk>/', CourseVideoView.as_view(), name='course-video'),
     path('course-checkout-session/', CreateCheckoutSession.as_view(), name='create-checkout-session'),
     path('enrolled-courses/',UserEnrolledCourses.as_view(), name='enrolled-courses'),
