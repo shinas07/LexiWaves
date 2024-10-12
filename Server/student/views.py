@@ -9,7 +9,6 @@ from accounts.serializers import CourseSerializer
 #Home Page Latest courses
 class LatestCoursesView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
-        courses  = Course.objects.filter()
+        courses  = Course.objects.filter(is_approved=True)
         serializer = CourseSerializer(courses, many=True)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
