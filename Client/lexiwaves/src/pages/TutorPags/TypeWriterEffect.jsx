@@ -25,7 +25,7 @@ function TypewriterEffect() {
 
   return (
     <div className="flex flex-col items-center justify-center h-[40rem]">
-      <p className="text-neutral-600 dark:text-neutral-200 text-xs sm:text-base mb-4">
+      <p className="text-neutral-300 dark:text-neutral-400  text-xs sm:text-base mb-4">
         Your journey to becoming a world-class tutor begins here.
       </p>
       <TypewriterEffectSmooth words={words} />
