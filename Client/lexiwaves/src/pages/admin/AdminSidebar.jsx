@@ -12,10 +12,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
 
   const links = [
     { name: 'Dashboard', link: '/admin-dashboard' },
-    { name: 'Courses', link: '/courses' },
-    { name: 'Enrolled Courses', link: '/admin/enrolled-courses' },
     { name: 'Students', link: '/admin-students-list' },
     { name: 'Tutors', link: '/admin-tutor-list' },
+    { name: 'Courses', link: '/admin-Approved-courses-list' },
+    { name: 'Enrolled Courses', link: '/admin-enrolled-courses' },
     { name: 'Languages', link: '/admin-language' },
     { name: 'Logout', link: '/admin-login', action: handleLogout }
   ];
