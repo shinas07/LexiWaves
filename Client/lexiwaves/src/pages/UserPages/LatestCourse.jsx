@@ -12,7 +12,7 @@ export function LatestCourses() {
     const fetchCourses = async () => {
       try {
         const response = await api.get('/student/latest-courses/'); 
-        console.log("Fetched Courses:", response.data); 
+        
         
         setData(response.data); 
       } catch (error) {
@@ -33,7 +33,7 @@ export function LatestCourses() {
   ));
   return (
     <div className="w-full h-full py-20">
-      <p className="text-sm md:text-5xl font-semibold text-neutral-600 dark:text-neutral-400 mt-12 ml-8">
+      <p className="text-sm md:text-4xl font-semibold text-neutral-600 dark:text-neutral-400 mt-12 ml-8">
         Latest Courses
       </p>
       <Carousel items={cards} />
