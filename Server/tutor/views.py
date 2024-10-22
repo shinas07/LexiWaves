@@ -6,13 +6,13 @@ from django.http import JsonResponse
 from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer,LessonSerializer, CourseWithStudentsSerializer
+from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer,LessonSerializer, CourseWithStudentsSerializer,  QuestionSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from .models import TutorOTPVerification,Tutor, Course, TutorDetails
+from .models import TutorOTPVerification,Tutor, Course, TutorDetails, Question, Answer
 from django.utils import timezone
 from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -159,7 +159,8 @@ class TutorLoginView(APIView):
                     tutor_details = TutorDetails.objects.get(tutor_id=tutor.id)
                     
                     # Check if tutor has submitted details (e.g., phone number exists) and admin approval
-                    has_submitted_details = bool(tutor_details.phone_number)  # Assuming phone_number is required for detail submission
+                    has_submitted_details = bool(tutor_details.phone_number)
+                    print('backend check',has_submitted_details)
                     admin_approved = tutor_details.admin_approved  # Check if admin has approved the tutor
 
                 except TutorDetails.DoesNotExist:
@@ -180,51 +181,10 @@ class TutorLoginView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
-
-# class TutorLoginView(APIView):
-    # def post(self, request):
-    #     email = request.data.get('email')
-    #     password = request.data.get('password')
-
-    #     try:
-
-    #         tutor_user = User.objects.get(email=email)
-            
-
-    #         if tutor_user.user_type == 'tutor' and check_password(password, tutor_user.password):
-    #             refresh = RefreshToken.for_user(tutor_user)
-
-    #             try:
-    #                 tutor = Tutor.objects.get(user=tutor_user)
-                    
-          
-    #                 tutor_details = TutorDetails.objects.get(tutor_id=tutor.id)
-               
-    #                 has_submitted_details = bool(tutor_details.phone_number)
-
-    #             except TutorDetails.DoesNotExist:
-    #                 has_submitted_details = False
-
-    #             return Response({
-    #                 'refresh': str(refresh),
-    #                 'access': str(refresh.access_token),
-    #                 'message': 'Login successful',
-    #                 'has_submitted_details': has_submitted_details
-    #             }, status=status.HTTP_200_OK)
-    #         else:
-    #             return Response({'error': 'Invalid user type or password'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    #     except User.DoesNotExist:
-    #         return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
-
- 
-
-
 class TutorDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        print('tutor details',request.data)
 
         serializer = TutorDetailsSerializer(data=request.data, context={'request': request})
         
@@ -283,10 +243,6 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        print('POST Data:', request.POST)
-        print('FILES:', request.FILES)
-
-        # Extract course data
         course_data = {
             'title': request.data.get('title'),
             'description': request.data.get('description'),
@@ -296,7 +252,6 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
             'difficulty': request.data.get('difficulty'),
         }
 
-        # Upload thumbnail and preview video
         thumbnail = request.FILES.get('thumbnail')
         video_url = request.FILES.get('video_url')
 
@@ -310,7 +265,9 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
         )
 
         try:
-            # Upload thumbnail
+            # Upload thumbnail and preview video (same as before)
+            # ...
+
             thumbnail_key = f'course_thumbnails/{uuid.uuid4()}-{thumbnail.name}'
             s3_client.upload_fileobj(thumbnail, settings.AWS_STORAGE_BUCKET_NAME, thumbnail_key)
             course_data['thumbnail_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{thumbnail_key}'
@@ -320,118 +277,35 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
             s3_client.upload_fileobj(video_url, settings.AWS_STORAGE_BUCKET_NAME, preview_video_key)
             course_data['video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{preview_video_key}'
 
-            print('Uploaded URLs:', course_data['thumbnail_url'], course_data['video_url'])
-
-        except ClientError as e:
-            print('S3 Upload Error:', str(e))
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Process lessons
-        lessons_data = []
-        lessons = request.data.get('lessons')
-        if lessons:
-            lessons = json.loads(lessons)
-            for lesson in lessons:
-                lesson_video = request.FILES.get(f'lesson_{lesson["order"]}_video')
+            # Process lessons
+            lessons_data = []
+            lesson_count = int(request.data.get('lesson_count', 0))
+            for i in range(1, lesson_count + 1):
+                lesson = {
+                    'title': request.data.get(f'lesson_{i}_title'),
+                    'description': request.data.get(f'lesson_{i}_description'),
+                    'order': request.data.get(f'lesson_{i}_order'),
+                }
+                lesson_video = request.FILES.get(f'lesson_{i}_video')
                 if lesson_video:
-                    try:
-                        lesson_video_key = f'lesson_videos/{uuid.uuid4()}-{lesson_video.name}'
-                        s3_client.upload_fileobj(lesson_video, settings.AWS_STORAGE_BUCKET_NAME, lesson_video_key)
-                        lesson['lesson_video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{lesson_video_key}'
-                    except ClientError as e:
-                        print(f'S3 Upload Error for lesson {lesson["order"]} video:', str(e))
-                        return Response({'error': f'Error uploading video for lesson {lesson["order"]}'}, status=status.HTTP_400_BAD_REQUEST)
+                    lesson_video_key = f'lesson_videos/{uuid.uuid4()}-{lesson_video.name}'
+                    s3_client.upload_fileobj(lesson_video, settings.AWS_STORAGE_BUCKET_NAME, lesson_video_key)
+                    lesson['lesson_video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{lesson_video_key}'
                 lessons_data.append(lesson)
 
-        course_data['lessons'] = lessons_data
+            course_data['lessons'] = lessons_data
 
-        serializer = CourseSerializer(data=course_data, context={'request': request})
-        if not serializer.is_valid():
-            print("Serializer validation failed:", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = CourseSerializer(data=course_data, context={'request': request})
+            if not serializer.is_valid():
+                print('serializer error',serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            course = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# class CourseCreationViewSet(viewsets.ModelViewSet):
-#     queryset = Course.objects.all()
-#     permission_classes = [IsAuthenticated]
-
-#     def create(self, request, *args, **kwargs):
-#         print('POST Data:', request.POST)
-#         print('FILES:', request.FILES)
-
-#         # Extract course data
-#         course_data = {
-#             'title': request.data.get('title'),
-#             'description': request.data.get('description'),
-#             'category': request.data.get('category'),
-#             'price': request.data.get('price'),
-#             'duration': request.data.get('duration'),
-#             'difficulty': request.data.get('difficulty'),
-#         }
-
-#         # Upload thumbnail and preview video
-#         thumbnail = request.FILES.get('thumbnail')
-#         video_url = request.FILES.get('video_url')
-
-#         if not thumbnail or not video_url:
-#             return Response({'error': 'Both thumbnail and preview video are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         s3_client = boto3.client('s3',
-#             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-#             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-#             region_name=settings.AWS_S3_REGION_NAME
-#         )
-
-#         try:
-#             # Upload thumbnail
-#             thumbnail_key = f'course_thumbnails/{uuid.uuid4()}-{thumbnail.name}'
-#             s3_client.upload_fileobj(thumbnail, settings.AWS_STORAGE_BUCKET_NAME, thumbnail_key)
-#             course_data['thumbnail_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{thumbnail_key}'
-
-#             # Upload preview video
-#             preview_video_key = f'course_previews/{uuid.uuid4()}-{video_url.name}'
-#             s3_client.upload_fileobj(video_url, settings.AWS_STORAGE_BUCKET_NAME, preview_video_key)
-#             course_data['video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{preview_video_key}'
-
-#             print('Uploaded URLs:', course_data['thumbnail_url'], course_data['video_url'])
-
-#         except ClientError as e:
-#             print('S3 Upload Error:', str(e))
-#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-#         # Process lessons
-        
-#         lessons_data = []
-#         lessons = request.data.get('lessons')
-#         if lessons:
-#             lessons = json.loads(lessons)
-#             for lesson in lessons:
-#                 lesson_video = request.FILES.get(f'lesson_{lesson["order"]}_video')
-#                 if lesson_video:
-#                     try:
-#                         lesson_video_key = f'lesson_videos/{uuid.uuid4()}-{lesson_video.name}'
-#                         s3_client.upload_fileobj(lesson_video, settings.AWS_STORAGE_BUCKET_NAME, lesson_video_key)
-#                         # Change this line
-#                         lesson['lesson_video_url'] = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{lesson_video_key}'
-#                     except ClientError as e:
-#                         print(f'S3 Upload Error for lesson {lesson["order"]} video:', str(e))
-#                         return Response({'error': f'Error uploading video for lesson {lesson["order"]}'}, status=status.HTTP_400_BAD_REQUEST)
-#                 lessons_data.append(lesson)
-
-#         course_data['lessons'] = lessons_data
-
-#         serializer = CourseSerializer(data=course_data, context={'request': request})
-#         if not serializer.is_valid():
-#             print("Serializer validation failed:", serializer.errors)
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#         self.perform_create(serializer)
-#         headers = self.get_success_headers(serializer.data)
-#         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
+        except ClientError as e:
+            print('error', str(e))
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -472,3 +346,83 @@ class EnrolledCoursesView(generics.ListAPIView):
         courses = [enrollment.course for enrollment in enrollments]
         serializer = CourseWithStudentsSerializer(courses, many=True)
         return Response(serializer.data)
+    
+
+from .models import  LessonCompletion, Lesson
+from .serializers import CourseSerializer, LessonCompletionSerializer
+
+
+class CompleteLessonView(generics.CreateAPIView):
+    serializer_class = LessonCompletionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        lesson_id = request.data.get('lesson_id')
+        print('lesson id',lesson_id)
+        try:
+            lesson = Lesson.objects.get(id=lesson_id)
+        except Lesson.DoesNotExist:
+            return Response({'error': 'Lesson not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        completion, created = LessonCompletion.objects.get_or_create(
+            user=request.user,
+            lesson=lesson
+        )
+
+        serializer = self.get_serializer(completion)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+class CompletedLessonsView(generics.ListAPIView):
+    serializer_class = LessonCompletionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        print(course_id)
+        return LessonCompletion.objects.filter(
+            user=self.request.user,
+            lesson__course_id=course_id
+        )
+
+# Quiz Functions
+class QuizCreationView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = QuestionSerializer
+
+    def get(self, request, courseId):
+        """Fetch quiz questions for a course"""
+        course = get_object_or_404(Course, id=courseId, tutor=request.user)
+        questions = Question.objects.filter(course=course)
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        courseId = self.kwargs.get('courseId')  # Get courseId from URL parameters
+        questions_data = request.data.get('questions', [])
+        print('Course ID:', courseId)
+        print('Questions Data:', questions_data)
+
+        try:
+            course = Course.objects.get(id=courseId, tutor=request.user)
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found or you don't have permission."}, status=status.HTTP_404_NOT_FOUND)
+
+        created_questions = []
+
+        for question_data in questions_data:
+            question_text = question_data.get('text')
+            answers_data = question_data.get('answers', [])
+
+            question = Question.objects.create(course=course, text=question_text)
+
+            for answer_data in answers_data:
+                Answer.objects.create(
+                    question=question,
+                    text=answer_data['text'],
+                    is_correct=answer_data['is_correct']
+                )
+
+            created_questions.append(question)
+
+        serializer = self.get_serializer(created_questions, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
