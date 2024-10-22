@@ -2,6 +2,7 @@ from rest_framework import serializers
 from tutor.models import TutorDetails 
 from accounts.models import User
 from .models import Language, StudentCourseEnrollment
+from tutor.models import Course
 
 
 class StudentListSerializer(serializers.ModelSerializer):
@@ -52,15 +53,10 @@ class StudentCourseEnrollmentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentCourseEnrollment
-        fields = [
-            'id',
-            'user_first_name',
-            'user_last_name',
-            'course_title',
-            'course_category',
-            'course_tutor_name',
-            'course_tutor_last_name',
-            'payment_status',
-            'amount_paid',
-            'created_at',
-        ]
+        fields = [ 'id','user_first_name', 'user_last_name', 'course_title', 'course_category','course_tutor_name', 'course_tutor_last_name', 'payment_status', 'amount_paid','created_at',]
+
+
+class ApprovedCourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['id', 'title', 'category', 'price', 'duration']
