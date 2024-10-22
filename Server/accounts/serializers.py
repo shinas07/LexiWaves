@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'password', 'user_type']
+        fields = ['email', 'first_name', 'last_name', 'password', 'user_type', 'date_joined']
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -86,7 +86,20 @@ class CourseWatchSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'category', 'thumbnail_url', 
                   'video_url', 'price', 'duration', 'difficulty', 'tutor', 
                   'created_at', 'updated_at', 'is_approved', 'lessons']
+
+   #User profile serializer 
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['email', 'first_name', 'last_name', 'user_type', 'date_joined','profile_image']
+  
+
         
+class UserProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_image']
 
 # Review 
 # class CourseReviewSerializer(serializers.ModelSerializer):
