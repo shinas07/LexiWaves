@@ -33,6 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('admin', 'Admin'),
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
+    profile_image = models.URLField(blank=True, null=True)
 
     objects = CustomUserManager()
 
