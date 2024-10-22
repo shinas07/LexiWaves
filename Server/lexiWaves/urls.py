@@ -23,21 +23,30 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from accounts.views import GoogleLogin
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from chat import routing as chat_routing
+from django.http import HttpResponse
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('accounts/', include('allauth.urls')),
     path('user/',include('accounts.urls')),
+    path('student/', include('student.urls')),
     path('tutor/',include('tutor.urls')),
     path('lexi-admin/',include('lexi_admin.urls')),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
-
-    path('dj-rest-auth/', include('dj_rest_auth.urls')),
-    path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('dj-rest-auth/google/', GoogleLogin.as_view(), name='google_login')
+    path('chat/', include('chat.urls')),
+    #    path('ws/', AuthMiddlewareStack(
+    #     URLRouter(
+    #         chat_routing.websocket_urlpatterns
+    #     )
+    # )),
 ]
 
 
