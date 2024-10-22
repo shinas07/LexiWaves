@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet, TutorCreatedCoursesView, EnrolledCoursesView,TutorDashboardView
+from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet, TutorCreatedCoursesView, EnrolledCoursesView,TutorDashboardView, CompletedLessonsView,CompleteLessonView,QuizCreationView
 
 urlpatterns = [
     path('signup/', TutorSignUpView.as_view(), name='tutor_signup'),
@@ -9,7 +9,12 @@ urlpatterns = [
     path('details/',TutorDetailsView.as_view(), name='tutor-details'),
     path('dashboard/',TutorDashboardView.as_view(), name='tutor-dashboard'),
     path('courses-create/', CourseCreationViewSet.as_view({'post': 'create'}), name='create-course'),
-     path('created-courses/', TutorCreatedCoursesView.as_view(), name='tutor_courses'),
-      path('enrolled-courses-list/', EnrolledCoursesView.as_view(), name='enrolled-courses'),
+    path('complete-lesson/', CompleteLessonView.as_view(), name='complete-lesson'),
+    path('completed-lessons/<int:course_id>/', CompletedLessonsView.as_view(), name='completed-lessons'),
+    path('created-courses/', TutorCreatedCoursesView.as_view(), name='tutor_courses'),
+    path('enrolled-courses-list/', EnrolledCoursesView.as_view(), name='enrolled-courses'),
+    path('courses/<int:courseId>/quiz/', QuizCreationView.as_view(), name='create-quiz'),
+
 ]
+
 
