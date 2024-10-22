@@ -1,9 +1,8 @@
 from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, StudentListSerializer, CourseSerializer,CourseDetailSerializer, StudentCourseEnrollmentSerializer,CourseWatchSerializer
+from .serializers import UserSerializer, StudentListSerializer, CourseSerializer,CourseDetailSerializer, StudentCourseEnrollmentSerializer,CourseWatchSerializer, UserProfileImageSerializer, UserProfileSerializer
 from .models import  OTPVerification, Student,User
-import random
 from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import timedelta
@@ -26,6 +25,10 @@ from lexi_admin.models import StudentCourseEnrollment
 from django.conf import settings
 stripe.api_key = settings.STRIPE_SECRET_KEY
 import json
+import uuid
+import boto3
+import random
+
 
 
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -59,6 +62,7 @@ def     send_otp_email(email, otp):
 
 def create_or_resend_otp(email):
     otp = generate_otp()
+    print(otp)
     OTPVerification.objects.update_or_create(
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
@@ -67,7 +71,7 @@ def create_or_resend_otp(email):
         return {"message": "OTP sent to your email. Please verify."}
     else:
         return {"error":"Falid to send OTP"}
-    
+
 
 class SignUpView(APIView):
     def post(self, request):
@@ -141,7 +145,6 @@ class UserLoginView(APIView):
             if not user.is_active:
                 return Response({'error': 'Your account has been blocked. Please contact support for assistance.'}, status=status.HTTP_403_FORBIDDEN)
             if user.check_password(password):
-                print('password is checked')
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'refresh': str(refresh),
@@ -212,13 +215,126 @@ class RefreshTokenView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         
+# User Profile View
+class UserProfileView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
+
+    def get(self, request):
+        user = request.user
+        serializer = self.serializer_class(user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+    
+# Password Change
+class ChangePasswordView(APIView):
+    permission_class = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+
+        if not user.check_password(current_password):
+            return Response({"error":"Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+    
+        if user.check_password(new_password):
+            return Response({"error":"New password cannot be the same as the current password."},status=status.HTTP_400_BAD_REQUEST)
+      
+        user.set_password(new_password)
+        user.save()
+        return Response({"successful":"password changed succeefully."},status=status.HTTP_200_OK)
+    
+# User Profile Upload
+
+
+
+class UserProfileImageUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        
+        # Get the uploaded profile image from the request
+        profile_image = request.FILES.get('profile_image')
+        
+        if not profile_image:
+            return Response({'error': 'Profile image is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Initialize the S3 client
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        try:
+            # Create a unique file name for the image
+            image_key = f'profile_images/{uuid.uuid4()}-{profile_image.name}'
+            # Upload the file to S3
+            s3_client.upload_fileobj(profile_image, settings.AWS_STORAGE_BUCKET_NAME, image_key, ExtraArgs={'ACL': 'public-read'})
+
+            # Construct the full URL to the image
+            profile_image_url = f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{image_key}'
+            
+            # Prepare the data for the serializer
+            serializer = UserProfileImageSerializer(user, data={'profile_image': profile_image_url}, partial=True) 
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserProfileImageRemoveView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user  # Assuming the user is authenticated
+        
+        # Check if the user has a profile image
+        if user.profile_image:
+            # Extract the image key from the URL
+            image_key = user.profile_image.split('/')[-1]  # Assuming the URL structure is consistent
+            
+            # Initialize the S3 client
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME
+            )
+            
+            # Delete the image from S3
+            user.profile_image = None
+            user.save()
+            try:
+                s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'profile_images/{image_key}')
+            except Exception as e:
+                print('error while removing',str())
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # Remove the profile image from the user model
+            user.profile_image = None  # Remove the profile image
+            user.save()  # Save the changes
+            
+            return Response({"message": "Profile image removed successfully"}, status=status.HTTP_204_NO_CONTENT)
+        print('')
+        return Response({"error": "No profile image to remove."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Home page Latest Courses
 
 # All Courses list
 class CrouseListView(generics.ListAPIView):
-    queryset = Course.objects.all().order_by('-created_at')
+    queryset = Course.objects.filter(is_approved=True).order_by('-created_at')
     serializer_class = CourseSerializer
 
 #Course Details View
@@ -316,8 +432,7 @@ class WatchCourseView(APIView):
     
     def get(self, request, courseId):  
         user = request.user
-        print(user)
-        print(f"User: {user}, Course ID: {courseId}")
+      
     
         try:
             # Check if the user is enrolled in the course and payment is completed
@@ -329,7 +444,8 @@ class WatchCourseView(APIView):
     
         try:
             # Fetch the course along with its lessons
-            course = Course.objects.prefetch_related('lessons').get(id=24)
+            # course = Course.objects.prefetch_related('lessons').get(id=33)
+            course = enrollment.course 
             serializer = CourseWatchSerializer(course)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Course.DoesNotExist:
@@ -346,5 +462,62 @@ class CheckEnrollmentView(generics.RetrieveAPIView):
         return Response({'enrolled':False}, status=200)
 
 
+# UserLogOut
+class LogoutView(APIView):
 
+    def post(self, request):
+        try:
+            # Get the refresh token from the request data
+            refresh_token = request.data.get('refresh_token')
+         
+            if not refresh_token:
+                return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            
+            return Response({"success": "User logged out successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+         
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+      
+from tutor.models import QuizAttempt, Lesson, Question, Answer, TutorDetails
 
+class DeactivateAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'success': False, 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not user.check_password(password):
+            return Response({'success': False, 'message': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Deleting quiz attempts
+        QuizAttempt.objects.filter(user=user).delete()
+
+        # Since 'Lesson' is connected via 'Course' (through the tutor), filter by course__tutor
+        lessons = Lesson.objects.filter(course__tutor=user)
+        lessons.delete()
+
+        # # For tutors, delete associated courses, questions, answers, and tutor details
+        # if user.user_type == 'tutor':
+        #     courses = Course.objects.filter(tutor=user)
+        #     for course in courses:
+        #         Question.objects.filter(course=course).delete()
+        #         Answer.objects.filter(question__course=course).delete()
+        #         Lesson.objects.filter(course=course).delete()
+        #     courses.delete()
+
+        #     # Delete TutorDetails for the tutor
+        #     TutorDetails.objects.filter(tutor=user).delete()
+
+        # Finally, delete the user account
+        user.delete()
+
+        return Response({'success': True, 'message': 'Account successfully deactivated.'}, status=status.HTTP_200_OK)
