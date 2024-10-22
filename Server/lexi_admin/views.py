@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from tutor.models import Tutor, TutorDetails
-from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer, TutorRequestSerializer, StudentCourseEnrollmentListSerializer,LanguageSerializer
+from .serializers import TutorDetailsSerializer, StudentListSerializer, TutorListSerializer, TutorRequestSerializer, StudentCourseEnrollmentListSerializer,LanguageSerializer, ApprovedCourseSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -16,6 +16,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 from tutor.models import Course
 from .models import StudentCourseEnrollment
+from tutor.serializers import CourseSerializer
+
 
 # Create your views here.
 
@@ -141,16 +143,53 @@ class LanguageCreateView(APIView):
         return Response({"error": "Invalid data", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
 
-# Listing Enrolled Courses and Student
 
+# Ḷisting Approved Courses 
+class ApprovedCoursesListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]  
+    queryset = Course.objects.filter(is_approved=True) 
+    serializer_class = ApprovedCourseSerializer
+   
+
+    def get_queryset(self):
+        return super().get_queryset()
+    
+# Listing Enrolled Courses and Student
 class EnrolledCoursesListView(generics.ListAPIView):
     queryset = StudentCourseEnrollment.objects.select_related('user', 'course').all()
     serializer_class = StudentCourseEnrollmentListSerializer
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # Call the superclass method to get the response
         response = super().get(request, *args, **kwargs)
-        print(response)
-        return response  # This will return the serialized data as a JSON response
+        return response  
 
+# Request Courses Count
+class NewCourseCountView(APIView):
+    def get(self, request):
+        new_course_count = Course.objects.filter(is_approved=False).count()
+        print(new_course_count)
+        return Response({'new_course_count': new_course_count}, status=status.HTTP_200_OK)
+    
+# Request Courses List For Approval
+class NewCoursesView(generics.ListAPIView):
+    permission_class = [IsAuthenticated]
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        return Course.objects.filter(is_approved=False)
+
+class CourseApprovalView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_approved = request.data.get('is_approved', instance.is_approved)
+        instance.save()
+        return Response({'status': 'Course approval status updated.'})
+
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+    
