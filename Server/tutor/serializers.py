@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Tutor, TutorDetails, Course
 from accounts.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Lesson
+from .models import Lesson, LessonCompletion,Answer, Question, QuizAttempt
 from lexi_admin.models import StudentCourseEnrollment
 from accounts.serializers import UserSerializer
 
@@ -22,7 +22,6 @@ class TutorSerializer(serializers.ModelSerializer):
 
 class TutorDetailsSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=False)
-    teaching_license = serializers.FileField(required=False)
     identity_proof = serializers.FileField(required=False)
 
     class Meta:
@@ -32,7 +31,6 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Extract the optional file fields
         profile_picture = validated_data.pop('profile_picture', None)
-        teaching_license = validated_data.pop('teaching_license', None)
         identity_proof = validated_data.pop('identity_proof', None)
 
         user = self.context['request'].user
@@ -42,15 +40,13 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
         else:
             raise ValueError("User does not have a tutor profile")
 
-        # Create the tutor details instance without the files first
+        #
         tutor_details = TutorDetails.objects.create(tutor=tutor, **validated_data)
         print('tutor created',tutor_details)
 
         # Handle the file uploads if they exist
         if profile_picture:
             tutor_details.profile_picture = profile_picture
-        if teaching_license:
-            tutor_details.teaching_license = teaching_license
         if identity_proof:
             tutor_details.identity_proof = identity_proof
 
@@ -63,6 +59,11 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = ['id', 'title', 'description', 'lesson_video_url', 'order']
+
+class LessonCompletionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonCompletion
+        fields = ['lesson', 'completed_at']
 
 
 
@@ -110,3 +111,22 @@ class CourseWithStudentsSerializer(serializers.ModelSerializer):
 #     def create(self, validated_data):
 #         validated_data['tutor'] = self.context['request'].user
 #         return super().create(validated_data)
+
+
+# Quiz Part
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ['id', 'text']
+
+class QuestionSerializer(serializers.ModelSerializer):
+    answers = AnswerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'text', 'answers']
+
+# class QuizAttemptSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = QuizAttempt
+#         fields = ['id', 'score', 'passed', 'date_attempted']
