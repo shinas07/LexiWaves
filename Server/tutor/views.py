@@ -24,6 +24,8 @@ from botocore.exceptions import ClientError
 import uuid
 from lexi_admin.models import StudentCourseEnrollment
 import json
+from .models import  LessonCompletion, Lesson
+from .serializers import CourseSerializer, LessonCompletionSerializer
 
 
 def generate_otp():
@@ -348,8 +350,6 @@ class EnrolledCoursesView(generics.ListAPIView):
         return Response(serializer.data)
     
 
-from .models import  LessonCompletion, Lesson
-from .serializers import CourseSerializer, LessonCompletionSerializer
 
 
 class CompleteLessonView(generics.CreateAPIView):
@@ -385,6 +385,7 @@ class CompletedLessonsView(generics.ListAPIView):
         )
 
 # Quiz Functions
+
 class QuizCreationView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = QuestionSerializer
@@ -426,3 +427,27 @@ class QuizCreationView(generics.CreateAPIView):
 
         serializer = self.get_serializer(created_questions, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+# Crouse edit
+class CourseDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+    def get(self, request, *args, **kwargs):
+        course_id = kwargs.get('courseId') 
+        try:
+            course = self.get_object()  
+            serializer = self.get_serializer(course)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        course_id = kwargs.get('pk')
+        course = self.get_object()  
+        serializer = self.get_serializer(course, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()  # Save the updated course details
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
