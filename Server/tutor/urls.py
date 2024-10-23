@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet, TutorCreatedCoursesView, EnrolledCoursesView,TutorDashboardView, CompletedLessonsView,CompleteLessonView,QuizCreationView
+from .views import  TutorSignUpView, TutorVerifyEmailView, TutorLoginView, TutorDetailsView, CourseCreationViewSet, TutorCreatedCoursesView, EnrolledCoursesView,TutorDashboardView, CompletedLessonsView,CompleteLessonView,QuizCreationView, CourseDetailView
 
 urlpatterns = [
     path('signup/', TutorSignUpView.as_view(), name='tutor_signup'),
@@ -14,7 +14,9 @@ urlpatterns = [
     path('created-courses/', TutorCreatedCoursesView.as_view(), name='tutor_courses'),
     path('enrolled-courses-list/', EnrolledCoursesView.as_view(), name='enrolled-courses'),
     path('courses/<int:courseId>/quiz/', QuizCreationView.as_view(), name='create-quiz'),
+    path('course/details/<int:pk>/', CourseDetailView.as_view(), name='course-detail'), 
 
 ]
+
 
 
