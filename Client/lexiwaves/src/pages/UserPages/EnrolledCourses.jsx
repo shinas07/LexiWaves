@@ -30,7 +30,6 @@ const UserEnrolledCoursesPage = () => {
 
         fetchCourses();
     }, []);
-    console.log('courses',courses)
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
@@ -38,10 +37,10 @@ const UserEnrolledCoursesPage = () => {
         <DotBackground>
             <FloatingNavbar/>
          <div className="min-h-screen mt-12 p-6">
-            <h1 className="text-3xl font-bold  mb-6 mt-4 text-center">Your Enrolled Courses</h1>
+            <h1 className="text-3xl font-bold mb-6 mt-8 text-center">Your Enrolled Courses</h1>
             <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {courses.map((course) => (
-                    <div key={course.id} className="shadow-md mt-6 bg-neutral-200 rounded-lg overflow-hidden transition-all hover:scale-105">
+                    <div key={course.id} className="shadow-md mt-6 ml-6 bg-neutral-200 rounded-lg overflow-hidden transition-all hover:scale-105">
                         <div className="p-4">
                             <img
                                 className="w-full h-40 rounded-lg object-cover"
