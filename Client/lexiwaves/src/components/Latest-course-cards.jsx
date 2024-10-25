@@ -119,16 +119,16 @@ export const Carousel = ({
         </div>
         <div className="flex justify-end gap-2 mr-10">
           <button
-            className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            className="relative z-40 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollLeft}
             disabled={!canScrollLeft}>
-            <IconArrowNarrowLeft className="h-6 w-6 text-gray-500" />
+            <IconArrowNarrowLeft className="h-5 w-5 text-gray-500" />
           </button>
           <button
-            className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            className="relative z-40 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollRight}
             disabled={!canScrollRight}>
-            <IconArrowNarrowRight className="h-6 w-6 text-gray-500" />
+            <IconArrowNarrowRight className="h-5 w-5 text-gray-500" />
           </button>
         </div>
       </div>
@@ -141,54 +141,39 @@ export const Card = ({
   index,
   layout = false
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-
-
-const handleCardClick = () => {
-    
-    navigate(`/course/${card.id}`); 
+  const handleCardClick = () => {
+    navigate(`/course/${card.id}`);
   };
 
+  return (
+    <motion.button
+      onClick={handleCardClick}
+      className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-60 md:h-80 md:w-72 overflow-hidden flex flex-col items-start justify-start relative z-10"
+    >
+      {/* Background image */}
+      <BlurImage
+        src={card.thumbnail_url}
+        alt={card.title}
+        fill
+        className="object-cover h-48 w-full"
+      />
 
-
-
-  return (<>
-
-<motion.button
-        onClick={handleCardClick} // Use the click handler for redirection
-        className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-56 md:h-[40rem] md:w-96 overflow-hidden flex flex-col items-start justify-start relative z-10 "
-      >
-
-        {/* Background image */}
-        <BlurImage
-          src={card.thumbnail_url}
-          alt={card.title}
-          fill
-          className="object-cover h-[65%] object-fit"
-        />
-
-              {/* Content area */}
-      <div className="h-[35%] flex flex-col justify-start text-white w-full p-4">
-        {/* <motion.p className="text-sm font-medium text-gray-400 w-full">
-          {card.category}
-        </motion.p> */}
-        <motion.h3 className="text-xl font-semibold mt-2 mb-6">
+      {/* Content area */}
+      <div className="h-[35%] flex flex-col justify-start text-black dark:text-white w-full p-4">
+        <motion.h3 className="text-lg font-semibold mt-2 mb-2">
           {card.title}
         </motion.h3>
-        <motion.p className="text-sm mb-2">
+        <motion.p className="text-sm mb-1">
           Tutor: {card.tutor_name} | Difficulty: {card.difficulty}
         </motion.p>
         <motion.p className="text-sm">
           {card.description}
         </motion.p>
       </div>
-
-
-      </motion.button>
-   
-
-  </>);
+    </motion.button>
+  );
 };
 
 export const BlurImage = ({
