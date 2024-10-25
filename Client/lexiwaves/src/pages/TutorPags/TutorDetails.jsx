@@ -7,6 +7,7 @@ import api from "../../service/api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
+import { Link } from "react-router-dom";
 
 
 const TutorDetailForm = () => {
@@ -19,9 +20,7 @@ const TutorDetailForm = () => {
 
     // Education & Qualifications
     degrees: "",
-    certifications: "",
     educational_institutions: "",
-    relevant_courses: "",
 
     // Professional Experience
     work_history: "",
@@ -32,12 +31,11 @@ const TutorDetailForm = () => {
     subjects_offered: "",
     skill_levels: "",
 
-    // Additional Documents
-    teaching_license: null,
+ 
 
     // Fee Structure
     hourly_rate: "",
-    payment_methods: "",
+
 
     // Personal Statement
     personal_statement: "",
@@ -47,7 +45,6 @@ const TutorDetailForm = () => {
 
     // Consent and Agreements
     terms_of_service: false,
-    privacy_policy: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -56,12 +53,6 @@ const TutorDetailForm = () => {
 
   const navigate = useNavigate();
 
-  const validate = () => {
-    const errors = {};
-    // Add validation logic here
-    setErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
 
   const handleChange = (e) => {
     const { id, value, type, checked, files } = e.target;
@@ -71,11 +62,26 @@ const TutorDetailForm = () => {
     }));
   };
 
+  const validate = () => {
+    const errors = {};
+    if (!formData.phone_number) errors.phone_number = 'Phone number is required';
+    if (!formData.address) errors.address = 'Address is required';
+    if (!formData.biography) errors.biography = 'Biography is required';
+    if (!formData.gender) errors.gender = 'gender is required';
+    if (!formData.hourly_rate) errors.hourly_rate = 'Hourly rate is required';
+    if (!formData.terms_of_service) errors.terms_of_service = 'You must accept the Terms of Service';
+    if (!formData.dateOfBirth) errors.dateOfBirth = 'Data of birth is required';
+    if (!formData.identity_proof) errors.identity_proof = 'Identity proof is required';
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
    
     e.preventDefault();
 
-    console.log('form data', formData)
+    if(!validate())
+      return
 
     const token = localStorage.getItem('accessToken')
 
@@ -106,6 +112,7 @@ const TutorDetailForm = () => {
      
  
     } catch (error) {
+      
       toast.error('Details is already submited');
        
     }
@@ -131,7 +138,7 @@ const TutorDetailForm = () => {
         </p>
         <form className="my-8" onSubmit={handleSubmit}>
           {/* Personal Information */}
-          <h3 className="font-semibold text-lg mb-4">Personal Information</h3>
+          <h3 className="font-semibold text-white text-lg mb-4">Personal Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <LabelInputContainer>
         <Label htmlFor="profilePicture">Profile Picture</Label>
@@ -151,6 +158,7 @@ const TutorDetailForm = () => {
             placeholder="Your phone number"
             type="tel"
         />
+          {errors.phone_number && <p className="text-red-500 text-sm">{errors.phone_number}</p>}
     </LabelInputContainer>
     <LabelInputContainer>
         <Label htmlFor="dateOfBirth">Date of Birth</Label>
@@ -161,6 +169,7 @@ const TutorDetailForm = () => {
             placeholder="Your date of birth"
             type="date"
         />
+        {errors.dateOfBirth && <p className='text-red-500 text-sm'>{errors.dateOfBirth}</p>}
     </LabelInputContainer>
     <LabelInputContainer>
         <Label htmlFor="biography">Biography</Label>
@@ -171,6 +180,9 @@ const TutorDetailForm = () => {
             placeholder="A brief biography about yourself"
             type="text"
         />
+         {errors.biography && <p className="text-red-500 text-sm">{errors.biography}</p>}
+    
+        
     </LabelInputContainer>
     <LabelInputContainer>
         <Label htmlFor="gender">Gender</Label>
@@ -185,6 +197,7 @@ const TutorDetailForm = () => {
             <option value="female">Female</option>
             <option value="non-binary-other">Non-binary/Other</option>
         </select>
+        {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
     </LabelInputContainer>
     <LabelInputContainer className="md:col-span-2">
         <Label htmlFor="address">Address</Label>
@@ -195,15 +208,16 @@ const TutorDetailForm = () => {
             placeholder="Your current address"
             type="text"
         />
+        {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
     </LabelInputContainer>
 </div>
 
 
           {/* Education & Qualifications */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
+          <h3 className="font-semibold text-white text-lg mt-8 mb-4">
             Education & Qualifications
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
             <LabelInputContainer>
               <Label htmlFor="degrees">Degrees</Label>
               <Input
@@ -211,16 +225,6 @@ const TutorDetailForm = () => {
                 value={formData.degrees}
                 onChange={handleChange}
                 placeholder="Your degrees"
-                type="text"
-              />
-            </LabelInputContainer>
-            <LabelInputContainer>
-              <Label htmlFor="certifications">Certifications</Label>
-              <Input
-                id="certifications"
-                value={formData.certifications}
-                onChange={handleChange}
-                placeholder="Your certifications"
                 type="text"
               />
             </LabelInputContainer>
@@ -236,20 +240,10 @@ const TutorDetailForm = () => {
                 type="text"
               />
             </LabelInputContainer>
-            <LabelInputContainer>
-              <Label htmlFor="relevant_courses">Relevant Courses</Label>
-              <Input
-                id="relevant_courses"
-                value={formData.relevant_courses}
-                onChange={handleChange}
-                placeholder="Additional courses or workshops"
-                type="text"
-              />
-            </LabelInputContainer>
           </div>
 
           {/* Professional Experience */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
+          <h3 className="font-semibold text-white text-lg mt-8 mb-4">
             Professional Experience
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,7 +280,7 @@ const TutorDetailForm = () => {
           </div>
 
           {/* Teaching Subjects and Skills */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
+          <h3 className="font-semibold text-white text-lg mt-8 mb-4">
             Teaching Subjects and Skills
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -313,23 +307,23 @@ const TutorDetailForm = () => {
           </div>
 
           {/* Additional Documents */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
-            Additional Documents
+          <h3 className="font-semibold text-white text-lg mt-8 mb-4">
+            Additional Document
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="teaching_license">Teaching License</Label>
-              <Input id="teaching_license" onChange={handleChange} type="file" />
+              <Label htmlFor="identity_proof">Identity Proof</Label>
+              <Input id="identity_proof" onChange={handleChange} type="file" />
+              {errors.identity_proof && <p className="text-red-500 text-sm">{errors.identity_proof}</p>} 
             </LabelInputContainer>
           </div>
 
         
 
-          {/* Fee Structure */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">Fee Structure</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   
+          <div className="grid grid-cols-1 mt-8 md:grid-cols-2 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="hourly_rate">Hourly Rate</Label>
+              <Label htmlFor="hourly_rate">$ Hourly Rate </Label>
               <Input
                 id="hourly_rate"
                 value={formData.hourly_rate}
@@ -337,26 +331,18 @@ const TutorDetailForm = () => {
                 placeholder="Your hourly rate"
                 type="text"
               />
+              {errors.hourly_rate && <p className="text-red-500 text-sm">{errors.hourly_rate}</p>} 
             </LabelInputContainer>
-            <LabelInputContainer>
-              <Label htmlFor="payment_methods">Payment Methods</Label>
-              <Input
-                id="payment_methods"
-                value={formData.payment_methods}
-                onChange={handleChange}
-                placeholder="Accepted payment methods"
-                type="text"
-              />
-            </LabelInputContainer>
+          
           </div>
 
           {/* Personal Statement */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
+          <h3 className="font-semibold text-white text-lg mt-8 mb-4">
             Personal Statement
           </h3>
           <div className="grid grid-cols-1 gap-4">
             <LabelInputContainer>
-              <Label htmlFor="personal_statement">Personal Statement</Label>
+              {/* <Label htmlFor="personal_statement">Personal Statemen</Label> */}
               <textarea
                 id="personal_statement"
                 value={formData.personal_statement}
@@ -367,16 +353,7 @@ const TutorDetailForm = () => {
             </LabelInputContainer>
           </div>
 
-          {/* Verification Documents */}
-          <h3 className="font-semibold text-lg mt-8 mb-4">
-            Verification Documents
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <LabelInputContainer>
-              <Label htmlFor="identity_proof">Identity Proof</Label>
-              <Input id="identity_proof" onChange={handleChange} type="file" />
-            </LabelInputContainer>
-          </div>
+        
 
           {/* Consent and Agreements */}
           <h3 className="font-semibold text-lg mt-8 mb-4">
@@ -391,27 +368,18 @@ const TutorDetailForm = () => {
                 onChange={handleChange}
                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <Label
-                htmlFor="termsOfService"
-                className="text-sm font-medium text-gray-700"
-              >
-                I agree to the Terms of Service
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="privacy_policy"
-                checked={formData.privacy_policy}
-                onChange={handleChange}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              <Label
-                htmlFor="privacyPolicy"
-                className="text-sm font-medium text-gray-700"
-              >
-                I consent to the Privacy Policy
-              </Label>
+             
+           
+                   <Label
+            htmlFor="terms_of_service"
+            className="text-sm font-medium text-gray-700"
+          >
+            I agree to the <span className="text-white-600 underline hover:text-gray-400">
+              <Link to="/terms-of-service">Terms of Service</Link>
+            </span>
+          </Label>
+                 
+              {errors.terms_of_service && <p className="text-red-500 text-sm">{errors.terms_of_service}</p>}
             </div>
           </div>
 
