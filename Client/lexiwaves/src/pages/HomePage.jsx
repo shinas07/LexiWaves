@@ -106,13 +106,13 @@ function Home() {
             <h1 className="text-4xl font-bold mb-4">Sharpen your language skills</h1>
             <p className="text-lg mb-10 text-muted-text">
                 Engage in bite-sized language exercises, meticulously designed to strengthen various language techniques. 
-                Hone your proficiency in your primary language or swiftly grasp any of the 30+ supported languages.
+                Hone your proficiency in your primary language or swiftly grasp any of the 20+ supported languages.
             </p>
             <div className="flex flex-wrap justify-center gap-8">
                 <div className="bg-black rounded-lg border border-gray-900 p-6 w-80">
                     <h2 className="text-2xl font-semibold mb-2">Gain fresh perspectives</h2>
                     <p className="text-sm text-muted-text">
-                        Tackle challenges and explore diverse solutions. Learn new techniques from some of the globe’s most skilled language learners.
+                        Tackle challenges and explore diverse solutions. Learn new techniques from some of the globe’s most skilled language Trainers.
                     </p>
                 </div>
                 <div className="bg-black rounded-lg border border-gray-900 p-6 w-80">
