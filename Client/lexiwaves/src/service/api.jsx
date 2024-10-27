@@ -1,4 +1,7 @@
 import axios from "axios";
+import { toast } from "sonner";
+
+
 
 const api = axios.create({
     baseURL : 'http://localhost:8000', 
@@ -15,6 +18,7 @@ const refreshAccessToken = async () => {
 
     const response = await api.post('/user/refresh-token/', { refresh: refreshToken });
     localStorage.setItem('accessToken', response.data.access);
+    localStorage.setItem('accessTokenExpiry', Date.now() + response.data.expires_in * 1000); 
     return response.data.access;
 };
 
@@ -23,18 +27,23 @@ const refreshAccessToken = async () => {
 api.interceptors.response.use(
     response => response,
     async (error) => {
-        console.log('Interceptor triggered:', error.response.status); 
         const originalRequest = error.config;
 
+        // Check if the error is due to an expired access token
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const accessToken = await refreshAccessToken();
-                
                 originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                return Promise.reject(refreshError); 
+                // Handle refresh token expiration
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('accessTokenExpiry');
+                toast.info('Session expired. Please log in again.');
+                // window.location.href = '/signin'; // Redirect to login
+                return Promise.reject(refreshError);
             }
         }
 
