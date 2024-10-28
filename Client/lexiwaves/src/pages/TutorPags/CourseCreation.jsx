@@ -45,9 +45,13 @@ const CourseCreationForm = () => {
   };
 
   const handleLessonChange = (index, e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     const updatedLessons = [...formData.lessons];
-    updatedLessons[index] = { ...updatedLessons[index], [name]: value };
+    if (name === 'lesson_video_url' && files && files[0]) {
+      updatedLessons[index] = { ...updatedLessons[index], [name]: files[0] };
+    } else {
+      updatedLessons[index] = { ...updatedLessons[index], [name]: value };
+    }
     setFormData((prev) => ({ ...prev, lessons: updatedLessons }));
   };
 
@@ -77,7 +81,7 @@ const CourseCreationForm = () => {
     
     formData.lessons.forEach((lesson, index) => {
       if (!lesson.title.trim()) newErrors[`lesson_${index}_title`] = 'Required';
-      if (!lesson.lesson_video_url.trim()) newErrors[`lesson_${index}_video_url`] = 'Required';
+      if (!lesson.lesson_video_url) newErrors[`lesson_${index}_video_url`] = 'Required';
     });
 
     setErrors(newErrors);
@@ -95,7 +99,7 @@ const CourseCreationForm = () => {
         const formDataToSend = new FormData();
         for (const key in formData) {
           if (key === 'lessons') {
-            formDataToSend.append('lessons', JSON.stringify(formData.lessons));
+            // Don't append lessons here, we'll handle them separately
           } else if (key === 'thumbnail' || key === 'video_url') {
             if (formData[key]) {
               formDataToSend.append(key, formData[key]);
@@ -103,19 +107,33 @@ const CourseCreationForm = () => {
           } else {
             formDataToSend.append(key, formData[key]);
           }
-          
         }
 
-                // Simulate progress
-          const progressInterval = setInterval(() => {
-            setProgress((prevProgress) => {
-              if (prevProgress >= 95) {
-                clearInterval(progressInterval);
-                return prevProgress;
-              }
-              return prevProgress + Math.random() * 10;
-            });
-          }, 1000);
+        // Handle lessons separately
+        formData.lessons.forEach((lesson, index) => {
+          formDataToSend.append(`lesson_${index + 1}_title`, lesson.title);
+          formDataToSend.append(`lesson_${index + 1}_description`, lesson.description);
+          formDataToSend.append(`lesson_${index + 1}_order`, lesson.order);
+          
+          // Check if lesson_video_url is a File object
+          if (lesson.lesson_video_url instanceof File) {
+            formDataToSend.append(`lesson_${index + 1}_video`, lesson.lesson_video_url, lesson.lesson_video_url.name);
+          }
+        });
+
+        // Append the number of lessons
+        formDataToSend.append('lesson_count', formData.lessons.length);
+
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          setProgress((prevProgress) => {
+            if (prevProgress >= 95) {
+              clearInterval(progressInterval);
+              return 100;
+            }
+            return prevProgress + Math.random() * 10;
+          });
+        }, 1000);
 
         const response = await api.post('/tutor/courses-create/', formDataToSend, {
           headers: {
@@ -135,7 +153,8 @@ const CourseCreationForm = () => {
         }
       } catch (error) {
         toast.error('Failed to create course');
-      }finally{
+        console.error('Error creating course:', error);
+      } finally {
         setLoading(false);
       }
     } else {
@@ -146,17 +165,18 @@ const CourseCreationForm = () => {
   // Loader
   const Loader = ({ progress }) => {
     const [message, setMessage] = useState('Preparing your course...');
+    console.log(progress)
   
     useEffect(() => {
       if (progress < 20) {
         setMessage('Preparing to upload course materials...');
-      } else if (progress < 40) {
+      } else if (progress < 35) {
         setMessage('Uploading course thumbnail...');
-      } else if (progress < 60) {
+      } else if (progress < 50) {
         setMessage('Uploading course videos...');
-      } else if (progress < 80) {
+      } else if (progress < 75) {
         setMessage('Saving course details...');
-      } else if (progress < 98) {
+      } else if (progress < 90) {
         setMessage('Almost there...');
       } else {
         setMessage('Course successfully created!');
@@ -177,7 +197,7 @@ const CourseCreationForm = () => {
               />
             </div>
           </div>
-          <p className="text-sm text-gray-300 text-center">{progress}% Complete</p>
+          <p className="text-sm text-gray-300 text-center">{Math.floor(progress)}% Complete</p>
         </div>
       </div>
     );
