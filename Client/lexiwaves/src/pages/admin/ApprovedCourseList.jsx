@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../service/api";
 import Layout from "./Layout";
 import { toast } from "sonner";
-import { Loader, AlertTriangle } from "lucide-react";
+import { Loader, AlertTriangle, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom"; 
 
 export default function ApprovedCoursesPage() {
@@ -10,6 +10,8 @@ export default function ApprovedCoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setErrors] = useState(null);
   const [newRequestsCount, setNewRequestsCount] = useState(0); // State for new requests count
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -49,6 +51,16 @@ export default function ApprovedCoursesPage() {
     fetchNewRequestsCount(); // Fetch new requests count
   }, []);
 
+  useEffect(() => {
+    if (!coursesData) return;
+    
+    const filtered = coursesData.filter(course => 
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCourses(filtered);
+  }, [searchTerm, coursesData]);
+
   const handleDelete = async (courseId) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -75,41 +87,37 @@ export default function ApprovedCoursesPage() {
   return (
     <Layout>
       <div className="flex h-screen font-sans text-white">
-        {/* Main Courses Content */}
         <main className="p-6 w-full overflow-auto">
-        <div className="flex justify-between items-center mb-6">
-            <div className="relative inline-block ml-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <h1 className="text-3xl font-bold">Approved Courses</h1>
+            
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-gray-700 text-white border border-gray-600 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-blue-500 text-sm"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+
+              <div className="relative inline-block">
                 <button
-                    onClick={handleNewCoursesRequestPage} 
-                    className="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600 transition duration-200"
+                  onClick={handleNewCoursesRequestPage}
+                  className="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600 transition duration-200 whitespace-nowrap text-sm font-medium"
                 >
-                    New Courses for Approval
+                  New Courses
                 </button>
                 {newRequestsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                     {newRequestsCount}
-                    </span>
+                  </span>
                 )}
+              </div>
             </div>
-
-
-            {/* <div className="flex items-center ml-auto">
-                {newRequestsCount > 0 && (
-                <span className="bg-yellow-400 text-black px-3 py-1 rounded-full mr-4">
-                    {newRequestsCount} New Requests
-                </span>
-                )}
-                <button
-                onClick={handleNewCoursesPage} // Call the function to navigate to the new courses page
-                className="bg-green-500 text-black px-4 py-2 rounded hover:bg-lightblue-500 transition duration-200"
-                >
-                New Courses for Approval
-                </button>
-            </div> */}
-        </div>
-
-
-          <h1 className="text-3xl font-bold mb-6">Approved Courses</h1>
+          </div>
 
           {loading && (
             <div className="flex items-center justify-center h-40">
@@ -138,8 +146,8 @@ export default function ApprovedCoursesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {coursesData.length > 0 ? (
-                    coursesData.map((course) => (
+                  {filteredCourses.length > 0 ? (
+                    filteredCourses.map((course) => (
                       <tr key={course.id} className="hover:bg-gray-700">
                         <td className="px-5 py-5 border-b border-gray-600 text-sm">{course.title}</td>
                         <td className="px-5 py-5 border-b border-gray-600 text-sm">{course.category}</td>
@@ -163,7 +171,9 @@ export default function ApprovedCoursesPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="text-center py-4">No approved courses found</td>
+                      <td colSpan="5" className="text-center py-4">
+                        {searchTerm ? 'No courses found matching your search' : 'No approved courses found'}
+                      </td>
                     </tr>
                   )}
                 </tbody>
