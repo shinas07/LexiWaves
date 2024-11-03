@@ -14,6 +14,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime, timedelta
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from tutor.models import QuizAttempt, Lesson
 from tutor.models import Course
 import stripe
 from django.conf import settings
@@ -134,6 +135,7 @@ class ResendOtpView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
+
 class UserLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -142,6 +144,8 @@ class UserLoginView(APIView):
        
         try:
             user = User.objects.get(email=email)
+            if user.user_type != 'student':
+                return Response({'error':'Access denied. This login is only for students.'},status=status.HTTP_403_FORBIDDEN)
             if not user.is_active:
                 return Response({'error': 'Your account has been blocked. Please contact support for assistance.'}, status=status.HTTP_403_FORBIDDEN)
             if user.check_password(password):
@@ -152,9 +156,9 @@ class UserLoginView(APIView):
                     'message': 'Login successful'
                 }, status=status.HTTP_200_OK)
             else:
-             return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+             return Response({'error': 'Invalid password'}, status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
-            return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'User does not exist'}, status=status.HTTP_403_FORBIDDEN)
         
 
 
@@ -481,7 +485,7 @@ class LogoutView(APIView):
          
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
-from tutor.models import QuizAttempt, Lesson, Question, Answer, TutorDetails
+
 
 class DeactivateAccountView(APIView):
     permission_classes = [IsAuthenticated]

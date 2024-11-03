@@ -26,20 +26,21 @@ class AdminLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        print('email and password',email,password)
+
 
         if not email or not password:
             return Response({'error': "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Authenticate user
-        admin = authenticate(request, email=email, password=password)
-        
-        if admin and admin.is_staff:
+        user = authenticate(request, email=email, password=password)
+        if user and user.user_type == 'admin' and user.is_staff:
             # Generate tokens
-            refresh = RefreshToken.for_user(admin)
+            refresh = RefreshToken.for_user(user)
+
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                'role':user.user_type
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials or not a staff user"}, status=status.HTTP_401_UNAUTHORIZED)
