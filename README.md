@@ -37,7 +37,7 @@ python manage.py runserver
 3. Frontend Setup:
 cd Client/lexiwaves
 npm install
-npm start
+npm run dev
 
 
 
