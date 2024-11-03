@@ -1,31 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import api from '../../service/api';
 import { toast } from 'sonner';
+import { DotBackground } from '../../components/Background';
+
 
 const CreateQuiz = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
-    const [courseName, setCourseName] = useState('');
+    const location = useLocation();
     const [questions, setQuestions] = useState([{ text: '', answers: [{ text: '', isCorrect: false }] }]);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        const fetchCourseDetails = async () => {
-            try {
-                const token = localStorage.getItem('accessToken');
-                const response = await api.get(`/tutor/courses/${courseId}/`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setCourseName(response.data.title);
-            } catch (error) {
-                console.error('Error fetching course details:', error);
-                setError('Failed to fetch course details');
-            }
-        };
-        fetchCourseDetails();
-    }, [courseId]);
+    const searchParams = new URLSearchParams(location.search);
+    const courseName = searchParams.get('courseTitle') || 'Untitled Course';
 
     const handleQuestionChange = (index, value) => {
         const newQuestions = [...questions];
@@ -75,6 +62,7 @@ const CreateQuiz = () => {
         try {
 
             const token = localStorage.getItem('accessToken');
+            console.log(courseId)
             const response = await api.post(`tutor/courses/${courseId}/quiz/`, {
                 questions: questions.map(q => ({
                     text: q.text,
@@ -83,9 +71,8 @@ const CreateQuiz = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('Quiz created:', response.data);
             toast.success('Quiz created successfully!');
-            navigate(`/tutor/courses/${courseId}`);
+            navigate(`/tutor/courses/details/${courseId}`);
         } catch (error) {
             console.error('Error creating quiz:', error);
             toast.error('Failed to create quiz. Please try again.');
@@ -93,10 +80,10 @@ const CreateQuiz = () => {
     };
 
     return (
-        
-        <div className="container mx-auto p-4 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold mb-6 text-center text-indigo-600">Create Quiz for {courseName}</h1>
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        <DotBackground>
+        <div className="container mx-auto p-4 mt-12 min-h-screen">
+            <h1 className="text-3xl font-bold mb-6 mt-6 text-center text-neutral-200">Create Quiz for 
+                <span className='ml-2 text-neutral-100'>{courseName}</span></h1>
             <form onSubmit={handleSubmit} className="space-y-6">
                 {questions.map((question, questionIndex) => (
                     <div key={questionIndex} className="bg-white p-6 rounded-lg shadow-md">
@@ -115,7 +102,7 @@ const CreateQuiz = () => {
                             value={question.text}
                             onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
                             placeholder="Enter question"
-                            className="w-full p-2 border rounded mb-4"
+                            className="w-full p-2 border rounded mb-4 text-black"
                             required
                         />
                         <div className="space-y-2">
@@ -126,7 +113,7 @@ const CreateQuiz = () => {
                                         value={answer.text}
                                         onChange={(e) => handleAnswerChange(questionIndex, answerIndex, e.target.value)}
                                         placeholder={`Answer ${answerIndex + 1}`}
-                                        className="flex-grow p-2 border rounded"
+                                        className="flex-grow p-2 border rounded text-black"
                                         required
                                     />
                                     <input
@@ -156,21 +143,19 @@ const CreateQuiz = () => {
                                 onClick={() => addAnswer(questionIndex)}
                                 className="mt-2 text-indigo-600 hover:text-indigo-800"
                             >
-                                <FaPlus className="inline mr-1" /> Add Answer
+                                <FaPlus className="inline mr-1"/> Add Options
                             </button>
                         )}
                     </div>
                 ))}
-                <div className="flex justify-center">
+                <div className="flex justify-center space-x-6 mt-6">
                     <button
                         type="button"
                         onClick={addQuestion}
                         className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition duration-300"
                     >
-                        <FaPlus className="inline mr-1" /> Add Question
+                        <FaPlus className="inline mr-1"/> Add Question
                     </button>
-                </div>
-                <div className="flex justify-center mt-6">
                     <button
                         type="submit"
                         className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-300"
@@ -180,6 +165,7 @@ const CreateQuiz = () => {
                 </div>
             </form>
         </div>
+        </DotBackground>
     );
 };
 
