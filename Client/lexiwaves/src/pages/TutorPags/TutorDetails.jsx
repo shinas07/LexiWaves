@@ -115,17 +115,8 @@ const TutorDetailForm = () => {
       
       toast.error('Details is already submited');
        
-    }
-
-
-    
+    } 
  };
- 
-
- 
-
-
-
 
   return (
     <DotBackground>
@@ -341,19 +332,17 @@ const TutorDetailForm = () => {
             Personal Statement
           </h3>
           <div className="grid grid-cols-1 gap-4">
-            <LabelInputContainer>
-              {/* <Label htmlFor="personal_statement">Personal Statemen</Label> */}
-              <textarea
-                id="personal_statement"
-                value={formData.personal_statement}
-                onChange={handleChange}
-                placeholder="Your teaching philosophy and approach"
-                className="flex h-32 w-full rounded-md bg-background px-3 py-2 text-sm text-white ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-neutral-800"
-              />
-            </LabelInputContainer>
-          </div>
+  <LabelInputContainer>
+    <textarea
+      id="personal_statement"
+      value={formData.personal_statement}
+      onChange={handleChange}
+      placeholder="Your teaching philosophy and approach"
+      className="flex h-32 w-full rounded-md bg-background px-3 py-2 text-white text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-neutral-800"
+    />
+  </LabelInputContainer>
+</div>
 
-        
 
           {/* Consent and Agreements */}
           <h3 className="font-semibold text-lg mt-8 mb-4">
