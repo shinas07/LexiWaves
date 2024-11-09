@@ -2,7 +2,8 @@ import React from 'react';
 
 const Loader = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+
+    <div className="fixed inset-0 flex items-center justify-center bg-opacity-75 z-50">
       <div className="flex space-x-2">
         <div className="dot bg-blue-600"></div>
         <div className="dot bg-blue-700 animation-delay-75"></div>
@@ -48,6 +49,7 @@ const Loader = () => {
         }
       `}</style>
     </div>
+
   );
 };
 
