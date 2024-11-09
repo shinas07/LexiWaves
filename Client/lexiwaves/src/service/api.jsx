@@ -1,16 +1,69 @@
+// import axios from "axios";
+// import { useSelector } from "react-redux";
+// import { useNavigate } from "react-router-dom";
+// import { toast } from "sonner";
+// import { logout } from "../redux/authSlice";
+
+// const api = axios.create({
+//     baseURL: 'http://localhost:8000', 
+//     withCredentials: true,
+// });
+
+// const refreshAccessToken = async () => {
+//     const refreshToken = localStorage.getItem('refreshToken');
+//     if (!refreshToken) throw new Error('No refresh token available');
+
+//     const response = await api.post('/user/refresh-token/', { refresh: refreshToken });
+//     localStorage.setItem('accessToken', response.data.access);
+//     // localStorage.setItem('accessTokenExpiry', Date.now() + response.data.expires_in * 1000); 
+//     return response.data.access;
+// };
+
+
+// api.interceptors.response.use(
+//     response => response,
+//     async (error) => {
+//         const navigate = useNavigate()
+//         const originalRequest = error.config;
+//         const dispatch = useSelector()
+
+//         // Check if the error is due to an expired access token
+//         if (error.response.status === 401 && !originalRequest._retry) {
+//             originalRequest._retry = true; // Mark as retried to avoid looping
+//             try {
+//                 const accessToken = await refreshAccessToken();
+//                 originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+//                 return api(originalRequest);
+//             } catch (refreshError) {
+//                 // Handle refresh token expiration (or other errors during refresh)
+//                 console.log(refreshError)
+//                 if (refreshError.response && refreshError.response.status === 401) {
+//                     localStorage.removeItem('accessTokenExpiry');
+//                     dispatch(logout())
+//                     toast.info('Session expired. Please log in again.');
+//                     navigate("/signin")
+//                 }
+//                 return Promise.reject(refreshError); // Reject with the original refresh error
+//             }
+//         }
+        
+//         return Promise.reject(error); // For all other errors, reject as usual
+//     }
+// );
+
+// export default api;
+
+
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-
+import { logout } from "../redux/authSlice";
+import { useDispatch } from "react-redux";
 
 const api = axios.create({
-    baseURL : 'http://localhost:8000', 
+    baseURL: 'http://localhost:8000',
     withCredentials: true,
-
-})
-
-
-
+});
 
 const refreshAccessToken = async () => {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -18,40 +71,49 @@ const refreshAccessToken = async () => {
 
     const response = await api.post('/user/refresh-token/', { refresh: refreshToken });
     localStorage.setItem('accessToken', response.data.access);
-    localStorage.setItem('accessTokenExpiry', Date.now() + response.data.expires_in * 1000); 
+    // Optionally store expiry time for better token management
+    localStorage.setItem('accessTokenExpiry', Date.now() + response.data.expires_in * 1000);
     return response.data.access;
 };
 
+let refreshInProgress = false;
 
-// Axios interceptor to handle token expiration
 api.interceptors.response.use(
     response => response,
     async (error) => {
-        const originalRequest = error.config;
+        // We can’t use React hooks like `useNavigate` or `useDispatch` here, so we’ll use them outside the interceptor
+        if (error.response.status === 401 && !error.config._retry && !refreshInProgress) {
+            error.config._retry = true; // Prevent infinite retry loop
 
-        // Check if the error is due to an expired access token
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+             // Prevent infinite refresh loop
+             refreshInProgress = true;
+
             try {
                 const accessToken = await refreshAccessToken();
-                originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-                return api(originalRequest);
+                error.config.headers['Authorization'] = `Bearer ${accessToken}`;
+                return api(error.config); // Retry the original request
             } catch (refreshError) {
-                // Handle refresh token expiration
+                // Handle the failure to refresh the token
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                localStorage.removeItem('accessTokenExpiry');
                 toast.info('Session expired. Please log in again.');
-                // window.location.href = '/signin'; // Redirect to login
-                return Promise.reject(refreshError);
+
+                // Redirect to login (from a component using navigate or history)
+                window.location.href = "/signin"; // This can be replaced with React's `navigate("/signin")` if you handle routing better.
+
+                // Dispatch logout action
+                const dispatch = useDispatch(); // Make sure this is used in a React component
+                dispatch(logout());
+
+                return Promise.reject(refreshError); // Reject the refresh error
+            }finally{
+                
+                refreshInProgress = false
             }
         }
 
-        return Promise.reject(error);
+        return Promise.reject(error); // Handle other errors
     }
 );
-
-
-
 
 export default api;
