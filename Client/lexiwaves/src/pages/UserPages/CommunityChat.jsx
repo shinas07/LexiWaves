@@ -34,7 +34,12 @@ const CommunitySelection = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await api.get('/chat/user-details');
+                const token = localStorage.getItem('accessToken'); 
+                const response = await api.get('/chat/user-details', {
+                    headers: {
+                        Authorization: `Bearer ${token}` 
+                    }
+                });
                 setUsername(response.data.username);
                 setEmail(response.data.email);
             } catch (error) {
