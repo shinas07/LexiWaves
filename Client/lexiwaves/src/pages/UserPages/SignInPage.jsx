@@ -50,7 +50,7 @@ const Login = () => {
             if (error.response && error.response.status === 401) {
                 toast.error('Wrong email or password');
             } else {
-                toast.error('Login faild. Try again');
+                toast.error(error.response.data.error);
             }
         }finally{
           setLoading(false)
@@ -93,7 +93,7 @@ const Login = () => {
             <form className="my-8" onSubmit={handleSubmit}>
               <LabelInputContainer className="mb-4">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" placeholder="johndoe@example.com" type="email"  value={email}
+                <Input id="email" placeholder="student@example.com" type="email"  value={email}
                             onChange={(e) => setEmail(e.target.value)}/>
 
               </LabelInputContainer>
@@ -117,12 +117,7 @@ const Login = () => {
 </div>
     
               <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-    
-              <div className="flex flex-col space-y-4">
-                {/* <SocialButton icon={<IconBrandGithub />} label="GitHub" /> */}
-                <SocialButton icon={<IconBrandGoogle />} label="Google" />
-               
-              </div>
+     
             </form>
     
             <div className="text-sm text-center mt-4">
