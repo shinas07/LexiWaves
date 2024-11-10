@@ -36,24 +36,115 @@ const CourseCreationForm = () => {
     fetchLanguages();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData((prev) => ({
+
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_VIDEO_SIZE = 40 * 1024 * 1024; // 40MB
+
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
+
+  if (name === "thumbnail" && files) {
+    const file = files[0];
+    if (!file) return; 
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({
+        ...prev,
+        thumbnail: "Only image files are allowed for the thumbnail.",
+      }));
+      return;
+    } else if (file.size > MAX_FILE_SIZE) {
+      setErrors((prev) => ({
+        ...prev,
+        thumbnail: "Thumbnail must be less than 5MB.",
+      }));
+      return;
+    }
+
+    setErrors((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value
+      thumbnail: "",
     }));
-  };
+  }
+
+  // Video validation
+  if (name === "video_url" && files) {
+    const file = files[0];
+    if (!file.type.startsWith("video/")) {
+      setErrors((prev) => ({ ...prev, video_url: "Only video files are allowed." }));
+      return;
+    } else if (file.size > MAX_VIDEO_SIZE) {
+      setErrors((prev) => ({ ...prev, video_url: "Video must be under 40MB." }));
+      return;
+    }
+    setErrors((prev) => ({ ...prev, video_url: "" }));
+  }
+
+  // Update the formData with the new value or file
+  setFormData((prev) => ({
+    ...prev,
+    [name]: files ? files[0] : value,
+  }));
+};
+
+  // const handleChange = (e) => {
+  //   const { name, value, files } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: files ? files[0] : value
+  //   }));
+  // };
+
+  // const handleLessonChange = (index, e) => {
+  //   const { name, value, files } = e.target;
+  //   const updatedLessons = [...formData.lessons];
+  //   if (name === 'lesson_video_url' && files && files[0]) {
+  //     updatedLessons[index] = { ...updatedLessons[index], [name]: files[0] };
+  //   } else {
+  //     updatedLessons[index] = { ...updatedLessons[index], [name]: value };
+  //   }
+  //   setFormData((prev) => ({ ...prev, lessons: updatedLessons }));
+  // };
 
   const handleLessonChange = (index, e) => {
-    const { name, value, files } = e.target;
+    const { name, files } = e.target;
     const updatedLessons = [...formData.lessons];
+
+    // Check if the field is for the video upload
     if (name === 'lesson_video_url' && files && files[0]) {
-      updatedLessons[index] = { ...updatedLessons[index], [name]: files[0] };
+        const file = files[0];
+        const isVideo = file.type.startsWith("video/");
+        if (!isVideo) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [`lesson_${index}_video_url`]: "Please upload a valid video file."
+            }));
+            return; // Exit the function to prevent further processing
+        } else {
+            // Clear error message if the file is valid
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [`lesson_${index}_video_url`]: null // Clear error if valid
+            }));
+        }
+
+        const maxSizeInBytes = 100 * 1024 * 1024; // 100MB limit
+        if (file.size > maxSizeInBytes) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [`lesson_${index}_video_url`]: "File size must be less than 100MB."
+            }));
+            return;
+        }
+        // If the file is valid, update the lesson with the file
+        updatedLessons[index] = { ...updatedLessons[index], [name]: files[0] };
     } else {
-      updatedLessons[index] = { ...updatedLessons[index], [name]: value };
+        // For other fields, just update the value
+        updatedLessons[index] = { ...updatedLessons[index], [name]: e.target.value };
     }
     setFormData((prev) => ({ ...prev, lessons: updatedLessons }));
-  };
+};
+
 
   const addLesson = () => {
     setFormData((prev) => ({
@@ -153,7 +244,7 @@ const CourseCreationForm = () => {
         }
       } catch (error) {
         toast.error('Failed to create course');
-        console.error('Error creating course:', error);
+     
       } finally {
         setLoading(false);
       }
@@ -332,8 +423,9 @@ const CourseCreationForm = () => {
                   file:bg-indigo-600 file:text-white
                   hover:file:bg-indigo-700
                   cursor-pointer"
-                required
+                required 
               />
+              {errors.video_url && <p className='mt-2 text-red-400 flex items-center'><AlertCircle className='w-4 h-4 mr-1'/>{errors.video_url}</p>}
             </div>
           </div>
 
@@ -406,7 +498,12 @@ const CourseCreationForm = () => {
                       cursor-pointer"
                     required
                   />
-                  {errors[`lesson_${index}_video_url`] && <p className="mt-1 text-sm text-red-400 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors[`lesson_${index}_video_url`]}</p>}
+                     {errors[`lesson_${index}_video_url`] && (
+                      <p className="mt-1 text-sm text-red-400 flex items-center">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {errors[`lesson_${index}_video_url`]}
+                      </p>
+                  )}
                 </div>
 
                 <div className="flex mt-6 justify-between">
