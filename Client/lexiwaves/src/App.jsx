@@ -25,7 +25,9 @@ import ForgotPassword from "./pages/UserPages/UserForgotPassword";
 import CommunitySelection from "./pages/UserPages/CommunityChat";
 import ProfilePage from "./pages/UserPages/AccountProfile";
 import QuizPage from "./pages/UserPages/Quiz";
-import TutorListForConnection from "./pages/UserPages/TutorList";
+import TutorListForConnection from "./pages/UserPages/UserInteractions/TutorList";
+import UserConnection from "./pages/UserPages/UserInteractions/UserTutorConnection"
+
 //Tutor pages import
 import TutorSignUP from "./pages/TutorPags/SignUp";
 import TutorOtpVerification from "./pages/TutorPags/TutorOtp";
@@ -44,6 +46,8 @@ import CourseEdit from "./pages/TutorPags/EditCourse";
 import CourseAndQuizDetails from "./pages/TutorPags/CourseAllDetails";
 import TutorUnauthorized from "./pages/TutorPags/TutorPagesUnauthorized";
 import TutorUnauthorizedRoute from "./pages/TutorPags/TutorProtectedRoute";
+import TutorProfileDetails from "./pages/UserPages/UserInteractions/TutorProfile";
+import StudentsList from "./pages/TutorPags/StudentsList";
 
 import AdminProtectedRoute from "./pages/admin/AdminProtectedRoute";
 // Admin pages import
@@ -61,7 +65,9 @@ import CourseDetailsCheckPage from "./pages/admin/CourseDetialsCheck";
 import AdminCoursesList from "./pages/admin/ApprovedCourseList";
 import Unauthorized from "./pages/admin/Unauthorized";
 import ChatRoom from "./pages/UserPages/ChatRoom";
-import { CodeSquare } from "lucide-react";
+import AdminRevenuePage from "./pages/admin/RevenuePage";
+import RevenueReport from "./pages/TutorPags/RevenueReport";
+import TutorProfile from "./pages/TutorPags/TutorProfile";
 
 
 
@@ -103,8 +109,7 @@ const App = () => {
 
   const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('accessToken');
-    console.log(token)
-    return token ? <Navigate to="/tutor-dashboard" /> : children;
+    return token ? <Navigate to="/tutor/dashboard" /> : children;
     
   };
 
@@ -153,6 +158,8 @@ const isTutorAllowed = () => {
           <Route path="/chat/:language" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <ChatRoom />} />
           <Route path="/quiz/:courseId" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <QuizPage />} />
           <Route path='/tutor-list-connection' element={!isAuthenticatedUser ? <Navigate to="/signin"/> : <TutorListForConnection/> }/>
+          <Route path='/connect-tutor' element={<UserConnection/>}/>
+          <Route path='/tutor-profile-detatil/:id' element={<TutorProfileDetails/>}/>
           
           
 
@@ -161,12 +168,13 @@ const isTutorAllowed = () => {
         <Route path="/tutor-otp" element={<ProtectedRoute><TutorOtpVerification /></ProtectedRoute>}/> 
         <Route path="/tutor-signin" element={<ProtectedRoute><TutorLogin /></ProtectedRoute>}/>
         <Route path="/tutor-details" element={<TutorUnauthorizedRoute><TutorDetailForm /></TutorUnauthorizedRoute>}/>
-        <Route path="/tutor-dashboard"element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/waiting-for-approval'/>} />
+        <Route path="/tutor/dashboard"element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/waiting-for-approval'/>} />
           <Route path="/tutor-setup" element={<TutorSetup />} />
             <Route path="/tutor-requests" element={!isAuthenticatedUser ? <Navigate to="/tutor-signin" /> : <TutorRequests />} />
             <Route path="/waiting-for-approval" element={<TutorUnauthorizedRoute><WaitingForApproval /></TutorUnauthorizedRoute>} />
             <Route path="/tutor-create-course" element={isTutorAllowed() ? <CreateCoursePage /> : <Navigate to="/waiting-for-approval" />} />
             <Route path='/terms-of-service' element={<TermsOfService/>}></Route>
+            <Route path='/tutor/profile' element={<TutorProfile/>}/>
             <Route path="/tutor-course-list" element={isTutorAllowed() ? <TutorCreatedCourses/> : <Navigate to="/waiting-for-approval" />} />
             <Route path="/tutor-enrolled-course-list" element={isTutorAllowed() ? <EnrolledCoursesListTutorSide /> :<Navigate to="/waiting-for-approval" /> } />
           <Route path='/tutor-learn-more' element={<TutorLearnMore/>}/>
@@ -175,6 +183,8 @@ const isTutorAllowed = () => {
           <Route path="/course/:courseId/edit" element={isTutorAllowed() ? <CourseEdit /> : <Navigate to='/waiting-for-approval'/>} />
           <Route path="/tutor/courses/details/:courseId" element={isTutorAllowed() ? <CourseAndQuizDetails/> : <Navigate to='waiting-for-approval'/>}/>
           <Route path='/tutor-unauthorized' element={<TutorUnauthorized/>}/>
+          <Route path='/tutor/students' element={<StudentsList/>}/>
+          <Route path='/tutor/revenue-report' element={<RevenueReport/>}/>
           
 
             
@@ -194,6 +204,7 @@ const isTutorAllowed = () => {
           <Route path="/admin-enrolled-courses" element={<AdminProtectedRoute><EnrolledCourses/></AdminProtectedRoute>}/>
           <Route path="/admin-tutor-requests" element={<AdminProtectedRoute><TutorRequests/></AdminProtectedRoute>}/>
           <Route path="/admin-unauthorized" element={<Unauthorized />} />
+          <Route path='/admin-revenue-details' element={<AdminRevenuePage/>}/> 
 
         </Routes>
       </Router>
