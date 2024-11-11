@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import {  IconBrandGoogle } from "@tabler/icons-react";
 import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
@@ -99,18 +98,18 @@ const SignUPForm = () => {
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
             <LabelInputContainer>
               <Label htmlFor="first_name">First name</Label>
-              <Input id="first_name" value={formData.first_name} onChange={handleChange} placeholder="John" type="text" />
+              <Input id="first_name" value={formData.first_name} onChange={handleChange} placeholder="Enter your first name" type="text" />
               {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name}</p>}
             </LabelInputContainer>
             <LabelInputContainer>
               <Label htmlFor="last_name">Last name</Label>
-              <Input id="last_name" value={formData.last_name} onChange={handleChange} placeholder="Doe" type="text" />
+              <Input id="last_name" value={formData.last_name} onChange={handleChange} placeholder="Enter your last name" type="text" />
               {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name}</p>}
             </LabelInputContainer>
           </div>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email Address</Label>
-            <Input id="email" value={formData.email} onChange={handleChange} placeholder="johndoe@example.com" type="email" />
+            <Input id="email" value={formData.email} onChange={handleChange} placeholder="Enter your email" type="email" />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
@@ -135,9 +134,7 @@ const SignUPForm = () => {
 
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
-          <div className="flex flex-col space-y-4">
-            <SocialButton icon={<IconBrandGoogle />} label="Google" />
-          </div>
+         
       </form>
       <div className="text-sm text-center mt-4">
             <Link to="/signin" className="text-white hover:underline hover:decoration-cyan-500 ">

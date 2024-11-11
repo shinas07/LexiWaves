@@ -13,6 +13,7 @@ const TutorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -21,12 +22,12 @@ const TutorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const response = await api.post("/tutor/login/", {
         email,
         password,
       });
-      console.log('tutor all detials',response.data)
       
       dispatch(login({
         user: { email },
@@ -40,21 +41,23 @@ const TutorLogin = () => {
       localStorage.setItem("refreshToken", response.data.refresh);
       localStorage.setItem("adminApproved", response.data.admin_approved);
       localStorage.setItem('hasSubmittedDetails', response.data.has_submitted_details);
+      localStorage.setItem('userRole',response.data.role)
+      
       if (!response.data.has_submitted_details) {
-        console.log('from data needed')
-            navigate('/tutor-details'); 
-        } else if (!response.data.admin_approved) {
-          console.log('admin is not approved')
-            navigate('/waiting-for-approval'); 
-        } else {
-            navigate('/tutor-dashboard'); 
-        }
+          navigate('/tutor-details');
+      } else if (!response.data.admin_approved) {
+          navigate('/waiting-for-approval');
+      } else {
+          navigate('/tutor/dashboard');
+      }
+      
   } catch (error) {
-    console.log(error.response)
       if (error.response && error.response.status === 401) {
         toast.error("Invalid email or password");
+       setLoading(false)
       } else {
-        toast.error("Login failed. Please try again.");
+        toast.error(error.response.data.error);
+        setLoading(false)
       }
   }
 
@@ -112,7 +115,7 @@ const TutorLogin = () => {
             className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
           >
-            Sign In &rarr;
+            {loading ? 'Sign In.....' : 'Sign In'}
             <BottomGradient />
           </button>
 
