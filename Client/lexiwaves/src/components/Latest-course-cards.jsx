@@ -136,11 +136,7 @@ export const Carousel = ({
   );
 };
 
-export const Card = ({
-  card,
-  index,
-  layout = false
-}) => {
+export const Card = ({ card, index, layout = false }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -152,15 +148,15 @@ export const Card = ({
       onClick={handleCardClick}
       className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-60 md:h-80 md:w-72 overflow-hidden flex flex-col items-start justify-start relative z-10"
     >
-      {/* Background image */}
-      <BlurImage
-        src={card.thumbnail_url}
-        alt={card.title}
-        fill
-        className="object-cover h-48 w-full"
-      />
+      {/* Changed: Wrapped BlurImage in a div for proper sizing */}
+      <div className="relative w-full h-48">
+        <BlurImage
+          src={card.thumbnail_url}
+          alt={card.title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
-      {/* Content area */}
       <div className="h-[35%] flex flex-col justify-start text-black dark:text-white w-full p-4">
         <motion.h3 className="text-lg font-semibold mt-2 mb-2">
           {card.title}
@@ -185,17 +181,22 @@ export const BlurImage = ({
   ...rest
 }) => {
   const [isLoading, setLoading] = useState(true);
+  
   return (
-    (<img
-      className={cn("transition duration-300", isLoading ? "blur-sm" : "blur-0", className)}
+    <img
+      className={cn(
+        "transition duration-300",
+        isLoading ? "blur-sm" : "blur-0",
+        className
+      )}
       onLoad={() => setLoading(false)}
       src={src}
       width={width}
       height={height}
       loading="lazy"
       decoding="async"
-      blurDataURL={typeof src === "string" ? src : undefined}
-      alt={alt ? alt : "Background of a beautiful view"}
-      {...rest} />)
+      alt={alt || "Background of a beautiful view"}
+      {...rest}
+    />
   );
 };
