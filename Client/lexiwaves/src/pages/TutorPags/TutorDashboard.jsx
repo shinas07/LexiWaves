@@ -134,7 +134,7 @@ const TutorDashboard = () => {
                     <tr key={student.id} className="border-b dark:border-gray-700">
                       <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.user_first_name} {student.user_last_name}</td>
                       <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.course_title}</td>
-                      <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.course_category || 'N/A'}</td> {/* Displaying account status or fallback */}
+                      <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.course_category || 'N/A'}</td> 
                     </tr>
                   ))}
                 </tbody>
