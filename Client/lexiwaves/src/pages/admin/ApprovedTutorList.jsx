@@ -1,112 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import api from '../../service/api';
-// import { Link } from 'react-router-dom';
-
-// export default function Tutorlist() {
-//   const [tutorData, setTutorsData] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setErrors] = useState(null);
-//   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-//   useEffect(() => {
-//     const fetchTutorsData = async () => {
-//       try {
-//         const token = localStorage.getItem('accessToken')
-//         const response = await api.get('/lexi-admin/tutor-list/',{
-//             headers:{
-//                 Authorization:`Bearer ${token}`
-//             }
-//         });
-//         setTutorsData(response.data);
-//         setLoading(false);
-//       } catch (error) {
-//         setErrors('Failed to fetch tutor data');
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchTutorsData();
-//   }, []);
-
-//   return (
-//     <div className="flex h-screen font-sans bg-gray-900 text-white">
-//       {/* Sidebar */}
-//       <aside className={`bg-gray-800 transition-width duration-300 ${sidebarOpen ? 'w-64' : 'w-20'} overflow-hidden`}>
-//         <div className="p-5">
-//           <h2 className={`text-xl font-bold mb-6 ${sidebarOpen ? 'block' : 'hidden'}`}>AdminPanel</h2>
-//           <nav>
-//             <ul>
-//               {['Dashboard', 'Courses', 'Students', 'Tutors', 'Analytics', 'Messages'].map((item, index) => (
-//                 <li key={index} className="mb-6">
-//                   <a href="/admin-dashboard" className="text-white hover:text-gray-300 flex items-center">
-//                     <span className={`ml-2 ${sidebarOpen ? 'block' : 'hidden'}`}>{item}</span>
-//                   </a>
-//                 </li>
-//               ))}
-//             </ul>
-//           </nav>
-//         </div>
-//       </aside>
-
-//       {/* Main Content */}
-//       <div className="flex-1 flex flex-col bg-gray-900">
-//         {/* Header */}
-//         <header className="bg-gray-800 shadow p-4 flex justify-between items-center">
-//           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-2xl text-white">
-//             {sidebarOpen ? '⮜' : '☰'}
-//           </button>
-//           <div className="flex items-center ml-2 space-x-4">
-//             <input type="search" placeholder="Search Tutors..." className="px-4 py-2 border rounded-md focus:outline-none focus:border-indigo-500 bg-gray-700 text-white" />
-//             <button className="text-xl text-white">🔔</button>
-//             <button className="text-xl text-white">👤</button>
-//           </div>
-//         </header>
-
-//         {/* Main Tutor Content */}
-//         <main className="p-6 overflow-auto">
-//           <h1 className="text-2xl font-bold mb-6">Tutors</h1>
-//           <div className="flex items-center justify-end space-x-4">
-//             <Link to='/tutor-reqeusts' className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md focus:outline-none">
-//               New Tutor Requests
-//             </Link>
-//         </div>
-
-//           {/* Loading and Error States */}
-//           {loading && <p>Loading tutors...</p>}
-//           {error && <p>{error}</p>}
-
-//           {!loading && !error && (
-//             <div className="bg-gray-800 p-4 mt-8 rounded-lg shadow-md">
-//               {/* Tutor Table */}
-//               <table className="min-w-full leading-normal">
-//                 <thead>
-//                   <tr>
-//                     <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Name</th>
-//                     <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Email</th>
-//                     <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Courses</th>
-//                     <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Joined</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {tutorData.map((tutor, index) => (
-//                     <tr key={index} className="hover:bg-gray-700">
-//                       <td className="px-5 py-5 border-b border-gray-600 text-sm">{tutor.firstname}</td>
-//                       <td className="px-5 py-5 border-b border-gray-600 text-sm">{tutor.email}</td>
-//                       <td className="px-5 py-5 border-b border-gray-600 text-sm">{tutor.courses}</td>
-//                       <td className="px-5 py-5 border-b border-gray-600 text-sm">{tutor.date_joined}</td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//           )}
-//         </main>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import React, { useEffect, useState } from 'react';
 import api from '../../service/api';
 import { Link } from 'react-router-dom';
@@ -116,6 +7,8 @@ export default function Tutorlist() {
   const [tutorData, setTutorsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setErrors] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTutorId, setSelectedTutortId] = useState(null);
 
   useEffect(() => {
     const fetchTutorsData = async () => {
@@ -126,6 +19,7 @@ export default function Tutorlist() {
             Authorization: `Bearer ${token}`
           }
         });
+        console.log(response.data)
         setTutorsData(response.data);
         setLoading(false);
       } catch (error) {
@@ -136,6 +30,34 @@ export default function Tutorlist() {
 
     fetchTutorsData();
   }, []);
+
+  const handleBlockClick = (studentId) => {
+    setSelectedTutortId(studentId);
+    setShowModal(true);
+  };
+  
+  // Actual block function
+  const confirmBlock = async () => {
+    await handleBlockTutor(selectedTutorId);
+    setShowModal(false);
+  };
+  
+
+  const handleBlockTutor = async (tutorId) => {
+    try{
+    const token = localStorage.getItem('accessToken')
+    await api.post(`/lexi-admin/bldock-student/${tutorId}/`,{
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    toast.success("Tutor blocked successfully!");
+    }catch(error){
+      console.error('Failed to block user:', error);
+      toast.error("Failed to block Tutor.");
+    }
+
+  }
 
   return (
     <Layout>
@@ -158,23 +80,49 @@ export default function Tutorlist() {
                 <tr>
                   <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Name</th>
                   <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Email</th>
-                  <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Courses</th>
                   <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase">Joined</th>
+                  <th className="px-5 py-3 border-b border-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {tutorData.map((tutor, index) => (
                   <tr key={index} className="hover:bg-gray-700">
-                    <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{tutor.firstname}</td>
+                    <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{tutor.first_name} {tutor.last_name}</td>
                     <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{tutor.email}</td>
-                    <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{tutor.courses}</td>
-                    <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{tutor.date_joined}</td>
+                    <td className="px-5 py-5 border-b border-gray-600 text-sm text-white">{new Date(tutor.date_joined).toLocaleDateString()}</td>
+                    <td className="px-5 py-5 border-b border-gray-600 text-sm">
+                    <button onClick={() => handleBlockClick(tutor.id)} className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200'>Block</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
+          {showModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-gray-700 rounded-lg p-6 max-w-sm w-full mx-4">
+          <h3 className="text-lg font-semibold mb-4">Confirm Block</h3>
+          <p className="text-whit mb-6">
+            Are you sure you want to block this student? This action can be undone later.
+          </p>
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={() => setShowModal(false)}
+              className="px-4 py-2 text-white hover:text-gray-400 transition duration-200"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmBlock}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
+            >
+              Confirm Block
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
       </div>
     </Layout>
   );
