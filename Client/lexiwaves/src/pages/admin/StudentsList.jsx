@@ -8,6 +8,8 @@ export default function StudentsPage() {
   const [studentsData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setErrors] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -19,7 +21,6 @@ export default function StudentsPage() {
           },
         });
         setStudentData(response.data);
-        console.log(response.data)
       } catch (error) {
         setErrors("Failed to fetch student data");
       } finally {
@@ -30,8 +31,17 @@ export default function StudentsPage() {
     fetchStudentData();
   }, []);
 
+  const handleBlockClick = (studentId) => {
+    setSelectedStudentId(studentId);
+    setShowModal(true);
+  };
+
+  const confirmBlock = async () => {
+    await handleBlock(selectedStudentId);
+    setShowModal(false);
+  };
+
   const handleBlock = async (studentId) => {
-    console.log(studentId)
     try {
       const token = localStorage.getItem("accessToken");
       await api.post(`/lexi-admin/block-student/${studentId}/`,{
@@ -43,14 +53,13 @@ export default function StudentsPage() {
       // Optionally, refresh the student data
       setStudentData((prevData) => prevData.filter((student) => student.id !== studentId));
     } catch (error) {
-      console.error('Failed to block user:', error);
       toast.error("Failed to block student.");
     }
   };
 
   return (
     <Layout>
-      <div className="flex h-screen font-sans text-white">
+      <div className="flex h-screen font-sans text-white ">
         {/* Main Student Content */}
         <main className="p-6 w-full overflow-auto">
           <h1 className="text-3xl font-bold mb-6">Students</h1>
@@ -89,7 +98,7 @@ export default function StudentsPage() {
                         <td className="px-5 py-5 border-b border-gray-600 text-sm">{new Date(student.date_joined).toLocaleDateString()}</td>
                         <td className="px-5 py-5 border-b border-gray-600 text-sm">
                           <button
-                            onClick={() => handleBlock(student.id)}
+                            onClick={() => handleBlockClick(student.id)}
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
                           >
                             Block
@@ -106,6 +115,30 @@ export default function StudentsPage() {
               </table>
             </div>
           )}
+           {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-gray-700 rounded-lg p-6 max-w-sm w-full mx-4">
+                    <h3 className="text-lg font-semibold mb-4">Confirm Block</h3>
+                    <p className=" text-white mb-6">
+                      Are you sure you want to block this student? This action can be undone later.
+                    </p>
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={() => setShowModal(false)}
+                        className="px-4 text-white py-2 text-gray-600 hover:text-gray-400 transition duration-200"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={confirmBlock}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
+                      >
+                        Confirm Block
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
         </main>
       </div>
     </Layout>
