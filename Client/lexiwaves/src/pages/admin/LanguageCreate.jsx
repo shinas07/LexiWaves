@@ -13,12 +13,10 @@ const AdminLanguages = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
     
     api.get('/lexi-admin/languages/', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Refresh-Token': refreshToken  
+        'Authorization': `Bearer ${accessToken}`
       }
     })
     .then(response => setLanguages(response.data))
@@ -109,15 +107,20 @@ const AdminLanguages = () => {
           <h2 className="text-2xl font-bold mb-8 text-center text-white">Existing Languages</h2>
           <hr className='mb-6' />
           <ul className="flex flex-wrap gap-2 justify-center">
-            {Array.isArray(languages) && languages.map(lang => (
-              <li key={lang.id} className="text-gray-300 flex items-center">
-                <span className="inline-block px-4 py-2 rounded-full bg-gray-800 text-white text-sm font-semibold mr-2">
-                  {lang.name} ({lang.code})
-                </span>
-              </li>
-            ))}
+            {Array.isArray(languages) && languages.length > 0 ? (
+              languages.map(lang => (
+                <li key={lang.id} className="text-gray-300 flex items-center">
+                  <span className="inline-block px-4 py-2 rounded-full bg-gray-800 text-white text-sm font-semibold mr-2">
+                    {lang.name} ({lang.code})
+                  </span>
+                </li>
+              ))
+            ) : (
+              <p className="text-gray-400 text-center mt-4">No languages available</p>
+            )}
           </ul>
         </div>
+
       </div>
    </Layout>
   );
