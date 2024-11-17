@@ -32,17 +32,17 @@ const Login = () => {
                 email,
                 password
             })
-            const { refresh, access } = response.data;
+            const { refresh, access,user } = response.data;
     
             // Save the tokens to localStorage
             localStorage.setItem('refreshToken', refresh);
             localStorage.setItem('accessToken', access);
-            
     
             dispatch(login({
-              user: { email },
               accessToken: access,  
-              refreshToken: refresh
+              refreshToken: refresh,
+              user:user,
+              userRole:user.user_type,
           }));
             toast.success('Login successful!')
             navigator('/');
