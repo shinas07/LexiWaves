@@ -8,10 +8,11 @@ import { logout  } from '../../redux/authSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+
 const ProfilePage = () => {
     const [userData, setUserData] = useState({ first_name: '', last_name: '', email: '' });
     const [isChangingPassword, setIsChangingPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [passwordData, setPasswordData] = useState({ current_password: '', new_password: '', confirm_password: '' });
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState({ first_name: '', last_name: '' });
@@ -22,6 +23,8 @@ const ProfilePage = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [uploading, setUploading] = useState(false)
     const [removing, setRemoving] = useState(false)
+
+
 
             
     const dispatch = useDispatch()
@@ -36,13 +39,14 @@ const ProfilePage = () => {
                 });
                 setUserData(response.data)
                 setTempName({ first_name: response.data.first_name, last_name: response.data.last_name });
-                console.log(response.data)
                 setImagePreview(response.data.profile_image)
     
             } catch (error) {
                 toast.error('User data is not found')
+                dispatch(logout())
+                navigate('/')
             } finally {
-                setIsLoading(false);
+                setLoading(false);
             }
         };
         fetchUserData();
@@ -174,6 +178,17 @@ const ProfilePage = () => {
             toast.error('Failed to remove profile image');
         }
     };
+
+    if (loading){
+        return(
+        <div>
+            <UserDashboardLayout>
+            <Loader/>
+            </UserDashboardLayout>
+        </div>
+        )
+
+    }
 
     return (
         <UserDashboardLayout>
