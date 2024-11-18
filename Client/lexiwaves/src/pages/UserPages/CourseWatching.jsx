@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, useAsyncError } from 'react-router-dom';
 import api from '../../service/api';
 import { DotBackground } from '../../components/Background';
 import FloatingNavbar from '../../components/Navbar';
 import { FaCheckCircle, FaLock } from 'react-icons/fa';
 import Quiz from './Quiz';
+import Loader from '../Loader';
 
 const CourseWatchingPage = () => {
     const { courseId } = useParams();
@@ -19,7 +20,14 @@ const CourseWatchingPage = () => {
     const [showCertificate, setShowCertificate] = useState(false);
     const [quizQuestions, setQuizQuestions] = useState([]);
     const [quizScore, setQuizScore] = useState(null);
+    const [courseDataId, setCourseDataId] = useState()
     const navigate = useNavigate();
+    const videoRef = useRef(null);
+    const watchTimeRef = useRef(0);
+    const MINIMUM_WATCH_TIME = 300;
+
+
+    
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -30,20 +38,22 @@ const CourseWatchingPage = () => {
                 });
                 
                 setCourse(courseResponse.data);
+                setCourseDataId(courseResponse.data.id)
                 setCurrentLessonVideo(courseResponse.data.video_url);
-    
+           
                 // Fetch completed lessons
-
                 const completedLessonsResponse = await api.get(`/student/completed-lessons/${courseResponse.data.id}/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setCompletedLessons(completedLessonsResponse.data.completed_lessons);
-                // setCompletedLessons(completedLessonsResponse.data.map(lesson => lesson.id));
                 setLoading(false);
             } catch (err) {
-                console.log(err)
+              
                 setError('Failed to load course');
                 setLoading(false);
+            }
+            finally{
+                setLoading(false)
             }
         };
     
@@ -57,9 +67,7 @@ const CourseWatchingPage = () => {
                 lesson_id: lessonId,
                 course_id: courseId
             }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
             setCompletedLessons(prev => [...prev, lessonId]);
         } catch (error) {
@@ -67,62 +75,65 @@ const CourseWatchingPage = () => {
         }
     };
 
-    const fetchQuizQuestions = async () => {
-        try {
-            const token = localStorage.getItem('accessToken');
-            const response = await api.get(`/student/course-quiz/${courseId}/`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            console.log(response.data)
-            setQuizQuestions(response.data);
-        } catch (error) {
-            console.error('Failed to load quiz questions:', error);
-        }
-    };
-
-    const handleLessonClick = async (lesson) => {
-        setCurrentLessonVideo(lesson.lesson_video_url);
-        setExpandedLessonId(lesson.id);
-        if (!completedLessons.includes(lesson.id)) {
-            await markLessonAsCompleted(lesson.id);
-        }
-    };
-
-    const handleQuizComplete = async (answers) => {
-        try {
-            const token = localStorage.getItem('accessToken');
-            const response = await api.post('/student/submit-quiz/', {
-                courseId,
-                answers
-            }, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setQuizScore(response.data.score);
-            setQuizCompleted(true);
-            if (response.data.passed) {
-                setShowCertificate(true);
-            }
-        } catch (error) {
-            console.error('Failed to submit quiz:', error);
-        }
-    };
-
     const handleStartQuiz = () => {
         navigate(`/quiz/${courseId}`);
     };
 
-    const handleGenerateCertificate = () => {
-        alert('Certificate generated! Check your downloads.');
+    const allLessonsCompleted = course && completedLessons.length === course.lessons.length;
+    // console.log('tutorid',course.tutor)
+    const handleTutorInteraction = () => {
+     
+        if (course && course.tutor) {
+            navigate('/connect-tutor', { state: { tutorId: course.tutor,courseId:courseDataId } });
+        }
     };
 
-    const allLessonsCompleted = course && completedLessons.length === course.lessons.length;
+    const handleTimeUpdate = async () => {
+        if (videoRef.current) {
+            const currentTime = Math.floor(videoRef.current.currentTime);
+            watchTimeRef.current = currentTime;
 
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-    if (error) return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
+            // Check if watched for minimum time (5 minutes)
+            if (currentTime >= MINIMUM_WATCH_TIME) {
+                try {
+                    const token = localStorage.getItem('accessToken');
+                    await api.post('/student/record-watch-time/', {
+                        course_id: courseId,
+                        watch_time: currentTime,
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                } catch (error) {
+                    console.error('Failed to record watch time:', error);
+                }
+            }
+        }
+    };
+    
+
+    if (loading) return(
+        <DotBackground>
+            <FloatingNavbar/>
+    <div className="flex justify-center items-center h-screen">
+        <Loader/>
+    </div>
+    </DotBackground>
+    )
+
+    if (error) return (
+    <DotBackground>
+    <FloatingNavbar />
+    <div className="flex justify-center items-center h-screen text-red-500">{error}
+    </div>;
+    </DotBackground>
+    )
+
 
     return (
         <DotBackground>
             <FloatingNavbar />
+            {/* Interaction Button at Top Left */}
+         
             <div className="container mx-auto p-6 mt-16">
                 <h1 className="text-3xl font-bold mb-6 text-white">{course.title}</h1>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -134,6 +145,7 @@ const CourseWatchingPage = () => {
                             </h2>
                             {currentLessonVideo && (
                                 <video 
+                                    ref={videoRef}
                                     key={currentLessonVideo} 
                                     controls 
                                     className="w-full rounded-lg shadow-lg" 
@@ -224,6 +236,14 @@ const CourseWatchingPage = () => {
                         </div>
                     </div>
                 </div>
+                <button
+    onClick={handleTutorInteraction}
+    className="fixed bottom-6 right-6 bg-blue-600 text-white text-sm font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 z-50"
+>
+    Need help? Click for interaction!
+</button>
+
+
             </div>
         </DotBackground>
     );
