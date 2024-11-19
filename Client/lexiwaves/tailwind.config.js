@@ -11,6 +11,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'muted-text': '#A8A29E',
+        'muted-foreground': '#D6C9B6',
+        'custom-gray': '#A8A29E',
         primary: colors.blue,        // Added primary color extension
         secondary: colors.indigo,    // Added secondary color extension
       },
@@ -26,7 +29,45 @@ module.exports = {
     },
   },
   plugins: [
-    addVariablesForColors,          // Added custom plugin for adding CSS variables for colors
+    
+    addVariablesForColors,          
+
+    function({ addUtilities }) {
+      addUtilities({
+        '.scrollbar': {
+          '&::-webkit-scrollbar': {
+            width: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#1F2937', // Dark background
+            borderRadius: '100vh',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#374151', // Darker thumb
+            borderRadius: '100vh',
+            '&:hover': {
+              background: '#4B5563' // Even darker on hover
+            }
+          }
+        },
+        '.scrollbar-thin': {
+          '&::-webkit-scrollbar': {
+            width: '2px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#1F2937',
+            borderRadius: '100vh',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#374151',
+            borderRadius: '100vh',
+            '&:hover': {
+              background: '#4B5563'
+            }
+          }
+        }
+      })
+    },
     function ({ matchUtilities, theme }) {
       matchUtilities({
         "bg-grid": (value) => ({
