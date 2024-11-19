@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../service/api';
-import { loadStripe } from '@stripe/stripe-js';
-import { DotBackground } from '../../components/Background';
+import TutorDashboardLayout from './TutorDashboardLayout';
 
 const EnrolledCoursesListTutorSide = () => {
     const [courses, setCourses] = useState([]);
@@ -18,7 +17,6 @@ const EnrolledCoursesListTutorSide = () => {
                     },
                 });
                 setCourses(response.data);
-                c
             } catch (err) {
                 setError('Failed to load enrolled courses');
             } finally {
@@ -33,7 +31,7 @@ const EnrolledCoursesListTutorSide = () => {
     if (error) return <div className="error">{error}</div>;
 
     return (
-        <DotBackground>
+     <TutorDashboardLayout>
         <div className="container text-sm mt-8 mx-auto px-6 py-8">
             <h2 className="text-3xl font-bold text-white mb-6">Enrolled Courses</h2>
             {courses.length === 0 ? (
@@ -71,7 +69,8 @@ const EnrolledCoursesListTutorSide = () => {
                 ))
             )}
         </div>
-        </DotBackground>
+        </TutorDashboardLayout>
+      
     );
 };
 
