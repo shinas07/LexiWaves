@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaPaperPlane, FaSignOutAlt, FaUsers, FaGlobe, FaUserCircle } from 'react-icons/fa';
-import Avatar from 'react-avatar';
 
 const ChatRoom = () => {
     const location = useLocation();
@@ -152,7 +151,12 @@ const ChatRoom = () => {
                                         : 'bg-gray-200 text-gray-800 rounded-r-lg rounded-bl-lg'
                                 } p-4 shadow-lg relative flex flex-col break-words transition-transform transform hover:scale-105`}>
                                     <div className="flex items-center mb-1">
-                                        <Avatar name={msg.username} size="30" round={true} className="mr-2" />
+                                        {/* <Avatar name={msg.username} size="30" round={true} className="mr-2" /> */}
+                                        <div 
+                                            className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium mr-2"
+                                            >
+                                            {msg.username ? msg.username.charAt(0).toUpperCase() : 'U'}
+                                            </div>
                                         <p className="font-semibold text-sm">{msg.username}</p>
                                     </div>
                                     <p className="text-base">{msg.message}</p>
