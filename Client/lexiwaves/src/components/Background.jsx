@@ -33,10 +33,13 @@ export function DotBackground({ children }) {
 )}
       
 
-      <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-      <p className="relative z-20 bg-clip-text text-transparent bg-gradient-to-b  py-8">
+      {/* <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <p className="relative z-20 bg-clip-text text-transparent bg-gradient-to-b py-8">
         {children}
-      </p>/
+      </p> */}
+       <div className="relative z-20 bg-clip-text text-transparent bg-gradient-to-b py-8">
+        {children}
+      </div>
     </div>
   );
 }
