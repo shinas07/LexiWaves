@@ -87,7 +87,7 @@ export const Progress = ({ value = 0, className = "" }) => (
 
 // Card Components
 export const Card = ({ className = "", children }) => (
-  <div className={`rounded-xl border border-gray-200 bg-white text-gray-950 shadow ${className}`}>
+  <div className={`rounded-xl border border-gray-800 bg-white text-gray-950 shadow ${className}`}>
     {children}
   </div>
 );
