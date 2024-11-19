@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from 'react-router-dom';
 import api from "../../service/api";
 import { toast } from "sonner";
+import { login } from "../../redux/authSlice";
 
 const AdminSignup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false)
+    const dispatch = useReducer()
     const navigator = useNavigate();
 
 
@@ -30,6 +32,7 @@ const AdminSignup = () => {
                 email,
                 password
             });
+            localStorage.setItem('userRole',response.data.role);
             localStorage.setItem('accessToken', response.data.access);
             localStorage.setItem('refreshToken', response.data.refresh);
             toast.success('SignIn successful');
@@ -56,7 +59,7 @@ const AdminSignup = () => {
         <DotBackground>
             <div className="max-w-md mt-32 w-full mx-auto rounded-lg md:rounded-2xl p-4 md:p-12 shadow-input bg-white dark:bg-black border border-black dark:border-neutral-800">
                 <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-                    Admin Signup for LexiWaves
+                    Admin Sign In for LexiWaves
                 </h2>
 
                 <div>
