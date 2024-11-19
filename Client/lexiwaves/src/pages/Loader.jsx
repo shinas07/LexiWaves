@@ -10,7 +10,7 @@ const Loader = () => {
         <div className="dot bg-blue-800 animation-delay-150"></div>
       </div>
       <p className="mt-4 text-blue-600 text-lg font-semibold"></p>
-      <style jsx>{`
+      <style>{`
         .dot {
           width: 16px; /* Dot size */
           height: 16px; /* Dot size */
