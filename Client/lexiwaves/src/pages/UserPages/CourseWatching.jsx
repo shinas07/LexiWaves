@@ -40,7 +40,6 @@ const CourseWatchingPage = () => {
                 setCourse(courseResponse.data);
                 setCourseDataId(courseResponse.data.id)
                 setCurrentLessonVideo(courseResponse.data.video_url);
-           
                 // Fetch completed lessons
                 const completedLessonsResponse = await api.get(`/student/completed-lessons/${courseResponse.data.id}/`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -110,6 +109,21 @@ const CourseWatchingPage = () => {
         }
     };
     
+
+    const handleLessonClick = (lesson) => {
+        setExpandedLessonId(expandedLessonId === lesson.id ? null : lesson.id);
+        setCurrentLessonVideo(lesson.lesson_video_url);
+        
+        // Reset video player when switching lessons
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+        }
+        
+        // If the lesson hasn't been completed yet, mark it as completed
+        if (!completedLessons.includes(lesson.id)) {
+            markLessonAsCompleted(lesson.id);
+        }
+    };
 
     if (loading) return(
         <DotBackground>
