@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGlobe, FaUser, FaSearch, FaArrowRight } from 'react-icons/fa';
+import { Globe2, Search, ArrowRight, Users, MessageCircle } from 'lucide-react';
 import api from '../../../service/api';
 import { DotBackground } from '../../../components/Background';
 import FloatingNavbar from '../../../components/Navbar';
 import { toast } from 'sonner';
 
 const LoadingAnimation = () => (
-    <motion.div
-        className="flex justify-center items-center h-64"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-    >
+    <div className="flex flex-col items-center justify-center h-64 gap-4">
         <motion.div
-            className="w-16 h-16 border-t-4 border-indigo-600 border-solid rounded-full"
+            className="w-20 h-20 rounded-full border-4 border-neutral-700"
+            style={{ borderTopColor: '#6366f1' }}
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         />
-    </motion.div>
+        <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-neutral-400 font-medium"
+        >
+            Loading communities...
+        </motion.p>
+    </div>
 );
 
 const CommunitySelection = () => {
@@ -40,7 +43,6 @@ const CommunitySelection = () => {
                         Authorization: `Bearer ${token}` 
                     }
                 });
-                console.log(response.data.username)
                 setUsername(response.data.username);
                 setEmail(response.data.email);
             } catch (error) {
@@ -84,30 +86,52 @@ const CommunitySelection = () => {
     return (
         <DotBackground>
             <FloatingNavbar />
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-5xl w-full"
-                >
-                    <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-600 bg-clip-text">
-                        Explore Language Communities
-                    </h1>
-                    
-                    <div className="flex flex-col md:flex-row gap-4 mb-8">
-                        <div className="relative flex-grow">
-                            <FaSearch className="absolute top-3 left-3 text-indigo-500"/>
-                            <input
-                                type="text"
-                                placeholder="Search languages"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 text-black w-full px-4 py-2 border-2 border-indigo-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
-                            />
+            <div className="min-h-screen pt-32 px-4 pb-16">
+                {/* Hero Section */}
+                <div className="max-w-6xl mx-auto mb-16 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-6"
+                    >
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+                            <Users className="w-4 h-4 text-indigo-400" />
+                            <span className="text-sm text-neutral-300">
+                                Join {languages.length}+ Language Communities
+                            </span>
                         </div>
-                    </div>
+                        
+                        <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                            Connect with Language Enthusiasts
+                        </h1>
+                        
+                        <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+                            Join vibrant communities of language learners, share experiences, and practice with native speakers.
+                        </p>
+                    </motion.div>
+                </div>
 
+                {/* Search Section */}
+                <div className="max-w-6xl mx-auto mb-12">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="relative"
+                    >
+                        <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                        <input
+                            type="text"
+                            placeholder="Search language communities..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full px-14 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-300"
+                        />
+                    </motion.div>
+                </div>
+
+                {/* Communities Grid */}
+                <div className="max-w-6xl mx-auto">
                     <AnimatePresence mode="wait">
                         {loading ? (
                             <LoadingAnimation key="loader" />
@@ -117,36 +141,68 @@ const CommunitySelection = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                             >
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {filteredLanguages.map((lang) => (
-                                        <motion.div
-                                            key={lang.id}
-                                            whileHover={{ scale: 1.03, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl shadow-lg cursor-pointer transition duration-300 hover:from-indigo-100 hover:to-purple-100"
+                                {filteredLanguages.map((lang, index) => (
+                                    <motion.div
+                                        key={lang.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ 
+                                            opacity: 1, 
+                                            y: 0,
+                                            transition: { delay: index * 0.1 }
+                                        }}
+                                        whileHover={{ y: -5 }}
+                                        className="group relative"
+                                    >
+                                        {/* Glow Effect */}
+                                        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+                                        
+                                        {/* Card Content */}
+                                        <div 
                                             onClick={() => joinCommunity(lang.name)}
+                                            className="relative p-6 bg-neutral-900/50 backdrop-blur-sm border border-white/[0.05] rounded-2xl cursor-pointer"
                                         >
-                                            <div className="flex items-center justify-between mb-4">
-                                                <span className="text-xl font-semibold text-indigo-700">{lang.name}</span>
-                                                <FaGlobe className="text-indigo-500 text-2xl" />
+                                            <div className="flex items-start justify-between mb-6">
+                                                <div>
+                                                    <h3 className="text-xl font-semibold text-white mb-2">
+                                                        {lang.name}
+                                                    </h3>
+                                                    <p className="text-neutral-400 text-sm">
+                                                        Connect with {lang.name} speakers
+                                                    </p>
+                                                </div>
+                                                <div className="p-3 rounded-xl bg-white/5 border border-white/[0.05]">
+                                                    <Globe2 className="w-6 h-6 text-indigo-400" />
+                                                </div>
                                             </div>
-                                            <p className="text-gray-600 mb-4">Join the {lang.name} community</p>
-                                            <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
-                                                Join Now <FaArrowRight className="ml-2" />
-                                            </button>
-                                        </motion.div>
-                                    ))}
-                                </div>
 
-                                {filteredLanguages.length === 0 && (
-                                    <p className="text-center text-gray-500 mt-8 text-lg">No languages found matching your search.</p>
-                                )}
+                                            <div className="flex items-center gap-4 mb-6">
+                                                <div className="flex -space-x-2">
+                                                    {[...Array(3)].map((_, i) => (
+                                                        <div 
+                                                            key={i}
+                                                            className="w-8 h-8 rounded-full bg-neutral-800 border-2 border-neutral-900 flex items-center justify-center"
+                                                        >
+                                                            <Users className="w-4 h-4 text-neutral-500" />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="p-3 rounded-xl bg-white/5 border border-white/[0.05]">
+                                                    <MessageCircle className="w-6 h-6 text-indigo-400" />
+                                                </div>
+                                            </div>
+
+                                            <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
+                                                Join Now <ArrowRight className="ml-2" />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                ))}
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </motion.div>
+                </div>
             </div>
         </DotBackground>
     );
