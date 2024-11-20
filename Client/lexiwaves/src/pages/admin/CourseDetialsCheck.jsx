@@ -46,64 +46,78 @@ export default function CourseDetailsCheckPage() {
             )}
 
             {!loading && !error && course && (
-                <div className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-3xl">
-                    <img 
-                        src={course.thumbnail_url} 
-                        alt={course.title} 
-                        className="w-full h-48 object-cover rounded-lg mb-4" 
-                    />
-                    <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
-                    <p className="text-lg mb-4">{course.description}</p>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <h2 className="text-lg font-semibold">Category:</h2>
-                            <p>{course.category}</p>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">Price:</h2>
-                            <p>${course.price}</p>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">Duration:</h2>
-                            <p>{course.duration} hours</p>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">Difficulty:</h2>
-                            <p>{course.difficulty}</p>
+                <div className="bg-gray-900 p-8 rounded-xl shadow-lg w-full max-w-4xl">
+                    <div className="flex flex-col md:flex-row gap-6 mb-8">
+                        <img 
+                            src={course.thumbnail_url} 
+                            alt={course.title} 
+                            className="w-full md:w-1/3 h-64 object-cover rounded-xl" 
+                        />
+                        <div className="flex-1">
+                            <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
+                            <p className="text-gray-300 text-lg mb-6">{course.description}</p>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="bg-gray-800 p-4 rounded-lg text-center">
+                                    <span className="block text-indigo-400 text-sm">Category</span>
+                                    <span className="text-xl font-semibold">{course.category}</span>
+                                </div>
+                                <div className="bg-gray-800 p-4 rounded-lg text-center">
+                                    <span className="block text-indigo-400 text-sm">Price</span>
+                                    <span className="text-xl font-semibold">${course.price}</span>
+                                </div>
+                                <div className="bg-gray-800 p-4 rounded-lg text-center">
+                                    <span className="block text-indigo-400 text-sm">Duration</span>
+                                    <span className="text-xl font-semibold">{course.duration}h</span>
+                                </div>
+                                <div className="bg-gray-800 p-4 rounded-lg text-center">
+                                    <span className="block text-indigo-400 text-sm">Difficulty</span>
+                                    <span className="text-xl font-semibold">{course.difficulty}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <h2 className="text-lg font-semibold mb-2">Preview Video:</h2>
-                    <video 
-                        controls 
-                        className="w-full mb-4" 
-                        src={course.video_url} 
-                        alt="Course Preview"
-                    />
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold mb-4 border-b border-gray-700 pb-2">Course Preview</h2>
+                        <video 
+                            controls 
+                            className="w-full rounded-lg" 
+                            src={course.video_url}
+                        />
+                    </div>
 
-                    <h2 className="text-lg font-semibold mb-2">Lessons:</h2>
-                    {course.lessons.length > 0 ? (
-                        <ul className="list-disc list-inside mb-4">
-                            {course.lessons.map((lesson) => (
-                                <li key={lesson.id} className="mb-4">
-                                    <div className="p-4 bg-gray-800 rounded-lg mb-2">
-                                        <strong className="text-lg">{lesson.title}</strong>
-                                        <p>{lesson.description}</p>
-                                        <h3 className="font-semibold mt-2">Lesson Video:</h3>
-                                        <video 
-                                            controls 
-                                            className="w-full mb-2" 
-                                            src={lesson.lesson_video_url} 
-                                            alt={lesson.title}
-                                        />
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4 border-b border-gray-700 pb-2">Course Lessons</h2>
+                        {course.lessons.length > 0 ? (
+                            <div className="space-y-4">
+                                {course.lessons.map((lesson, index) => (
+                                    <div key={lesson.id} className="bg-gray-800 rounded-lg overflow-hidden">
+                                        <div className="p-4 border-b border-gray-700">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <span className="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm">
+                                                    Lesson {index + 1}
+                                                </span>
+                                                <h3 className="text-xl font-bold">{lesson.title}</h3>
+                                            </div>
+                                            <p className="text-gray-300">{lesson.description}</p>
+                                        </div>
+                                        <div className="p-4">
+                                            <video 
+                                                controls 
+                                                className="w-full rounded-lg" 
+                                                src={lesson.lesson_video_url}
+                                            />
+                                        </div>
                                     </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No lessons available for this course.</p>
-                    )}
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 bg-gray-800 rounded-lg">
+                                <p className="text-gray-300">No lessons available for this course.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
