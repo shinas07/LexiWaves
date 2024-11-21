@@ -13,7 +13,7 @@ export default function Layout({ children }) {
             {sidebarOpen ? '⮜' : '☰'}
           </button>
           <div className="flex items-center space-x-4">
-            <button className="text-xl text-gray-700 dark:text-gray-300">🔔</button>
+            {/* <button className="text-xl text-gray-700 dark:text-gray-300">🔔</button> */}
             <button className="text-xl text-gray-700 dark:text-gray-300">👤</button>
           </div>
         </header>
