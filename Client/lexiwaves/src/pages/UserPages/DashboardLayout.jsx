@@ -14,6 +14,7 @@ import { logout } from "../../redux/authSlice.jsx";
 import { toast } from "sonner";
 import api from "../../service/api.jsx";
 import { CodeSquare } from "lucide-react";
+import { motion, AnimatePresence} from 'framer-motion'
 
 const UserDashboardLayout = ({ children }) => {
   const navigate = useNavigate();
@@ -115,27 +116,53 @@ const UserDashboardLayout = ({ children }) => {
           </SidebarBody>
         </Sidebar>
  {/* Modal Component */}
- {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
-            <div className="bg-black p-6 rounded-lg text-white max-w-sm w-full">
-              <h2 className="text-xl mb-4">Are you sure you want to log out?</h2>
-              <div className="flex justify-between">
-                <button 
-                  onClick={handleCloseModal} 
-                  className="bg-gray-600 px-4 py-2 rounded-md text-sm"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={() => { handleLogout(); handleCloseModal(); }} 
-                  className="bg-red-600 px-4 py-2 rounded-md text-sm"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+ <AnimatePresence>
+          {isModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+              onClick={() => setIsModalOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                className="bg-neutral-900 border border-white/[0.05] rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
+              >
+                <div className="mb-6">
+                  <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                    <IconArrowLeft className="h-6 w-6 text-red-500" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Confirm Logout
+                  </h2>
+                  <p className="text-neutral-400">
+                    Are you sure you want to log out of your account?
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 px-4 py-2.5 rounded-lg border border-white/[0.05] text-white hover:bg-white/5 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors duration-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </motion.div>
+              </motion.div>
+          )}
+        </AnimatePresence>
+
 
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-neutral-900">
           {children}
