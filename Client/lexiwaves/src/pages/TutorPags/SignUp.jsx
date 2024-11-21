@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+// import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 // import { DotBackground } from "../components/Background";
 // import { }
 import { Link, useNavigate } from "react-router-dom";
@@ -145,10 +145,10 @@ const TutorSignUP = () => {
 
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
-          <div className="flex flex-col space-y-4">
+          {/* <div className="flex flex-col space-y-4">
             <SocialButton icon={<IconBrandGithub />} label="GitHub" />
             <SocialButton icon={<IconBrandGoogle />} label="Google" />
-          </div>
+          </div> */}
       </form>
       <div className="text-sm text-center mt-4">
             <Link to="/tutor-signin" className="text-white hover:underline hover:decoration-cyan-500 ">
