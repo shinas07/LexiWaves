@@ -8,6 +8,18 @@ import { logout  } from '../../redux/authSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+const ProfileSection = ({ title, icon: Icon, value, subtext }) => (
+  <div className="flex items-center space-x-4 p-4 hover:bg-white/[0.02] rounded-xl transition-colors">
+    <div className="p-3 bg-white/[0.05] rounded-xl">
+      <Icon className="w-5 h-5 text-indigo-400" />
+    </div>
+    <div>
+      <p className="text-sm text-neutral-400">{title}</p>
+      <p className="text-base font-medium text-white">{value}</p>
+      {subtext && <p className="text-xs text-neutral-500">{subtext}</p>}
+    </div>
+  </div>
+);
 
 const ProfilePage = () => {
     const [userData, setUserData] = useState({ first_name: '', last_name: '', email: '' });
@@ -192,91 +204,99 @@ const ProfilePage = () => {
 
     return (
         <UserDashboardLayout>
-            <div className="max-w-6xl mx-auto mt-10 p-6">
-                <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-white">My Profile</h1>
-                
+            <div className="max-w-6xl mx-auto px-4 py-12">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                            Profile Settings
+                        </h1>
+                        <p className="text-neutral-400 mt-1">
+                            Manage your account settings and preferences
+                        </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-sm">
+                            Active Account
+                        </span>
+                        <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-sm">
+                            {userData.user_type}
+                        </span>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Profile Summary Card */}
-                    <div className="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="p-6 dark:bg-neutral-800  text-center">
-                        <div className="p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-md dark:bg-gray-800">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Profile Image</h2>
-                <div className="flex items-center justify-center mb-4">
-                        <div className="relative">
-                            {imagePreview ? (
-                                <img
-                                src={imagePreview}
-                                alt="Profile Preview"
-                                className={`${
-                                    uploading 
-                                        ? 'w-32 h-32 opacity-80 bg-gray-200 border-white' 
-                                        : 'w-24 h-24 border-blue-400' 
-                                } rounded-full object-cover mr-4 border-4 shadow-xl transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-2xl hover:border-blue-600 cursor-pointer`}
-                            />
-                            
-                            ) : (
-                                <div
-                                    className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center mr-4 border-4 border-gray-400 shadow-md transition-transform transform hover:scale-105 cursor-pointer"
-                                    onClick={() => document.getElementById('file-upload').click()} // Open file dialog on placeholder click
-                                >
-                                    <Camera className="text-gray-500" />
+                    {/* Profile Card */}
+                    <div className="space-y-6">
+                        {/* Profile Image */}
+                        <div className="p-6 rounded-2xl bg-neutral-900 border border-white/[0.05]">
+                            <div className="flex flex-col items-center">
+                                <div className="relative group">
+                                    {imagePreview ? (
+                                        <img
+                                            src={imagePreview}
+                                            alt="Profile"
+                                            className="w-32 h-32 rounded-full object-cover ring-4 ring-indigo-500/20"
+                                        />
+                                    ) : (
+                                        <div className="w-32 h-32 rounded-full bg-white/[0.05] flex items-center justify-center">
+                                            <Camera className="w-8 h-8 text-neutral-400" />
+                                        </div>
+                                    )}
+                                    
+                                    <button 
+                                        onClick={() => document.getElementById('file-upload').click()}
+                                        className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                                    >
+                                        <Camera className="w-4 h-4" />
+                                    </button>
                                 </div>
-                            
-                            )}
-                            <input
-                                type="file"
-                                accept="image/*" // Allow all image types
-                                onChange={handleImage} // Handle image change
-                                className="hidden"
-                                id="file-upload"
-                                onClick={(e) => { e.target.value = null; }} // Reset input value to allow re-uploading the same file
-                            />
-                        </div>
-                </div>
-                <div className="flex items-center justify-center mt-2">
-                    {imagePreview ? (
-                        
-                        <span
-                        className={`${removing ? 'text-red-600' : 'text-red-500'} cursor-pointer`}
-                        onClick={handleImageRemove}
-                    >
-                        {removing ? 'Removing...' : 'Remove'}
-                    </span>
-                    ):(
-                    <span className="text-green-500 cursor-pointer" onClick={() => document.getElementById('file-upload').click()}>Update</span>
-                    )}
-                </div>
-                <p className="text-gray-600 mt-1 text-center">Please upload a square image (JPG, PNG) with a minimum resolution of 1,000x1,000 pixels.</p>
-            </div>
-        
 
+                                <input
+                                    type="file"
+                                    id="file-upload"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleImage}
+                                />
 
-                            <h2 className="text-2xl mt-4 font-semibold text-gray-800 dark:text-white mb-2">
-                                {userData.first_name} {userData.last_name}
-                            </h2>
-                            <p className="text-gray-600 dark:text-gray-300 mb-4">{userData.email}</p>
-                            <div className="flex justify-center space-x-2">
-                                <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                                    Active
-                                </span>
-                                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                                    {userData.user_type}
-                                </span>
+                                <div className="mt-4 text-center">
+                                    <h3 className="text-lg font-medium text-white">
+                                        {userData.first_name} {userData.last_name}
+                                    </h3>
+                                    <p className="text-neutral-400 text-sm mt-1">{userData.email}</p>
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Quick Info */}
+                        <div className="p-6 rounded-2xl bg-neutral-900 border border-white/[0.05] space-y-2">
+                            <ProfileSection
+                                title="Member Since"
+                                icon={Calendar}
+                                value={new Date(userData.date_joined).toLocaleDateString()}
+                            />
+                            {/* Add more ProfileSection components for other info */}
                         </div>
                     </div>
 
-                    {/* Personal Information Card */}
-                    <div className="md:col-span-2  bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
-                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Personal Information</h2>
+                    {/* Main Content */}
+                    <div className="md:col-span-2 space-y-6">
+                        {/* Personal Information */}
+                        <div className="p-6 rounded-2xl bg-neutral-900 border border-white/[0.05]">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold text-white">Personal Information</h2>
                                 {!isEditingName && (
-                                    <button onClick={() => setIsEditingName(true)} className="text-blue-500 hover:text-blue-600 transition duration-150 ease-in-out">
-                                        <Edit2 size={20} />
+                                    <button
+                                        onClick={() => setIsEditingName(true)}
+                                        className="p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-colors"
+                                    >
+                                        <Edit2 className="w-4 h-4 text-neutral-400" />
                                     </button>
                                 )}
                             </div>
+
                             {isEditingName ? (
                                 <div className="space-y-4">
                                     <div>
@@ -336,89 +356,89 @@ const ProfilePage = () => {
                                 </div>
                             )}
                         </div>
-                        
-                        <div className="p-6 bg-white dark:bg-neutral-800 rounded-lg shadow-md dark:bg-gray-800">
-    <h2 className="text-2xl font-semibold mb-4 mt-4 text-gray-700 dark:text-gray-300">Security</h2>
-    {isChangingPassword ? (
-        <form onSubmit={handlePasswordChange} className="space-y-4">
-            {/* Current Password Field */}
-            <div className="relative">
-                <input
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    value={passwordData.current_password}
-                    onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Current Password"
-                    required
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                    aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
-                >
-                    {showCurrentPassword ?  <Eye /> :  <EyeOff />}
-                </button>
-            </div>
 
-            {/* New Password Field */}
-            <div className="relative">
-                <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={passwordData.new_password}
-                    onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="New Password"
-                    required
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
-                >
-                    {showNewPassword ?  <Eye/> : <EyeOff /> }
-                </button>
-            </div>
+                        {/* Security Section */}
+                        <div className="p-6 rounded-2xl bg-neutral-900 border border-white/[0.05]">
+                            <h2 className="text-2xl font-semibold mb-4 mt-4 text-gray-700 dark:text-gray-300">Security</h2>
+                            {isChangingPassword ? (
+                                <form onSubmit={handlePasswordChange} className="space-y-4">
+                                    {/* Current Password Field */}
+                                    <div className="relative">
+                                        <input
+                                            type={showCurrentPassword ? 'text' : 'password'}
+                                            value={passwordData.current_password}
+                                            onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Current Password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                                            aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                                        >
+                                            {showCurrentPassword ?  <Eye /> :  <EyeOff />}
+                                        </button>
+                                    </div>
 
-            {/* Confirm New Password Field */}
-            <div className="relative">
-                <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={passwordData.confirm_password}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Confirm New Password"
-                    required
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                >
-                    {showConfirmPassword ? <Eye /> : <EyeOff /> }
-                </button>
-            </div>
+                                    {/* New Password Field */}
+                                    <div className="relative">
+                                        <input
+                                            type={showNewPassword ? 'text' : 'password'}
+                                            value={passwordData.new_password}
+                                            onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="New Password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                                            aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                                        >
+                                            {showNewPassword ?  <Eye/> : <EyeOff /> }
+                                        </button>
+                                    </div>
 
-            {/* Submit and Cancel Buttons */}
-            <div className="flex space-x-2">
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                    Change Password
-                </button>
-                <button type="button" onClick={() => setIsChangingPassword(false)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    ) : (
-        <button onClick={() => setIsChangingPassword(true)} className="flex items-center text-blue-500 hover:text-blue-600 focus:outline-none">
-            <Lock className="mr-2" />
-            Change Password
-        </button>
-    )}
-</div>
+                                    {/* Confirm New Password Field */}
+                                    <div className="relative">
+                                        <input
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            value={passwordData.confirm_password}
+                                            onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Confirm New Password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                                            aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                                        >
+                                            {showConfirmPassword ? <Eye /> : <EyeOff /> }
+                                        </button>
+                                    </div>
 
+                                    {/* Submit and Cancel Buttons */}
+                                    <div className="flex space-x-2">
+                                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                                            Change Password
+                                        </button>
+                                        <button type="button" onClick={() => setIsChangingPassword(false)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <button onClick={() => setIsChangingPassword(true)} className="flex items-center text-blue-500 hover:text-blue-600 focus:outline-none">
+                                    <Lock className="mr-2" />
+                                    Change Password
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
