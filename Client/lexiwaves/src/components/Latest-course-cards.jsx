@@ -80,18 +80,15 @@ export const Carousel = ({
     (<CarouselContext.Provider value={{ onCardClose: handleCardClose, currentIndex }}>
       <div className="relative w-full">
         <div
-          className="flex w-full overflow-x-scroll overscroll-x-auto py-10 md:py-20 scroll-smooth [scrollbar-width:none]"
+          className="flex w-full overflow-x-scroll py-10 md:py-20 scroll-smooth [scrollbar-width:none] relative"
           ref={carouselRef}
           onScroll={checkScrollability}>
-          <div
-            className={cn(
-              "absolute right-0  z-[1000] h-auto  w-[5%] overflow-hidden bg-gradient-to-l"
-            )}></div>
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black via-black/50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black via-black/50 to-transparent z-10 pointer-events-none" />
 
           <div
             className={cn(
-              "flex flex-row justify-start gap-4 pl-4",
-              // remove max-w-4xl if you want the carousel to span the full width of its container
+              "flex flex-row justify-start gap-6 pl-8",
               "max-w-7xl mx-auto"
             )}>
             {items.map((item, index) => (
@@ -105,9 +102,8 @@ export const Carousel = ({
                   y: 0,
                   transition: {
                     duration: 0.5,
-                    delay: 0.2 * index,
-                    ease: "easeOut",
-                    once: true,
+                    delay: 0.1 * index,
+                    ease: [0.23, 1, 0.32, 1]
                   },
                 }}
                 key={"card" + index}
@@ -117,18 +113,30 @@ export const Carousel = ({
             ))}
           </div>
         </div>
-        <div className="flex justify-end gap-2 mr-10">
+        <div className="flex justify-end gap-3 mr-10">
           <button
-            className="relative z-40 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            className={cn(
+              "relative z-40 h-10 w-10 rounded-full border border-white/10",
+              "flex items-center justify-center transition-all duration-300",
+              "",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              canScrollLeft ? "bg-white/5" : "bg-white/5"
+            )}
             onClick={scrollLeft}
             disabled={!canScrollLeft}>
-            <IconArrowNarrowLeft className="h-5 w-5 text-gray-500" />
+            <IconArrowNarrowLeft className="h-5 w-5 text-white" />
           </button>
           <button
-            className="relative z-40 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            className={cn(
+              "relative z-40 h-10 w-10 rounded-full border border-white/10 backdrop-blur-sm",
+              "flex items-center justify-center transition-all duration-300",
+              
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              canScrollRight ? "bg-white/5" : "bg-white/5"
+            )}
             onClick={scrollRight}
             disabled={!canScrollRight}>
-            <IconArrowNarrowRight className="h-5 w-5 text-gray-500" />
+            <IconArrowNarrowRight className="h-5 w-5 text-white" />
           </button>
         </div>
       </div>
@@ -144,31 +152,66 @@ export const Card = ({ card, index, layout = false }) => {
   };
 
   return (
-    <motion.button
-      onClick={handleCardClick}
-      className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-60 md:h-80 md:w-72 overflow-hidden flex flex-col items-start justify-start relative z-10"
+    <motion.div
+      whileHover={{ y: -5 }}
+      onClick={() => navigate(`/course/${card.id}`)}
+      className="group relative cursor-pointer"
     >
-      {/* Changed: Wrapped BlurImage in a div for proper sizing */}
-      <div className="relative w-full h-48">
-        <BlurImage
-          src={card.thumbnail_url}
-          alt={card.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+      
+      <div className="relative rounded-3xl bg-neutral-900/50 backdrop-blur-sm border border-white/[0.05] h-[420px] w-[300px] overflow-hidden flex flex-col">
+        <div className="relative w-full h-56 overflow-hidden">
+          <BlurImage
+            src={card.thumbnail_url}
+            alt={card.title}
+            className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-transparent" />
+          
+          <div className="absolute top-4 right-4">
+            <div className="px-3 py-1 rounded-full text-xs font-medium bg-black/30 backdrop-blur-sm border border-white/10 text-white">
+              {card.difficulty}
+            </div>
+          </div>
+        </div>
 
-      <div className="h-[35%] flex flex-col justify-start text-black dark:text-white w-full p-4">
-        <motion.h3 className="text-lg font-semibold mt-2 mb-2">
-          {card.title}
-        </motion.h3>
-        <motion.p className="text-sm mb-1">
-          Tutor: {card.tutor_name} | Difficulty: {card.difficulty}
-        </motion.p>
-        <motion.p className="text-sm">
-          {card.description}
-        </motion.p>
+        <div className="flex-1 p-6 flex flex-col">
+          <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">
+            {card.title}
+          </h3>
+          
+          <div className="flex items-center gap-3 mt-2">
+            <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center">
+              <span className="text-sm font-medium text-white">
+                {card.tutor_name.charAt(0)}
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-neutral-300">
+                {card.tutor_name}
+              </p>
+              <p className="text-xs text-neutral-500">
+                Instructor
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-auto pt-4 border-t border-white/[0.05] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-xs text-neutral-400">Active Course</span>
+            </div>
+            <motion.div
+              whileHover={{ x: 5 }}
+              className="text-indigo-400 text-sm flex items-center gap-1"
+            >
+              View Course
+              <IconArrowNarrowRight className="w-4 h-4" />
+            </motion.div>
+          </div>
+        </div>
       </div>
-    </motion.button>
+    </motion.div>
   );
 };
 
