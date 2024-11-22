@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { FloatingNav } from "./ui/floatingNavbar";
-import { IconHome, IconMessage, IconUser } from "@tabler/icons-react";
+import { IconHome, IconBook2,IconBook } from "@tabler/icons-react";
+
 
 export default function FloatingNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,14 +23,14 @@ export default function FloatingNavbar() {
       icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
-      name: "Courses",
-      link: "/courses",
-      icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" />,
+      name: "Docs",
+      link: "/docs",
+      icon: <IconBook className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
-      name: "Tutors",
-      link: "/tutor-list-connection",
-      icon: <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />,
+      name: "Learn",
+      link: "/courses",
+      icon: <IconBook2 className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
   ];
 
