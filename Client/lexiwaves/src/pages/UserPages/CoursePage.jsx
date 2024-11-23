@@ -2,45 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../service/api';
 import { DotBackground } from '../../components/Background';
-import { Clock, BarChart, DollarSign, Layout } from 'lucide-react';
+import { Clock, BarChart, DollarSign, Search, ChevronRight } from 'lucide-react';
 import FloatingNavbar from '../../components/Navbar';
 import { VanishSearchBarUi } from '../../components/ui/vanish-SearchBar';
 import Pagination from '../../components/Pagination';
+import Loader from '../Loader';
 
 
 
 const CourseCard = ({ course }) => (
+  <div className="relative group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
+    {/* Image Container */}
+    <div className="relative h-52 overflow-hidden">
+      <img 
+        src={course.thumbnail_url} 
+        alt={course.title} 
+        className="w-full h-full object-cover transform transition-transform group-hover:scale-110" 
+      />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors" />
+      
+      {/* Price Tag */}
+      <div className="absolute top-4 right-4">
+        <span className="px-3 py-1.5 bg-white/90 text-gray-900 text-sm font-medium rounded-full">
+          ${course.price}
+        </span>
+      </div>
+      
+      {/* Difficulty Badge */}
+      <div className="absolute top-4 left-4">
+        <span className="px-3 py-1 bg-indigo-500/90 text-white text-xs font-medium rounded-full">
+          {course.difficulty}
+        </span>
+      </div>
+    </div>
 
+    {/* Content */}
+    <div className="p-6 bg-gradient-to-b from-[#13151A] to-[#191D24] border border-white/[0.05] backdrop-blur-sm">
+      <h3 className="text-xl font-semibold text-white mb-2 line-clamp-1">
+        {course.title}
+      </h3>
+      
+      <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+        {course.description}
+      </p>
 
-  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105">
-    
-    <img src={course.thumbnail_url} alt={course.title} className="w-full h-48 object-cover" />
-    <div className="p-6">
-      <h3 className="text-xl font-semibold text-white mb-2">{course.title}</h3>
-      <p className="text-gray-400 mb-4 line-clamp-2">{course.description}</p>
-      <div className="flex justify-between items-center text-sm text-gray-300 mb-4">
-        <div className="flex items-center">
-          <Clock className="w-4 h-4 mr-1" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center text-gray-300 text-sm">
+          <Clock className="w-4 h-4 mr-1 text-indigo-400" />
           <span>{course.duration} hours</span>
         </div>
-        <div className="flex items-center">
-          <BarChart className="w-4 h-4 mr-1" />
-          <span>{course.difficulty}</span>
-        </div>
-        <div className="flex items-center">
-          <DollarSign className="w-4 h-4 mr-1" />
-          <span>${course.price}</span>
-        </div>
+        <Link 
+          to={`/course/${course.id}`} 
+          className="inline-flex items-center text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
+        >
+          View Details
+          <ChevronRight className="w-4 h-4 ml-1" />
+        </Link>
       </div>
-      <Link 
-        to={`/course/${course.id}`} 
-        className="block w-full text-center bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-300"
-      >
-        View Course
-      </Link>
     </div>
   </div>
-  
 );
 
 // Search Bar
@@ -110,10 +131,11 @@ const CourseList = () => {
         const response = await api.get('user/courses/');
         setCourses(response.data);
         setFilteredCourses(response.data);
-        setLoading(false);
       } catch (err) {
         setError('Failed to load courses');
-        setLoading(false);
+        setLoading(true);
+      }finally{
+        setLoading(false)
       }
     };
 
@@ -158,18 +180,29 @@ const CourseList = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading) return <div className="text-white text-center mt-8">Loading...</div>;
+  if (loading) return <div>
+    <DotBackground>
+      <FloatingNavbar/>
+    <Loader/>
+    </DotBackground>
+  </div>;
   if (error) return <div className="text-red-500 text-center mt-8">{error}</div>;
 
   return (
     <DotBackground>
       <FloatingNavbar />
-      <div className="max-w-7xl text-sm mx-auto p-6 mt-16">
-        <div className='flex flex-row mt-12 justify-between mb-4'>    
-          <h1 className="text-3xl font-extrabold mb-4 text-center text-gray-200 tracking-wide leading-tight">
-            Explore Our Courses
-          </h1>
-          <div className='flex justify-end mb-6'>
+      <div className="max-w-7xl mx-auto p-6 mt-16">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 mt-12">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Explore Courses
+            </h1>
+            <p className="text-gray-400">
+              Find the perfect course to enhance your language skills
+            </p>
+          </div>
+          <div className="w-full md:w-auto">
             <VanishSearchBar 
               onSearch={handleSearch} 
               onKeyDown={handleKeyPress}
@@ -177,25 +210,33 @@ const CourseList = () => {
           </div>
         </div>
 
+        {/* No Results Message */}
         {filteredCourses.length === 0 && !showAllCourses ? (
-          <div className="text-center text-gray-400 py-8">
-            <p className="text-xl">No courses found matching "{searchTerm}"</p>
-            <p className="mt-2">Press Enter to show all courses</p>
+          <div className="text-center py-16">
+            <Search className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+            <p className="text-xl text-white mb-2">
+              No courses found matching "{searchTerm}"
+            </p>
+            <p className="text-gray-400">
+              Press Enter to show all courses
+            </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {getCurrentCourses().map(course => (
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>
             
-            <Pagination 
-              totalItems={showAllCourses ? courses.length : filteredCourses.length}
-              itemsPerPage={itemsPerPage}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+            <div className="mt-12 flex justify-center">
+              <Pagination 
+                totalItems={showAllCourses ? courses.length : filteredCourses.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </>
         )}
       </div>
