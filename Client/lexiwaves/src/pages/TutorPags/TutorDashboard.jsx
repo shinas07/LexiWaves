@@ -78,98 +78,152 @@ const TutorDashboard = () => {
     )
   }
 
+  const stats = [
+    { 
+      title: "Total Revenue", 
+      value: "$8,200", 
+      icon: <DollarSign className="w-6 h-6" />,
+      color: "bg-green-500/10 text-green-500"
+    },
+    { 
+      title: "Total Students", 
+      value: data.length, 
+      icon: <User className="w-6 h-6" />,
+      color: "bg-blue-500/10 text-blue-500"
+    },
+    { 
+      title: "Active Courses", 
+      value: "12", 
+      icon: <BookOpen className="w-6 h-6" />,
+      color: "bg-purple-500/10 text-purple-500"
+    },
+    { 
+      title: "Course Views", 
+      value: "2.4K", 
+      icon: <TrendingUp className="w-6 h-6" />,
+      color: "bg-orange-500/10 text-orange-500"
+    }
+  ];
+
   return (
     <TutorDashboardLayout>
       <div className="p-8">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-8">Dashboard Overview</h1>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white">Dashboard Overview</h1>
+          <button 
+            onClick={() => navigate("/tutor-create-course")}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Create Course
+          </button>
+        </div>
         
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          {/* Total Revenue Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-600 bg-opacity-75">
-                <DollarSign size={24} className="text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-                <p className="text-lg font-semibold text-gray-700 dark:text-white">$8,200</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm mb-1">{stat.title}</p>
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                </div>
+                <div className={`p-3 rounded-xl ${stat.color}`}>
+                  {stat.icon}
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Revenue Chart and Recent Students */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Charts and Tables Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Revenue Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Revenue Overview</h2>
+          <div className="lg:col-span-2 bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-indigo-400" />
+              Revenue Overview
+            </h2>
             <Line 
               data={revenueData}
               options={{
                 responsive: true,
                 plugins: {
-                  legend: { position: 'top' },
-                  title: { display: true, text: 'Monthly Revenue' }
+                  legend: { 
+                    position: 'top',
+                    labels: { color: '#fff' }
+                  }
                 },
-                scales: { y: { beginAtZero: true } }
+                scales: {
+                  y: { 
+                    beginAtZero: true,
+                    grid: { color: '#ffffff20' },
+                    ticks: { color: '#fff' }
+                  },
+                  x: {
+                    grid: { color: '#ffffff20' },
+                    ticks: { color: '#fff' }
+                  }
+                }
               }}
             />
           </div>
 
           {/* Recent Students */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Recent Students</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="border-b dark:border-gray-700">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Name</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Course</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Course Category</th> {/* Replaced Progress */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.slice(0, 5).map((student) => (  // Showing only 5 students as an example
-                    <tr key={student.id} className="border-b dark:border-gray-700">
-                      <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.user_first_name} {student.user_last_name}</td>
-                      <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.course_title}</td>
-                      <td className="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{student.course_category || 'N/A'}</td> 
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <User className="w-5 h-5 mr-2 text-indigo-400" />
+              Recent Students
+            </h2>
+            <div className="space-y-4">
+              {data.slice(0, 5).map((student) => (
+                <div key={student.id} className="bg-gray-700/50 p-4 rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                      <User className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">
+                        {student.user_first_name} {student.user_last_name}
+                      </p>
+                      <p className="text-sm text-gray-400">{student.course_title}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 gap-4">
-              <button 
-                onClick={() => navigate("/tutor-create-course")}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"
-              >
-                <Plus size={20} className="mr-2" />
-                Create New Course
-              </button>
-              <button 
-                onClick={() => navigate("/tutor/students")}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"
-              >
-                <User size={20} className="mr-2" />
-                View All Students
-              </button>
-              <button 
-                onClick={() => navigate("/tutor/revenue-report")}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center"
-              >
-                <DollarSign size={20} className="mr-2" />
-                Revenue Report
-              </button>
-            </div>
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+          <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+            <Calendar className="w-5 h-5 mr-2 text-indigo-400" />
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button 
+              onClick={() => navigate("/tutor/students")}
+              className="flex items-center justify-center p-4 bg-gray-700/50 rounded-xl hover:bg-gray-700 transition-colors group"
+            >
+              <User className="w-5 h-5 mr-2 text-indigo-400 group-hover:text-indigo-300" />
+              <span className="text-white group-hover:text-gray-200">View Students</span>
+            </button>
+            <button 
+              onClick={() => navigate("/tutor/revenue-report")}
+              className="flex items-center justify-center p-4 bg-gray-700/50 rounded-xl hover:bg-gray-700 transition-colors group"
+            >
+              <DollarSign className="w-5 h-5 mr-2 text-green-400 group-hover:text-green-300" />
+              <span className="text-white group-hover:text-gray-200">Revenue Report</span>
+            </button>
+            <button 
+              onClick={() => navigate("/tutor/interaction/student-list")}
+              className="flex items-center justify-center p-4 bg-gray-700/50 rounded-xl hover:bg-gray-700 transition-colors group"
+            >
+              <Mail className="w-5 h-5 mr-2 text-purple-400 group-hover:text-purple-300" />
+              <span className="text-white group-hover:text-gray-200">Messages</span>
+            </button>
           </div>
         </div>
       </div>
