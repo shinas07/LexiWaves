@@ -25,6 +25,7 @@ const CourseWatchingPage = () => {
     const videoRef = useRef(null);
     const watchTimeRef = useRef(0);
     const MINIMUM_WATCH_TIME = 300;
+    const [accumulatedWatchTime, setAccumulatedWatchTime] = useState(0);
 
 
     
@@ -38,7 +39,8 @@ const CourseWatchingPage = () => {
                 });
                 
                 setCourse(courseResponse.data);
-                setCourseDataId(courseResponse.data.id)
+                console.log(courseResponse.data)
+                setCourseDataId(courseResponse.data.id);
                 setCurrentLessonVideo(courseResponse.data.video_url);
                 // Fetch completed lessons
                 const completedLessonsResponse = await api.get(`/student/completed-lessons/${courseResponse.data.id}/`, {
@@ -92,18 +94,16 @@ const CourseWatchingPage = () => {
             const currentTime = Math.floor(videoRef.current.currentTime);
             watchTimeRef.current = currentTime;
 
-            // Check if watched for minimum time (5 minutes)
-            if (currentTime >= MINIMUM_WATCH_TIME) {
+            // Update accumulated time every 60 seconds (or your preferred interval)
+            if (currentTime % 1 === 0 && currentTime !== 0) {
                 try {
-                    const token = localStorage.getItem('accessToken');
-                    await api.post('/student/record-watch-time/', {
-                        course_id: courseId,
-                        watch_time: currentTime,
-                    }, {
-                        headers: { Authorization: `Bearer ${token}` },
+                    await api.post('/student/study-streak/', {
+                        course_id: course.id,
+                        duration: 60  // sending duration in seconds
                     });
+                    console.log('one streak')
                 } catch (error) {
-                    console.error('Failed to record watch time:', error);
+                    console.error('Failed to update study streak:', error);
                 }
             }
         }
@@ -158,16 +158,21 @@ const CourseWatchingPage = () => {
                                 {expandedLessonId ? 'Lesson Video' : 'Course Preview'}
                             </h2>
                             {currentLessonVideo && (
-                                <video 
-                                    ref={videoRef}
-                                    key={currentLessonVideo} 
-                                    controls 
-                                    className="w-full rounded-lg shadow-lg" 
-                                    style={{ aspectRatio: '16/9' }}
-                                >
-                                    <source src={currentLessonVideo} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
+                                <div className="video-container" onContextMenu={(e) => e.preventDefault()}>
+                                    <video 
+                                        ref={videoRef}
+                                        key={currentLessonVideo} 
+                                        controls 
+                                        controlsList="nodownload"
+                                        disablePictureInPicture
+                                        onTimeUpdate={handleTimeUpdate}
+                                        className="w-full rounded-lg shadow-lg" 
+                                        style={{ aspectRatio: '16/9'}}
+                                    >
+                                        <source src={currentLessonVideo} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
                             )}
                         </div>
 
