@@ -120,7 +120,7 @@ const [selectedStudentId, setSelectedStudentId] = useState(null);
                   <div className="bg-gray-700 rounded-lg p-6 max-w-sm w-full mx-4">
                     <h3 className="text-lg font-semibold mb-4">Confirm Block</h3>
                     <p className=" text-white mb-6">
-                      Are you sure you want to block this student? This action can be undone later.
+                      Are you sure you want to block this student?
                     </p>
                     <div className="flex justify-end space-x-3">
                       <button
