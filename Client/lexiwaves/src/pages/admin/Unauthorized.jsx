@@ -1,71 +1,78 @@
 import React from 'react';
-import { ArrowLeft, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ShieldAlert, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DotBackground } from '../../components/Background';
 
-const Unauthorized = () => {
+const AdminUnauthorized = () => {
     const navigate = useNavigate();
 
     return (
         <DotBackground>
-        <div className="min-h-screen bg-gradient-to-b flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-                {/* Alert Icon */}
-                <div className="flex justify-center mb-6">
-                    <div className="p-3 bg-red-100 rounded-full">
-                        <ShieldAlert className="w-12 h-12 text-red-500" />
+            <div className="min-h-screen  flex items-center justify-center p-4">
+                <div className="max-w-md w-full backdrop-blur-sm bg-white/10 rounded-2xl shadow-2xl p-8 text-center border border-white/10">
+                    {/* Admin Lock Icon */}
+                    <div className="flex justify-center mb-8">
+                        <div className="relative">
+                            <div className="p-4 bg-red-500/10 rounded-full animate-pulse">
+                                <Lock className="w-16 h-16 text-red-500" />
+                            </div>
+                            <ShieldAlert className="w-8 h-8 text-yellow-500 absolute -top-2 -right-2" />
+                        </div>
+                    </div>
+
+                    {/* Error Content */}
+                    <div className="space-y-4 mb-8">
+                        <h1 className="text-3xl font-bold text-white">
+                            Admin Access Only
+                        </h1>
+                        <div className="space-y-3">
+                            <p className="text-gray-300 text-lg">
+                                This area is restricted to LexiWaves administrators only.
+                            </p>
+                            <p className="text-sm text-gray-400">
+                                Please log in with your administrator credentials to access this section.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => navigate('/')}
+                            className="w-full group flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white py-3 px-6 rounded-xl transition-all duration-300 border border-white/10 hover:border-white/30"
+                        >
+                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            Return to Homepage
+                        </button>
+                        
+                        <button
+                            onClick={() => navigate('/admin-login')}
+                            className="w-full group flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl transition-all duration-300"
+                        >
+                            <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            Admin Login
+                        </button>
+                    </div>
+
+                    {/* Support Information */}
+                    <div className="mt-8 pt-6 border-t border-white/10">
+                        <div className="flex flex-col items-center space-y-3">
+                            <p className="text-sm text-gray-400">
+                                For administrative access requests, please contact
+                            </p>
+                            <a 
+                                href="mailto:admin@lexiwaves.com" 
+                                className="group flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors duration-300"
+                            >
+                                <Mail className="w-4 h-4 group-hover:animate-bounce" />
+                                admin@lexiwaves.com
+                            </a>
+                        </div>
                     </div>
                 </div>
-
-                {/* Error Title */}
-                <h1 className="text-2xl font-bold text-gray-800 mb-3">
-                    Access Denied
-                </h1>
-
-                {/* Error Message */}
-                <div className="space-y-3 mb-8">
-                    <p className="text-gray-600">
-                        Sorry, you don't have permission to access this area.
-                    </p>
-                    <p className="text-sm text-gray-500">
-                        This section is restricted to administrators only. Please contact your system administrator if you believe this is an error.
-                    </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-md transition-colors duration-200"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Return to Homepage
-                    </button>
-                    
-                    <button
-                        onClick={() => navigate('/admin-login')}
-                        className="w-full bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 py-2 px-4 rounded-md transition-colors duration-200"
-                    >
-                        Go to Admin Login
-                    </button>
-                </div>
-
-                {/* Help Section */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                    <p className="text-sm text-gray-500">
-                        Need assistance? Contact support at{' '}
-                        <a 
-                            href="mailto:support@example.com" 
-                            className="text-blue-600 hover:text-blue-800"
-                        >
-                            support@lexiwaves.com
-                        </a>
-                    </p>
-                </div>
             </div>
-        </div>
         </DotBackground>
     );
 };
 
-export default Unauthorized;
+export default AdminUnauthorized;
