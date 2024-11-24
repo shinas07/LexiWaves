@@ -31,9 +31,9 @@ const Login = () => {
             const response = await api.post('/user/login/', {
                 email,
                 password
-            })
-            const { refresh, access,user } = response.data;
-    
+              })
+              const { refresh, access,user } = response.data;
+      
             // Save the tokens to localStorage
             localStorage.setItem('refreshToken', refresh);
             localStorage.setItem('accessToken', access);
