@@ -5,14 +5,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from "../../service/api";
 import { toast } from "sonner";
 import { login } from "../../redux/authSlice";
+import { useDispatch } from "react-redux";
 
 const AdminSignup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false)
-    const dispatch = useReducer()
+    const dispatch = useDispatch()
     const navigator = useNavigate();
+
+
 
 
 
@@ -32,12 +35,25 @@ const AdminSignup = () => {
                 email,
                 password
             });
-            localStorage.setItem('userRole',response.data.role);
-            localStorage.setItem('accessToken', response.data.access);
-            localStorage.setItem('refreshToken', response.data.refresh);
-            toast.success('SignIn successful');
+            
+            const { refresh, access,user } = response.data;
+            console.log(user)
+    
+            // localStorage.setItem('userRole',response.data.role);
+            // localStorage.setItem('accessToken', response.data.access);
+            // localStorage.setItem('refreshToken', response.data.refresh);
+            
+            dispatch(login({
+                accessToken: access,  
+                refreshToken: refresh,
+                user:user,
+                userRole:user.user_type,
+            }));
+
+            toast.success('SignIn Successful');
             navigator('/admin-dashboard');
         } catch (error) {
+            console.log(error)
             const errorMessage = error.response?.data?.error || 'An error occurred, try again'
             toast.error(errorMessage);
         }finally{
