@@ -80,11 +80,9 @@ export const Carousel = ({
     (<CarouselContext.Provider value={{ onCardClose: handleCardClose, currentIndex }}>
       <div className="relative w-full">
         <div
-          className="flex w-full overflow-x-scroll py-10 md:py-20 scroll-smooth [scrollbar-width:none] relative"
+          className="flex w-full overflow-x-scroll py-8 md:py-8 scroll-smooth [scrollbar-width:none] relative"
           ref={carouselRef}
           onScroll={checkScrollability}>
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black via-black/50 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black via-black/50 to-transparent z-10 pointer-events-none" />
 
           <div
             className={cn(
@@ -147,9 +145,9 @@ export const Carousel = ({
 export const Card = ({ card, index, layout = false }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/course/${card.id}`);
-  };
+  // const handleCardClick = () => {
+  //   navigate(`/course/${card.id}`);
+  // };
 
   return (
     <motion.div
