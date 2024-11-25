@@ -4,11 +4,13 @@ import { Carousel, Card } from "../../components/Latest-course-cards";
 import api from "../../service/api";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function LatestCourses() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -16,7 +18,7 @@ export function LatestCourses() {
         const response = await api.get('/student/latest-courses/');
         setData(response.data);
       } catch (error) {
-        setError(error.message);
+        setError('Failed to load the latest courses. please refresh the page');
       } finally {
         setLoading(false);
       }
@@ -45,7 +47,7 @@ export function LatestCourses() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <p className="text-red-400">Error: {error}</p>
+          <p className="text-red-400">{error}</p>
         </div>
       </div>
     );
@@ -56,9 +58,9 @@ export function LatestCourses() {
   ));
 
   return (
-    <div className="w-full py-20">
+    <div className="w-full py-8">
       {/* Header Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -72,11 +74,12 @@ export function LatestCourses() {
             </p>
           </div>
 
-          {/* Optional: Add a "View All" button */}
+          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-neutral-300 hover:bg-white/10 transition-colors"
+            onClick={() => navigate('/courses')}
           >
             View All
             <svg 
