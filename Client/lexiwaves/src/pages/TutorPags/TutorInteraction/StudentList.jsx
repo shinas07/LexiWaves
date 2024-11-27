@@ -13,7 +13,7 @@ import {
 import Loader from '../../Loader';
 import TutorDashboardLayout from '../TutorDashboardLayout';
 
-const StudentsList = () => {
+const InteractionStudentsList = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -180,4 +180,4 @@ const StudentsList = () => {
   );
 };
 
-export default StudentsList;
+export default InteractionStudentsList;
