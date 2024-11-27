@@ -4,6 +4,7 @@ import { FaPlus, FaTrash } from 'react-icons/fa';
 import api from '../../service/api';
 import { toast } from 'sonner';
 import { DotBackground } from '../../components/Background';
+import TutorDashboardLayout from './TutorDashboardLayout';
 
 
 const CreateQuiz = () => {
@@ -80,7 +81,7 @@ const CreateQuiz = () => {
     };
 
     return (
-        <DotBackground>
+        <TutorDashboardLayout>
         <div className="container mx-auto p-4 mt-12 min-h-screen">
             <h1 className="text-3xl font-bold mb-6 mt-6 text-center text-neutral-200">Create Quiz for 
                 <span className='ml-2 text-neutral-100'>{courseName}</span></h1>
@@ -165,7 +166,7 @@ const CreateQuiz = () => {
                 </div>
             </form>
         </div>
-        </DotBackground>
+        </TutorDashboardLayout>
     );
 };
 
