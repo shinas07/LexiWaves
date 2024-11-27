@@ -29,7 +29,6 @@ import ForgotPassword from "./pages/UserPages/UserForgotPassword";
 import CommunitySelection from "./pages/UserPages/UserCommunity/CommunityChat";
 import ProfilePage from "./pages/UserPages/AccountProfile";
 import QuizPage from "./pages/UserPages/Quiz";
-import UserConnection from "./pages/UserPages/UserInteractions/UserTutorConnection"
 import StudentUnauthorized from "./pages/UserPages/StudentUnauthorized";
 import DocsPage from "./pages/Docs";
 import LexiSupportPage from "./pages/Support";
@@ -77,7 +76,7 @@ import ChatRoom from "./pages/UserPages/UserCommunity/ChatRoom";
 import AdminRevenuePage from "./pages/admin/RevenuePage";
 import RevenueReport from "./pages/TutorPags/RevenueReport";
 import TutorProfile from "./pages/TutorPags/TutorProfile";
-import InteractionStudentsList from "./pages/TutorPags/TutorInteraction/studentList";
+import InteractionStudentsList from "./pages/TutorPags/TutorInteraction/StudentList";
 import ReviewSession from "./pages/VideoCall/StudentReview";
 import Reports from "./pages/admin/Reports";
 import PaymentCancel from "./pages/UserPages/PaymentCancel";
