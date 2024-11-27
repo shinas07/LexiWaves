@@ -89,31 +89,6 @@ const EnrolledCoursesList = () => {
 
         {/* Updated Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white/80 text-sm">Total Revenue</p>
-                <p className="text-white text-2xl font-bold">
-                  ${enrolledCourses.reduce((acc, curr) => acc + parseFloat(curr.amount_paid), 0).toFixed(2)}
-                </p>
-              </div>
-              <CurrencyDollarIcon className="h-10 w-10 text-white/80" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white/80 text-sm">Admin Revenue</p>
-                <p className="text-white text-2xl font-bold">
-                  ${totalAdminRevenue.toFixed(2)}
-                </p>
-                <p className="text-white/60 text-xs">({ADMIN_COMMISSION_PERCENTAGE}% Commission)</p>
-              </div>
-              <CashIcon className="h-10 w-10 text-white/80" />
-            </div>
-          </div>
-
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
