@@ -1,7 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaPaperPlane, FaSignOutAlt, FaUsers, FaGlobe, FaUserCircle } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Send, 
+    LogOut, 
+    Users, 
+    Globe2, 
+    MessageSquare, 
+    Wifi, 
+    WifiOff,
+    MoreVertical,
+    Settings,
+    Bell
+} from 'lucide-react';
 
 const ChatRoom = () => {
     const location = useLocation();
@@ -105,100 +116,163 @@ const ChatRoom = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-100 to-purple-100">
-            <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-center">
-                        <div className="flex items-center mb-4 sm:mb-0">
-                            <FaGlobe className="text-3xl mr-3 text-indigo-200" />
+        <div className="h-screen bg-neutral-900 flex">
+            {/* Sidebar */}
+            <div className="w-64 border-r border-white/[0.05] p-4 hidden md:flex flex-col">
+                <div className="mb-8">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                        LexiWaves Chat
+                    </h2>
+                </div>
+
+                {/* Room Info */}
+                <div className="p-4 bg-white/[0.03] rounded-2xl mb-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 rounded-xl bg-indigo-500/10">
+                            <Globe2 className="w-5 h-5 text-indigo-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-white font-medium">{language}</h3>
+                            <p className="text-sm text-neutral-400">Community Chat</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-neutral-400">
+                        <Users className="w-4 h-4" />
+                        <span>{onlineUsers} members online</span>
+                    </div>
+                </div>
+
+                {/* Online Status */}
+                <div className={`flex items-center gap-2 p-3 rounded-xl ${isOnline ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                    {isOnline ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+                    <span className="text-sm font-medium">{isOnline ? 'Connected' : 'Offline'}</span>
+                </div>
+
+                <div className="mt-auto">
+                    <button 
+                        onClick={() => navigate('/community-chat')}
+                        className="w-full p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-2"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span>Leave Chat</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Chat Area */}
+            <div className="flex-1 flex flex-col">
+                {/* Header */}
+                <div className="border-b border-white/[0.05] p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                                {username.charAt(0).toUpperCase()}
+                            </div>
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold">{language} Community Chat</h1>
-                                <p className="text-indigo-200 mt-1 flex items-center">
-                                    <FaUsers className="mr-2" />
-                                    {onlineUsers} online • Welcome, {username}!
-                                </p>
+                                <h3 className="text-white font-medium">{username}</h3>
+                                <p className="text-sm text-neutral-400">{email}</p>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                        <div className={`bg-${isOnline ? 'green' : 'red'}-500 px-3 py-1 rounded-full text-sm flex items-center`}>
-                                <span className={`w-2 h-2 bg-${isOnline ? 'green' : 'red'}-400 rounded-full mr-2`}></span>
-                                {isOnline ? 'Online' : 'Offline'}
-                            </div>
-                            <button 
-                                onClick={() => navigate('/community-chat')}
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition duration-300 ease-in-out flex items-center text-sm font-medium"
-                            >
-                                <FaSignOutAlt className="mr-2" /> Leave Chat
+                        <div className="flex items-center gap-3">
+                            <button className="p-2 rounded-lg hover:bg-white/[0.05]">
+                                <Bell className="w-5 h-5 text-neutral-400" />
+                            </button>
+                            <button className="p-2 rounded-lg hover:bg-white/[0.05]">
+                                <Settings className="w-5 h-5 text-neutral-400" />
                             </button>
                         </div>
                     </div>
                 </div>
-            </header>
-            
-            <div className="flex-grow p-6 overflow-hidden">
-                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl h-full flex flex-col">
-                    <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-4 space-y-4">
+
+                {/* Messages */}
+                <div 
+                    ref={chatContainerRef}
+                    className="flex-1 overflow-y-auto p-4 space-y-4"
+                >
+                    <AnimatePresence initial={false}>
                         {messages.map((msg, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className={`flex ${msg.username === username ? 'justify-end' : 'justify-start'} mb-2`}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className={`flex ${msg.username === username ? 'justify-end' : 'justify-start'}`}
                             >
-                                <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                                <div className={`group max-w-md ${
                                     msg.username === username 
-                                        ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-l-lg rounded-br-lg'
-                                        : 'bg-gray-200 text-gray-800 rounded-r-lg rounded-bl-lg'
-                                } p-4 shadow-lg relative flex flex-col break-words transition-transform transform hover:scale-105`}>
-                                    <div className="flex items-center mb-1">
-                                        {/* <Avatar name={msg.username} size="30" round={true} className="mr-2" /> */}
-                                        <div 
-                                            className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium mr-2"
-                                            >
-                                            {msg.username ? msg.username.charAt(0).toUpperCase() : 'U'}
-                                            </div>
-                                        <p className="font-semibold text-sm">{msg.username}</p>
+                                        ? 'bg-indigo-500 text-white'
+                                        : 'bg-white/[0.05] text-white'
+                                } rounded-2xl p-4 space-y-2 hover:shadow-lg transition-all relative`}
+                                >
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium">
+                                            {msg.username.charAt(0).toUpperCase()}
+                                        </div>
+                                        <span className="font-medium text-sm">{msg.username}</span>
+                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-white/10 rounded-lg">
+                                            <MoreVertical className="w-4 h-4" />
+                                        </button>
                                     </div>
-                                    <p className="text-base">{msg.message}</p>
-                                    {msg.timestamp && !isNaN(new Date(msg.timestamp)) && (
-                                        <p className="text-xs text-gray-500 mt-1 self-end">
-                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </p>
-                                    )}
+                                    <p className="text-sm">{msg.message}</p>
+                                    <div className="text-xs opacity-60">
+                                        {new Date(msg.timestamp).toLocaleTimeString([], { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        })}
+                                    </div>
                                 </div>
                             </motion.div>
                         ))}
-                        {isTyping && (
-                            <div className="text-gray-500 text-sm italic">
-                                Someone is typing...
-                            </div>
-                        )}
-                    </div>
+                    </AnimatePresence>
 
-                    <div className="p-4 bg-gray-50 border-t border-gray-200">
-                        <form onSubmit={sendMessage} className="flex items-center space-x-3">
-                            <div className="relative flex-grow">
-                                <input
-                                    type="text"
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="w-full py-3 px-4 rounded-full bg-gray-200 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-gray-700"
-                                    required
+                    {isTyping && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-center gap-2 text-neutral-400"
+                        >
+                            <div className="flex gap-1">
+                                <motion.div
+                                    animate={{ y: [0, -5, 0] }}
+                                    transition={{ repeat: Infinity, duration: 0.5 }}
+                                    className="w-1.5 h-1.5 bg-neutral-400 rounded-full"
+                                />
+                                <motion.div
+                                    animate={{ y: [0, -5, 0] }}
+                                    transition={{ repeat: Infinity, duration: 0.5, delay: 0.1 }}
+                                    className="w-1.5 h-1.5 bg-neutral-400 rounded-full"
+                                />
+                                <motion.div
+                                    animate={{ y: [0, -5, 0] }}
+                                    transition={{ repeat: Infinity, duration: 0.5, delay: 0.2 }}
+                                    className="w-1.5 h-1.5 bg-neutral-400 rounded-full"
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 ease-in-out rounded-full p-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                <FaPaperPlane />
-                            </button>
-                        </form>
-                    </div>
+                            <span className="text-sm">Someone is typing...</span>
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Message Input */}
+                <div className="p-4 border-t border-white/[0.05]">
+                    <form onSubmit={sendMessage} className="flex items-center gap-4">
+                        <input
+                            type="text"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Type your message..."
+                            className="flex-1 bg-white/[0.05] text-white placeholder-neutral-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                        />
+                        <button
+                            type="submit"
+                            className="p-3 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                        >
+                            <Send className="w-5 h-5" />
+                        </button>
+                    </form>
                 </div>
             </div>
-
-          
         </div>
     );
 };
