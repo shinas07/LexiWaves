@@ -13,7 +13,6 @@ const PaymentEnrollButton = ({ courseId }) => {
     const handleClick = async () => {
         setLoading(true);
         const accessToken = localStorage.getItem('accessToken');
-        console.log(accessToken)
 
         try {
             // Check if the user is already enrolled
@@ -47,7 +46,7 @@ const PaymentEnrollButton = ({ courseId }) => {
                 });
 
                 if (result.error) {
-                    console.error(result.error.message);
+                    console.log(result.error)
                     toast.error('Failed to redirect to payment. Please try again.');
                 } else {
                     // Handle successful enrollment (if needed)
