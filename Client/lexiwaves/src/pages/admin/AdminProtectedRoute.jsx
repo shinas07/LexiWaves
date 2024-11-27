@@ -1,8 +1,11 @@
+import { useRadioGroup } from "@mui/material";
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const AdminProtectedRoute = ({ children }) => {
-    const userRole = localStorage.getItem('userRole');
+    const userRole = useSelector((state) => state.auth.userRole)
+    console.log('admin only',userRole)
 
     if (userRole !== 'admin'){
         return <Navigate to='/admin-unauthorized'/>
