@@ -63,7 +63,7 @@ export default function CourseApprovingPage() {
   return (
     <Layout>
       <div className="flex h-screen font-sans text-white">
-        <main className="p-6 w-full overflow-auto">
+        <main className="p-6 w-full overflow-auto scrollbar-thin">
           <h1 className="text-3xl font-bold mb-6">New Courses for Approval</h1>
 
           {loading && (
