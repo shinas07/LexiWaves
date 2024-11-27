@@ -34,22 +34,22 @@ module.exports = {
 
     function({ addUtilities }) {
       addUtilities({
-        '.scrollbar': {
-          '&::-webkit-scrollbar': {
-            width: '4px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#1F2937', // Dark background
-            borderRadius: '100vh',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#374151', // Darker thumb
-            borderRadius: '100vh',
-            '&:hover': {
-              background: '#4B5563' // Even darker on hover
-            }
-          }
-        },
+        // '.scrollbar': {
+        //   '&::-webkit-scrollbar': {
+        //     width: '4px',
+        //   },
+        //   '&::-webkit-scrollbar-track': {
+        //     background: '#1F2937', // Dark background
+        //     borderRadius: '100vh',
+        //   },
+        //   '&::-webkit-scrollbar-thumb': {
+        //     background: '#374151', // Darker thumb
+        //     borderRadius: '100vh',
+        //     '&:hover': {
+        //       background: '#4B5563' // Even darker on hover
+        //     }
+        //   }
+        // },
         '.scrollbar-thin': {
           '&::-webkit-scrollbar': {
             width: '2px',
