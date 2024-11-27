@@ -35,10 +35,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     { name: 'Dashboard', link: '/admin-dashboard' },
     { name: 'Students', link: '/admin-students-list' },
     { name: 'Tutors', link: '/admin-tutor-list' },
+    { name: 'Languages', link: '/admin-language' },
     { name: 'Courses', link: '/admin-Approved-courses-list' },
     { name: 'Enrolled Courses', link: '/admin-enrolled-courses' },
     { name: 'Reports', link:'/admin-report'},
-    { name: 'Languages', link: '/admin-language' },
+    { name: 'Revenue', link: '/admin-revenue-details' },
     { name: 'Logout', action: () => setShowLogoutModal(true) }
   ];
 
