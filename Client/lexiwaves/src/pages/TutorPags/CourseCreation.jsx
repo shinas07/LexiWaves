@@ -232,7 +232,6 @@ const handleChange = (e) => {
             'Content-Type': 'multipart/form-data',
           }
         });
-    
         clearInterval(progressInterval);
         setProgress(100);
 
