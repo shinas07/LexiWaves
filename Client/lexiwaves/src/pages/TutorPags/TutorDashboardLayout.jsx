@@ -6,10 +6,7 @@ import {
   IconBrandTabler,
   IconSettings,
   IconUser,
-  IconHome,
   IconBook,
-  IconMail,
-  IconCalendar,
   IconLogout,
 } from '@tabler/icons-react';
 import { useDispatch } from 'react-redux';
@@ -17,7 +14,7 @@ import { logout } from '../../redux/authSlice.jsx';
 import { toast } from 'sonner';
 import api from '../../service/api.jsx';
 import { cn } from '../../lib/utils.jsx';
-
+import { DollarSign } from 'lucide-react';
 
 const LogoutModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
@@ -114,20 +111,15 @@ const TutorDashboardLayout = ({ children }) => {
       to: '/tutor/interaction/student-list',
       icon: <PeopleInteractionIcon/>
     },
-    // {
-    //   label: 'Calendar',
-    //   to: '/tutor/calendar',
-    //   icon: <IconCalendar className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-    // },
     {
       label: 'Profile',
       to: '/tutor/profile',
       icon: <IconUser className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
     },
     {
-      label: 'Settings',
-      to: '/tutor/settings',
-      icon: <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+      label: 'Revenue',
+      to: '/tutor/revenue',
+      icon: <DollarSign className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
     },
   ];
 
