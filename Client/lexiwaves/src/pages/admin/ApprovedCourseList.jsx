@@ -77,7 +77,7 @@ export default function ApprovedCoursesPage() {
   };
 
   const handleViewDetails = (courseId) => {
-    navigate(`/courses/${courseId}`); // Navigate to the course details page
+    navigate(`/admin-course-details/${courseId}`);
   };
 
   const handleNewCoursesRequestPage = () => {
@@ -87,7 +87,7 @@ export default function ApprovedCoursesPage() {
   return (
     <Layout>
       <div className="flex h-screen font-sans text-white">
-        <main className="p-6 w-full overflow-auto">
+        <main className="p-6 w-full overflow-auto scrollbar-thin">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <h1 className="text-3xl font-bold">Approved Courses</h1>
             
