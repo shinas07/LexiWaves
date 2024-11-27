@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Video, Book, Users, DollarSign, Plus } from 'lucide-react';
 import api from '../../service/api';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
 import { VanishSearchBarUi } from '../../components/ui/vanish-SearchBar';
 import TutorDashboardLayout from './TutorDashboardLayout';
@@ -36,6 +36,7 @@ const TutorCreatedCourses = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
+        console.log(response.data)
 
         if (response.status === 200) {
           setCourses(response.data);
@@ -90,10 +91,10 @@ const TutorCreatedCourses = () => {
     }
   };
 
-  const [expandedCourseId, setExpandedCourseId] = useState(null);
+  const navigate = useNavigate();
 
-  const toggleCourseDescription = (courseId) => {
-    setExpandedCourseId(expandedCourseId === courseId ? null : courseId);
+  const handleRowClick = (courseId) => {
+    navigate(`/tutor/courses/details/${courseId}`);
   };
 
   if (loading) {
@@ -118,12 +119,7 @@ const TutorCreatedCourses = () => {
           {/* Search Bar */}
           <div className="w-full md:w-1/3">
             <VanishSearchBarUi
-              placeholders={[
-                'Search by course title...',
-                'Find specific courses...',
-                'Search by description...',
-                'Looking for something?',
-              ]}
+              placeholders={['Search courses...', 'Find by title...']}
               onChange={(e) => handleSearch(e.target.value)}
               onKeyDown={handleKeyPress}
             />
@@ -144,12 +140,9 @@ const TutorCreatedCourses = () => {
                 <thead>
                   <tr className="bg-gray-700">
                     <th className="px-6 py-3 text-left">Title</th>
-                    <th className="px-6 py-3 text-left">Description</th>
-                    <th className="px-6 py-3 text-left">Difficulty</th>
-                    <th className="px-6 py-3 text-left">Duration</th>
-                    <th className="px-6 py-3 text-left">Lessons</th>
                     <th className="px-6 py-3 text-left">Students</th>
                     <th className="px-6 py-3 text-left">Price</th>
+                    <th className="px-6 py-3 text-left">Status</th>
                     <th className="px-6 py-3 text-left">Actions</th>
                   </tr>
                 </thead>
@@ -157,48 +150,46 @@ const TutorCreatedCourses = () => {
                   {getCurrentCourses().map((course) => (
                     <tr
                       key={course.id}
-                      className="hover:bg-gray-700 transition duration-300"
+                      onClick={() => handleRowClick(course.id)}
+                      className="hover:bg-gray-700 transition duration-300 cursor-pointer"
                     >
-                      <td className="px-6 py-4">{course.title}</td>
+                      <td className="px-6 py-4 font-medium">{course.title}</td>
                       <td className="px-6 py-4">
-                        <div className="line-clamp-2">
-                          {course.description}
-                          {course.description.length > 100 && (
-                            <button
-                              className="text-indigo-400 hover:text-indigo-300 transition duration-300 ml-2"
-                              onClick={() => toggleCourseDescription(course.id)}
-                            >
-                              {expandedCourseId === course.id
-                                ? 'Read Less'
-                                : 'Read More'}
-                            </button>
-                          )}
+                        <div className="flex items-center">
+                          <Users className="w-4 h-4 mr-2" />
+                          {course.students_count}
                         </div>
-                        {expandedCourseId === course.id && (
-                          <div className="mt-2">{course.description}</div>
-                        )}
                       </td>
-                      <td className="px-6 py-4 text-yellow-400 font-semibold">
-                        {course.difficulty}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          {course.price}
+                        </div>
                       </td>
-                      <td className="px-6 py-4">{course.duration} hours</td>
-                      <td className="px-6 py-4">{course.lessons_count} lessons</td>
-                      <td className="px-6 py-4">{course.students_count} students</td>
-                      <td className="px-6 py-4">{course.price}</td>
-                      <td className="px-6 py-4 flex space-x-4">
-                        <Link
-                          to={`/course/${course.id}/edit`}
-                          className="text-indigo-400 hover:text-indigo-300 transition duration-300"
-                        >
-                          Edit
-                        </Link>
-                        <Link
-                          to={`/create-quiz/${course.id}?courseTitle=${encodeURIComponent(course.title)}`}
-                          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 flex items-center"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Quiz
-                        </Link>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          course.is_approved 
+                            ? 'bg-green-500/20 text-green-500' 
+                            : 'bg-yellow-500/20 text-yellow-500'
+                        }`}>
+                          {course.is_approved ? 'Approved' : 'Pending'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex space-x-3" onClick={(e) => e.stopPropagation()}>
+                          <Link
+                            to={`/course/${course.id}/edit`}
+                            className="text-indigo-400 hover:text-indigo-300 transition duration-300"
+                          >
+                            Edit
+                          </Link>
+                          <Link
+                            to={`/create-quiz/${course.id}`}
+                            className="text-green-400 hover:text-green-300 transition duration-300"
+                          >
+                            Quiz
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}
