@@ -76,7 +76,7 @@ import ChatRoom from "./pages/UserPages/UserCommunity/ChatRoom";
 import AdminRevenuePage from "./pages/admin/RevenuePage";
 import RevenueReport from "./pages/TutorPags/RevenueReport";
 import TutorProfile from "./pages/TutorPags/TutorProfile";
-// import InteractionStudentsList from "./pages/TutorPags/TutorInteraction/StudentList";
+import InteractionStudentsList from "./pages/TutorPags/TutorInteraction/StudentList";
 import ReviewSession from "./pages/VideoCall/StudentReview";
 import Reports from "./pages/admin/Reports";
 import PaymentCancel from "./pages/UserPages/PaymentCancel";
@@ -199,7 +199,7 @@ const isTutorAllowed = () => {
           <Route path='/tutor-unauthorized' element={<TutorUnauthorized/>}/>
           <Route path='/tutor/students' element={<StudentsList/>}/>
           <Route path='/tutor/revenue-report' element={<RevenueReport/>}/>
-          {/* <Route path='/tutor/interaction/student-list' element={<InteractionStudentsList/>}/> */}
+          <Route path='/tutor/interaction/student-list' element={<InteractionStudentsList/>}/>
           <Route path='/tutor/students/course-chats/:studentId' element={<StudentCourseChats/>}/>
           <Route path='/tutor/chat/:roomId' element={<TutorChatRoom/>}/>
           <Route path="/tutor/video-call-request/:studentId/:courseId" element={<VideoCallManagement />} />
