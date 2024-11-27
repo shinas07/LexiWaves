@@ -93,11 +93,11 @@ function Home() {
             <TypewriterEffect />
           </div>
         ) : (
-          <div className="w-full mt-8 p-4">
-            <div className="flex justify-center mt-2">
+          <div className="w-full mt-4 p-4">
+            <div className="flex justify-center mt-8">
               <LatestCourses /> 
-            </div>
-          </div>
+             </div>
+           </div>
         )}
 
         {/* Features Section */}
