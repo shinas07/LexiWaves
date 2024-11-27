@@ -11,22 +11,28 @@ import Login from "./pages/UserPages/SignInPage";
 import OtpVerification from "./pages/UserPages/UserOtpPage";
 import { useSelector } from "react-redux";
 import { Toaster, toast } from 'sonner';
+import { ProtectedRouted } from "./ProtextedRoute";
+import VideoCallRoom from "./pages/VideoCall/StudentVideoRoom";
+import PageNotFound from "./pages/PageNotFound";
+
 
 //User page imports
 import UserAccountPage from "./pages/UserPages/AccountDashboard";
 import CourseDetail from "./pages/UserPages/CourseDetails";
 import CourseList from "./pages/UserPages/CoursePage";
 import CourseVideo from "./pages/UserPages/CourseVideo";
-import SuccessPage from "./pages/UserPages/PaymentSuccessPage";
+import SuccessPage from "./pages/UserPages/PaymentSuccess";
 import UserEnrolledCoursesPage from "./pages/UserPages/EnrolledCourses";
 import CourseWatchingPage from "./pages/UserPages/CourseWatching";
 import SettingsPage from "./pages/UserPages/AccountSettings";
 import ForgotPassword from "./pages/UserPages/UserForgotPassword";
-import CommunitySelection from "./pages/UserPages/CommunityChat";
+import CommunitySelection from "./pages/UserPages/UserCommunity/CommunityChat";
 import ProfilePage from "./pages/UserPages/AccountProfile";
 import QuizPage from "./pages/UserPages/Quiz";
-import TutorListForConnection from "./pages/UserPages/UserInteractions/TutorList";
 import UserConnection from "./pages/UserPages/UserInteractions/UserTutorConnection"
+import StudentUnauthorized from "./pages/UserPages/StudentUnauthorized";
+import DocsPage from "./pages/Docs";
+import LexiSupportPage from "./pages/Support";
 
 //Tutor pages import
 import TutorSignUP from "./pages/TutorPags/SignUp";
@@ -46,8 +52,11 @@ import CourseEdit from "./pages/TutorPags/EditCourse";
 import CourseAndQuizDetails from "./pages/TutorPags/CourseAllDetails";
 import TutorUnauthorized from "./pages/TutorPags/TutorPagesUnauthorized";
 import TutorUnauthorizedRoute from "./pages/TutorPags/TutorProtectedRoute";
-import TutorProfileDetails from "./pages/UserPages/UserInteractions/TutorProfile";
 import StudentsList from "./pages/TutorPags/StudentsList";
+import StudentCourseChats from "./pages/TutorPags/TutorInteraction/StudentChatBoxes";
+import TutorChatRoom from "./pages/TutorPags/TutorInteraction/TutorChatRoom";
+import VideoCallManagement from "./pages/TutorPags/TutorInteraction/VideoCallManagement";
+import TutorVideoRoom from "./pages/VideoCall/TutorVideoRoom";
 
 import AdminProtectedRoute from "./pages/admin/AdminProtectedRoute";
 // Admin pages import
@@ -64,11 +73,15 @@ import CourseApprovingPage from "./pages/admin/CourseApprovalPage";
 import CourseDetailsCheckPage from "./pages/admin/CourseDetialsCheck";
 import AdminCoursesList from "./pages/admin/ApprovedCourseList";
 import Unauthorized from "./pages/admin/Unauthorized";
-import ChatRoom from "./pages/UserPages/ChatRoom";
+import ChatRoom from "./pages/UserPages/UserCommunity/ChatRoom";
 import AdminRevenuePage from "./pages/admin/RevenuePage";
 import RevenueReport from "./pages/TutorPags/RevenueReport";
 import TutorProfile from "./pages/TutorPags/TutorProfile";
-
+import InteractionStudentsList from "./pages/TutorPags/TutorInteraction/studentList";
+import ReviewSession from "./pages/VideoCall/StudentReview";
+import Reports from "./pages/admin/Reports";
+import PaymentCancel from "./pages/UserPages/PaymentCancel";
+import TutorRevenue from "./pages/TutorPags/TutorRevenue";
 
 
 
@@ -130,36 +143,38 @@ const isTutorAllowed = () => {
   return (
     
     <div className="dark">
-
       {<Toaster expan={false} position="top-right" />}
-
       <Router>
         <Routes>
 
+          {/* student routes here */}
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={isAuthenticatedUser ? <Navigate to="/" /> : <SignUPForm />}/>
           <Route path="/signin" element={isAuthenticatedUser ? <Navigate to="/" /> : <Login />}/>
-          
-
           <Route path="/otp" element={isAuthenticatedUser ? <Navigate to="/" /> : <OtpVerification />}/>
           <Route path="/profile" element={<ProfilePage/>}/>
           <Route path='/forgot-password' element={<ForgotPassword/>}/>
-          <Route path="/user-account" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <UserAccountPage />}/>
+          {/* <Route path="/user-account" element={<ProtectedRouted allowedRoles={['student']}><UserAccountPage /> </ProtectedRouted>}/> */}
+          <Route path="/user-account" element={<UserAccountPage/>}/>
           <Route path="/settings" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <SettingsPage />} />
-          <Route path="/courses" element={<CourseList/>}></Route>
+          <Route path="/courses" element={<ProtectedRouted allowedRoles={['student']}><CourseList/></ProtectedRouted>}></Route>
           <Route path="/course/:id" element={<CourseDetail/>}/>
           <Route path='course-enroll/:id' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseVideo/>}/>
           <Route path='/success' element={<SuccessPage/>}/>
+          <Route path='/cancel' element={<PaymentCancel/>}/>
           <Route path='/enrolled-courses' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <UserEnrolledCoursesPage/>}/>
             <Route path="/watch-course/:courseId"  element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseWatchingPage/>}/>
-          
           <Route path="/community-chat" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <CommunitySelection />}/>
-          
           <Route path="/chat/:language" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <ChatRoom />} />
           <Route path="/quiz/:courseId" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <QuizPage />} />
-          <Route path='/tutor-list-connection' element={!isAuthenticatedUser ? <Navigate to="/signin"/> : <TutorListForConnection/> }/>
-          <Route path='/connect-tutor' element={<UserConnection/>}/>
-          <Route path='/tutor-profile-detatil/:id' element={<TutorProfileDetails/>}/>
+          <Route path='/student/unauthorized' element={<StudentUnauthorized/>}/>
+          <Route path='/docs' element={<DocsPage/>}/>
+          <Route path='/lexi-support' element={<LexiSupportPage/>}/>
+
+          {/* Video call route */}
+          <Route path="/video-call-room/:requestId" element={<VideoCallRoom/>}/>
+          <Route path='/review-session/:requestId' element={<ReviewSession/>}/>
+          <Route path="/tutor/video-call-room/:requestId" element={<TutorVideoRoom />} />
           
           
 
@@ -185,7 +200,11 @@ const isTutorAllowed = () => {
           <Route path='/tutor-unauthorized' element={<TutorUnauthorized/>}/>
           <Route path='/tutor/students' element={<StudentsList/>}/>
           <Route path='/tutor/revenue-report' element={<RevenueReport/>}/>
-          
+          <Route path='/tutor/interaction/student-list' element={<InteractionStudentsList/>}/>
+          <Route path='/tutor/students/course-chats/:studentId' element={<StudentCourseChats/>}/>
+          <Route path='/tutor/chat/:roomId' element={<TutorChatRoom/>}/>
+          <Route path="/tutor/video-call-request/:studentId/:courseId" element={<VideoCallManagement />} />
+          <Route path='/tutor/revenue' element={<TutorRevenue/>}/>
 
             
 
@@ -204,8 +223,10 @@ const isTutorAllowed = () => {
           <Route path="/admin-enrolled-courses" element={<AdminProtectedRoute><EnrolledCourses/></AdminProtectedRoute>}/>
           <Route path="/admin-tutor-requests" element={<AdminProtectedRoute><TutorRequests/></AdminProtectedRoute>}/>
           <Route path="/admin-unauthorized" element={<Unauthorized />} />
-          <Route path='/admin-revenue-details' element={<AdminRevenuePage/>}/> 
+          <Route path='/admin-revenue-details' element={<AdminProtectedRoute><AdminRevenuePage/></AdminProtectedRoute>}/> 
+          <Route path='/admin-report' element={<AdminProtectedRoute><Reports/></AdminProtectedRoute>}/>
 
+          <Route path="*" element={<PageNotFound/>}/>
         </Routes>
       </Router>
     </div>
