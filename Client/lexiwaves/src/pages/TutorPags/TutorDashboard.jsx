@@ -41,65 +41,89 @@ const TutorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]); // To store student data
   const [revenueData, setRevenueData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: [],
     datasets: [{
       label: 'Monthly Revenue',
-      data: [500, 1200, 900, 1600, 2000, 1800],
+      data: [],
       borderColor: 'rgb(75, 192, 192)',
       tension: 0.1
     }]
   });
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalStudents, setTotalStudents] = useState(0);
 
   useEffect(() => {
-    const fetchStudentDetails = async () => {
+    const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await api.get('student/students-details/', {
+
+        // Fetch student details
+        const studentResponse = await api.get('student/students-details/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
-        setData(response.data); // Setting the response data to state
-      
-      } catch {
-        toast.error('Faild to fetch data');
+        setData(studentResponse.data); // Setting the response data to state
+
+        // Fetch revenue details
+        const revenueResponse = await api.get('tutor/revenue/', { // Adjusted endpoint
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        setTotalRevenue(revenueResponse.data.total_revenue); // Set total revenue from response
+        setTotalStudents(studentResponse.data.length); // Total students from the student data
+
+        // Prepare revenue chart data
+        setRevenueData({
+          labels: revenueResponse.data.revenue_labels || [], // Assuming the API returns labels
+          datasets: [{
+            label: 'Monthly Revenue',
+            data: revenueResponse.data.revenue_data || [], // Assuming the API returns revenue data
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        });
+
+      } catch (error) {
+        toast.error('Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
-    fetchStudentDetails();
+    fetchDashboardData();
   }, []);
 
   if (loading) {
-    return(
-    <TutorDashboardLayout>
-    <div className="flex justify-center p-12"><Loader/></div>;
-    </TutorDashboardLayout>
-    )
+    return (
+      <TutorDashboardLayout>
+        <div className="flex justify-center p-12"><Loader/></div>
+      </TutorDashboardLayout>
+    );
   }
 
   const stats = [
     { 
       title: "Total Revenue", 
-      value: "$8,200", 
+      value: `$${totalRevenue}`, 
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-green-500/10 text-green-500"
     },
     { 
       title: "Total Students", 
-      value: data.length, 
+      value: totalStudents, 
       icon: <User className="w-6 h-6" />,
       color: "bg-blue-500/10 text-blue-500"
     },
     { 
       title: "Active Courses", 
-      value: "12", 
+      value: "12", // This can also be fetched dynamically if needed
       icon: <BookOpen className="w-6 h-6" />,
       color: "bg-purple-500/10 text-purple-500"
     },
     { 
       title: "Course Views", 
-      value: "2.4K", 
+      value: "2.4K", // This can also be fetched dynamically if needed
       icon: <TrendingUp className="w-6 h-6" />,
       color: "bg-orange-500/10 text-orange-500"
     }
