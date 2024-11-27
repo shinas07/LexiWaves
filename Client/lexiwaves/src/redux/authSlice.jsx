@@ -4,16 +4,26 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     isAuthenticated: !!localStorage.getItem('accessToken'),
-    user: null, // This will store user details like email
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    userRole: localStorage.getItem('userRole'),
     accessToken: localStorage.getItem('accessToken'),
     refreshToken: localStorage.getItem('refreshToken'), 
   },
   reducers: {
     login: (state, action) => {
       state.isAuthenticated = true;
-      state.user = action.payload.user; // Set the user data (like email)
-      state.accessToken = action.payload.accessToken; // Store the access token
-      state.refreshToken = action.payload.refreshToken; // Store the refresh token
+      state.user = action.payload.user;
+      state.userRole = action.payload.userRole;
+      state.accessToken = action.payload.accessToken; 
+      state.refreshToken = action.payload.refreshToken; 
+
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      localStorage.setItem('userRole', action.payload.user.user_type);
+      localStorage.setItem('accessToken', action.payload.accessToken);
+      localStorage.setItem('refreshToken', action.payload.refreshToken);
+      // const userrole  = localStorage.getItem('userRole');
+      
+    
     },
     logout: (state) => {
       state.isAuthenticated = false;
@@ -21,9 +31,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       
-      // Clear tokens from localStorage when the user logs out
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.clear();
     },
   },
 });
