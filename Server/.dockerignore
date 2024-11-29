@@ -1,0 +1,97 @@
+# **/.DS_Store
+# **/__pycache__
+# **/.venv
+# **/.classpath
+# **/.dockerignore
+# **/.env
+# **/.git
+# **/.gitignore
+# **/.project
+# **/.settings
+# **/.toolstarget
+# **/.vs
+# **/.vscode
+# **/*.*proj.user
+# **/*.dbmdl
+# **/*.jfm
+# **/bin
+# **/charts
+# **/docker-compose*
+# **/compose.y*ml
+# **/Dockerfile*
+# **/node_modules
+# **/npm-debug.log
+# **/obj
+# **/secrets.dev.yaml
+# **/values.dev.yaml
+# LICENSE
+# README.md
+
+# Python bytecode
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Dependency management
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing & coverage
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+
+# IDEs and editors
+**/.vscode
+**/.idea/
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.classpath
+**/.gitignore
+
+# Operating System files
+**/.DS_Store
+Thumbs.db
+.Spotlight-V100/
+.AppleDouble/
+
+# Docker-related
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/docker-compose*
+**/compose.y*ml
+**/Dockerfile*
+
+# Node.js
+**/node_modules
+**/npm-debug.log
+
+# Miscellaneous
+**/*.dbmdl
+**/*.jfm
+**/bin
+**/charts
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Documentation files
+LICENSE
+README.md
