@@ -1,6 +1,8 @@
 from django.urls import path
-from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView, Student ,ResendOtpView,RefreshTokenView
-from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView,ResendOtpView,CrouseListView,CourseDetailView, CourseVideoView,CreateCheckoutSession, UserEnrolledCourses, WatchCourseView, CheckEnrollmentView, RequestotpView,ForgotPassowrdVerifyOtpView, UserProfileView, LogoutView, ChangePasswordView, UserProfileImageUploadView,UserProfileImageRemoveView,DeactivateAccountView
+# from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView, Student ,ResendOtpView,RefreshTokenView
+from . views import  SignUpView, VerifyEmailView, UserLoginView,ResendOtpView,ResendOtpView,CourseListView,CourseDetailView, CourseVideoView,CreateCheckoutSession, UserEnrolledCourses, WatchCourseView, CheckEnrollmentView, RequestotpView,ForgotPassowrdVerifyOtpView, UserProfileView, LogoutView, ChangePasswordView, UserProfileImageUploadView,UserProfileImageRemoveView,DeactivateAccountView,RefreshTokenView
+from . import views
+
 
 urlpatterns = [ 
     path('signup/', SignUpView.as_view(), name='signup'),
@@ -20,7 +22,7 @@ urlpatterns = [
     # path('students-list/',StudentListView.as_view(),name='students-list'),
     
 
-    path('courses/',CrouseListView.as_view(), name='course-list'),
+    path('courses/',CourseListView.as_view(), name='course-list'),
     path('course/details/<int:course_id>/', CourseDetailView.as_view(), name='course_detail'),
     path('courses/video/<int:pk>/', CourseVideoView.as_view(), name='course-video'),
     path('course-checkout-session/', CreateCheckoutSession.as_view(), name='create-checkout-session'),
@@ -30,5 +32,7 @@ urlpatterns = [
     # path('course/<int:course_id>/reviews/', CourseReviewView.as_view(), name='course-reviews'),
     path('logout/', LogoutView.as_view(), name='auth_logout'),
     path('deactivate-account/',DeactivateAccountView.as_view(), name='user_deactivate'),
+
+     path('webhook/stripe/', views.stripe_webhook, name='stripe-webhook'),
 ]
 
