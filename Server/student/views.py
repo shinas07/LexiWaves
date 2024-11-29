@@ -1,21 +1,23 @@
 from django.shortcuts import render
 from tutor.models import Course
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+
 from rest_framework import status,generics, viewsets
 from accounts.serializers import CourseSerializer
 from tutor.models import Lesson
-from .models import UserLesson
-from .serializers import UserLessonSerializer, TutorSerializer
+from .models import UserLesson,StudyStreak
+from .serializers import UserLessonSerializer, TutorSerializer, TutorProfileShowingSerializer,TutorInteractionSerializer,StreakSerializer,StudeyActivitySerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from tutor.models import Question,QuizAttempt,Answer
 from tutor.serializers import QuestionSerializer
 from django.shortcuts import get_object_or_404
 from accounts.models import User
-from tutor.models import Tutor
-
-
-# Create your views here.
+from tutor.models import Tutor, TutorDetails
+from lexi_admin.models import StudentCourseEnrollment
+from lexi_admin.serializers import StudentCourseEnrollmentListSerializer
+from .learning_streak_service import StreakService
 
 
 #Home Page Latest courses
@@ -27,6 +29,7 @@ class LatestCoursesView(generics.ListAPIView):
     
 # Quiz related funtions
 class MarkLessonWatchedView(APIView):
+    # authentication_classes = [TokenAuthentication]
     permission_class = [IsAuthenticated]
 
     def post(self, request):
@@ -45,6 +48,7 @@ class MarkLessonWatchedView(APIView):
         
 
 class CompletedLessonsView(APIView):
+    # authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, course_id):
@@ -71,6 +75,7 @@ class CompletedLessonsView(APIView):
 
 
 class QuizView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, course_id):
@@ -104,7 +109,6 @@ class QuizView(APIView):
 
             # Fetch questions with answers
             questions = Question.objects.filter(course_id=course_id).prefetch_related('answers')
-            print('coruse questions' , question)
             # Format questions and answers (excluding correct answer flags)
             formatted_questions = []
             for question in questions:
@@ -217,10 +221,61 @@ class QuizView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# User to Tutor Connection Views
-class TutorListView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated] 
-    def get(self, request):
-        tutors = Tutor.objects.filter(tutordetails__admin_approved=True)
-        serializer = TutorSerializer(tutors, many=True)
-        return Response(serializer.data)
+# Course Enrolled Student Details
+class CourseEnrolledStudentsView(APIView):
+    # authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # Fetch enrolled courses for the authenticated user
+        enrollments = StudentCourseEnrollment.objects.filter(user=request.user).select_related('course')
+        serializer = StudentCourseEnrollmentListSerializer(enrollments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+# Student Intraction with Tutor
+class TutorDetailByCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, tutor_id):
+        try:
+            # Fetch the tutor (User) by tutor_id
+            tutor = User.objects.get(id=tutor_id)
+        
+            # Serialize the tutor data
+            serializer = TutorInteractionSerializer(tutor)
+            
+            return Response(serializer.data, status=200)
+        
+        except User.DoesNotExist:
+            return Response({"error": "Tutor not found"}, status=404)
+
+# Student Study streak
+class StudyStreakViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = StreakSerializer
+    
+    def get(self,request):
+        streak, created = StudyStreak.objects.get_or_create(
+            user=request.user,
+            defaults={'current_streak': 0,
+                'max_streak': 0,
+                'total_study_days': 0,
+                'last_study_date': None}
+            )
+        serializer = self.serializer_class(streak)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        course_id = request.data.get('course_id')
+        duration = request.data.get('duration')
+        print(course_id, duration)
+
+        if not all([course_id, duration]):
+            return Response({'error':'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            course = Course.objects.get(id=course_id)
+            streak = StreakService.update_streak(request.user, course, duration)
+            return Response(StreakSerializer(streak).data)
+        except Course.DoesNotExist:
+            return Response({'error':'Course not found'}, status=status.HTTP_404_NOT_FOUND)
