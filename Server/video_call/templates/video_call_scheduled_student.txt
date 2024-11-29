@@ -1,0 +1,8 @@
+Hello {{ student_name }},
+
+Your video call has been scheduled with {{ tutor_name }} for {{ scheduled_time }}.
+
+Join link: {{ join_link }}
+
+Best regards,
+LexiWaves Team

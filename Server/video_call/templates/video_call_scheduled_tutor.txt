@@ -1,0 +1,19 @@
+Hello {{ tutor_name }},
+
+A video call session has been scheduled with your student.
+
+Session Details:
+- Student: {{ student_name }}
+- Course: {{ course_name }}
+- Date & Time: {{ scheduled_time }}
+- Duration: 1 hour
+
+You can join the session using this link: {{ join_link }}
+
+Note: The video call link will be active 5 minutes before the scheduled time.
+
+Best regards,
+LexiWaves Team
+
+This is an automated message. Please do not reply to this email.
+© 2024 LexiWaves. All rights reserved.

@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiWaves - Video Session Scheduled</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .session-details {
+            background-color: #fafafa;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 3px solid #000;
+        }
+        .join-button {
+            display: inline-block;
+            padding: 12px 28px;
+            margin: 20px 0;
+            background-color: #fff;
+            border: 2px solid #000;
+            text-decoration: none;
+            font-weight: 500;
+            color: #000;
+            letter-spacing: 0.5px;
+        }
+        .note {
+            font-style: italic;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">LexiWaves</div>
+
+    <p>Dear {{ tutor_name }},</p>
+
+    <p>Your video session has been confirmed with the following details:</p>
+
+    <div class="session-details">
+        <p><strong>Student:</strong> {{ student_name }}</p>
+        <p><strong>Course:</strong> {{ course_name }}</p>
+        <p><strong>Date & Time:</strong> {{ scheduled_time }}</p>
+        <p><strong>Duration:</strong> 1 hour</p>
+    </div>
+
+    <a href="{{ join_link }}" class="join-button">Join Session</a>
+
+    <p class="note">
+        The session link will be active 5 minutes before the scheduled time.
+    </p>
+
+    <div class="footer">
+        <p>Best regards,<br>The LexiWaves Team</p>
+        <small>This is an automated message from LexiWaves. Please do not reply.</small>
+    </div>
+</body>
+</html>
