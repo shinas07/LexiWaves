@@ -30,4 +30,8 @@ jobs:
           context: ./Server
           file: ./Server/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
+          build-args: # Optional: Add any necessary build arguments
+        env:
+          DOCKER_BUILDKIT: 1
+          DEBUG: 1 
