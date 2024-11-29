@@ -1,36 +1,37 @@
-name: LexiWaves CI Pipeline
+name: Backend CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]  # Trigger on push to the main branch
+    branches: [ main ]
+    paths:
+      - 'Server/**'  # Only trigger on changes in Server directory
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Server/**'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner provided by GitHub Actions
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: Server  # Set working directory to Server
 
     steps:
-    # Checkout the code to the runner
-    - name: Checkout code
-      uses: actions/checkout@v3  # Action to check out the repository
-
-    # Set up Docker Buildx for building multi-platform images
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2  # Setup Docker Buildx for optimized build performance
-
-    # Log in to Docker Hub using credentials stored in GitHub Secrets
+    - name: Check out code
+      uses: actions/checkout@v3
+      
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}  # Docker Hub username from GitHub secrets
-        password: ${{ secrets.DOCKERHUB_TOKEN }}    # Docker Hub access token from GitHub secrets
-
-    # Build the Docker image locally and tag it but do not push it to Docker Hub in CI
-    - name: Build Docker image
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
-        context: .  # Path to the Docker context (the root of the repository)
-        file: Dockerfile  # Path to the Dockerfile
-        push: false  # Don't push during CI; only build and test
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves:latest  # Tag for the built image
-        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves:latest  # Use caching from Docker Hub to speed up builds
-        cache-to: type=inline  # Use inline cache to store build cache
+        context: ./Server  # Specify Server directory
+        file: ./Server/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves:latest
