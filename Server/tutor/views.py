@@ -1,12 +1,12 @@
 from datetime import timedelta
 from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
-
+from django.db.models import Count
 # Create your views here.
 from rest_framework import status, generics,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer,LessonSerializer, CourseWithStudentsSerializer,  QuestionSerializer
+from .serializers import  TutorSerializer, TutorDetailsSerializer,CourseSerializer,LessonSerializer, CourseWithStudentsSerializer,  QuestionSerializer, CourseDetailSerializer,TutorProfileSerializer,CourseUpdateSerializer,TutorCourseListSerializer
 import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -24,8 +24,10 @@ from botocore.exceptions import ClientError
 import uuid
 from lexi_admin.models import StudentCourseEnrollment
 import json
-from .models import  LessonCompletion, Lesson
-from .serializers import CourseSerializer, LessonCompletionSerializer
+from .models import  LessonCompletion, Lesson,TutorSlot,TutorRevenue
+from .serializers import CourseSerializer, LessonCompletionSerializer,TutorSlotSerializer
+# from accounts.models import Student
+from django.db.models import Sum,Q,FloatField, Case, When
 
 
 def generate_otp():
@@ -33,7 +35,7 @@ def generate_otp():
 
 
 def send_otp_email(email, otp):
-
+    print(otp)
     subject = 'Verify you email'
     html_message = render_to_string('otp_temp.html', {'otp': otp})
     plain_message = strip_tags(html_message)
@@ -72,7 +74,6 @@ class TutorSignUpView(APIView):
             response = create_or_resend_otp(email)
    
             if 'error' in response:
-                
                 return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
@@ -90,7 +91,6 @@ class TutorSignUpView(APIView):
         else:
             error_message = serializer.errors
 
-        print(error_message)
         return Response({'error':error_message}, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -149,21 +149,15 @@ class TutorLoginView(APIView):
             # Fetch the tutor user using the provided email
             tutor_user = User.objects.get(email=email)
 
-            # Check if the user is a tutor and the password is correct
+
             if tutor_user.user_type == 'tutor' and check_password(password, tutor_user.password):
-                refresh = RefreshToken.for_user(tutor_user)  # Generate refresh token
+                refresh = RefreshToken.for_user(tutor_user)
 
                 try:
-                    # Fetch the Tutor object associated with this user
                     tutor = Tutor.objects.get(user=tutor_user)
-                    
-                    # Check if TutorDetails exist and fetch the admin approval and details submission status
                     tutor_details = TutorDetails.objects.get(tutor_id=tutor.id)
-                    
-                    # Check if tutor has submitted details (e.g., phone number exists) and admin approval
                     has_submitted_details = bool(tutor_details.phone_number)
-                    print('backend check',has_submitted_details)
-                    admin_approved = tutor_details.admin_approved  # Check if admin has approved the tutor
+                    admin_approved = tutor_details.admin_approved 
 
                 except TutorDetails.DoesNotExist:
                     has_submitted_details = False
@@ -174,11 +168,12 @@ class TutorLoginView(APIView):
                     'access': str(refresh.access_token),
                     'message': 'Login successful',
                     'has_submitted_details': has_submitted_details,
-                    'admin_approved': admin_approved
+                    'admin_approved': admin_approved,
+                    'role':tutor_user.user_type,
                 }, status=status.HTTP_200_OK)
 
             else:
-                return Response({'error': 'Invalid user type or password'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'error': 'Invalid user type or password'}, status=status.HTTP_403_FORBIDDEN)
 
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -197,7 +192,6 @@ class TutorDetailsView(APIView):
                 "data": TutorDetailsSerializer(tutor_details).data
             }, status=status.HTTP_201_CREATED)
         else:
-            print("Serializer errors:", serializer.errors)
             return Response({
                 "error": "Failed to save details. Please try again.",
                 "details": serializer.errors
@@ -237,8 +231,18 @@ class TutorDashboardView(APIView):
 
         return Response({"message": "Access granted to dashboard."}, status=status.HTTP_200_OK)
 
+# Tutor Profile View
+class TutorProfileView(APIView):
+    permission_classes = [IsAuthenticated]
 
-
+    def get(self, request):
+        try:
+            tutor = Tutor.objects.select_related('user').get(user=request.user)
+            serializer = TutorProfileSerializer(tutor)
+            print('user data',serializer.data)
+            return Response(serializer.data)
+        except Tutor.DoesNotExist:
+            return Response({"error": "Tutor profile not found"}, status=404)
 
 class CourseCreationViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -267,8 +271,6 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
         )
 
         try:
-            # Upload thumbnail and preview video (same as before)
-            # ...
 
             thumbnail_key = f'course_thumbnails/{uuid.uuid4()}-{thumbnail.name}'
             s3_client.upload_fileobj(thumbnail, settings.AWS_STORAGE_BUCKET_NAME, thumbnail_key)
@@ -313,27 +315,19 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
 
 
 class TutorCreatedCoursesView(generics.ListAPIView):
-
-    serializer_class = CourseSerializer
+    serializer_class = TutorCourseListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Filter courses by the logged-in tutor
-        tutor = self.request.user  # Assuming the tutor is linked to the user
-        return Course.objects.filter(tutor=tutor).order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        try:
-            queryset = self.get_queryset()
-            if not queryset.exists():
-                return Response({"message": "You have not created any courses yet."}, status=status.HTTP_404_NOT_FOUND)
-            
-            # Serialize the queryset
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        tutor = self.request.user
+        return Course.objects.filter(tutor=tutor)\
+            .annotate(
+                students_count=Count(
+                    'studentcourseenrollment',
+                    filter=Q(studentcourseenrollment__payment_status='completed')
+                )
+            )\
+            .order_by('-created_at')
         
 
 # Listing all Enrolled CourseList
@@ -358,7 +352,7 @@ class CompleteLessonView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         lesson_id = request.data.get('lesson_id')
-        print('lesson id',lesson_id)
+       
         try:
             lesson = Lesson.objects.get(id=lesson_id)
         except Lesson.DoesNotExist:
@@ -400,8 +394,7 @@ class QuizCreationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         courseId = self.kwargs.get('courseId')  # Get courseId from URL parameters
         questions_data = request.data.get('questions', [])
-        print('Course ID:', courseId)
-        print('Questions Data:', questions_data)
+    
 
         try:
             course = Course.objects.get(id=courseId, tutor=request.user)
@@ -431,7 +424,7 @@ class QuizCreationView(generics.CreateAPIView):
 # Crouse edit
 class CourseDetailView(generics.RetrieveUpdateAPIView):
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+    serializer_class = CourseUpdateSerializer
 
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get('courseId') 
@@ -451,3 +444,166 @@ class CourseDetailView(generics.RetrieveUpdateAPIView):
             serializer.save()  # Save the updated course details
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# Course all detials includeing Quiz
+class CourseAllDetails(generics.RetrieveAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseDetailSerializer
+
+    def get(self, request, *args, **kwargs):
+        course_id = kwargs.get('pk')
+        try:
+            course = self.get_object()
+            serializer = self.get_serializer(course)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            return Response({'error':'Course not found'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class TutorLogoutView(APIView):
+    permission_class = [IsAuthenticated]
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh_token')
+
+            if not refresh_token:
+                return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"success": "User logged out successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# views.py
+
+class RevenueReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        tutor = request.user  # Get the logged-in tutor
+
+        # Get all courses taught by the tutor
+        courses = Course.objects.filter(tutor=tutor)
+
+        revenue_data = []
+
+        for course in courses:
+            # Aggregate the total revenue from enrolled students
+            total_revenue = StudentCourseEnrollment.objects.filter(course=course).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+            # Get the number of students enrolled in the course
+            students_enrolled = StudentCourseEnrollment.objects.filter(course=course).count()
+
+            revenue_data.append({
+                "course_title": course.title,
+                "students_enrolled": students_enrolled,
+                "total_revenue": total_revenue,
+                "course_price": course.price,  # Assuming each course has a price field
+            })
+
+        return Response({"revenue_report": revenue_data})
+
+class TutorSlotView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tutor = Tutor.objects.get(user=request.user)
+        slots = TutorSlot.objects.filter(tutor=tutor)
+        serializer = TutorSlotSerializer(slots)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TutorSlotSerializer(data=request.data)
+        if serializer.is_valid():
+            tutor = Tutor.objects.get(user=request.user)
+            serializer.save(tutor=tutor)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Revenue OverView
+class TutorRevenueDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            tutor = request.user
+            today = timezone.now()
+            current_month_start = today.replace(day=1, hour=0, minute=0, second=0)
+
+            # Calculate total revenue
+            total_revenue = TutorRevenue.objects.filter(
+                tutor=tutor,
+            ).aggregate(
+                total=Sum('amount') 
+            )['total'] or 0
+            
+            # Calculate monthly revenue
+            monthly_revenue = TutorRevenue.objects.filter(
+                tutor=tutor,
+                created_at__gte=current_month_start
+            ).aggregate(
+                total=Sum('amount') 
+            )['total'] or 0  
+
+            # Get course revenues and admin commissions
+            course_revenues = Course.objects.filter(
+                tutor=tutor
+            ).annotate(
+                total_revenue=Sum('tutorrevenue__amount'),
+                # Use Case and When to handle admin commission calculation
+                admin_commission=Sum(
+                    Case(
+                        When(adminrevenue__amount__isnull=False, then='adminrevenue__amount'),
+                        default=0,
+                        output_field=FloatField()
+                    )
+                ),
+                enrollment_count=Count('studentcourseenrollment', 
+                    filter=Q(studentcourseenrollment__payment_status='completed')
+                )
+            ).values(
+                'id', 
+                'title', 
+                'total_revenue',
+                'admin_commission',  # Include admin commission in the response
+                'enrollment_count',
+                'price'
+            )
+            
+            recent_transactions = TutorRevenue.objects.filter(
+                tutor=tutor
+            ).select_related('course').order_by(
+                '-created_at'
+            )[:10]
+
+            return Response({
+                'summary': {
+                    'total_revenue': float(total_revenue),
+                    'monthly_revenue': float(monthly_revenue),
+                    'total_courses': Course.objects.filter(tutor=tutor).count(),
+                    'total_enrollments': sum(c['enrollment_count'] for c in course_revenues)
+                },
+                'courses': [{
+                    'id': course['id'],
+                    'title': course['title'],
+                    'revenue': float(course['total_revenue'] or 0),
+                    'admin_commission': float(course['admin_commission'] or 0),  # Pass the admin commission
+                    'enrollments': course['enrollment_count'],
+                    'price': float(course['price'])
+                } for course in course_revenues],
+                'recent_transactions': [{
+                    'id': tx.id,
+                    'course_title': tx.course.title,
+                    'amount': float(tx.amount),
+                    'date': tx.created_at.strftime('%Y-%m-%d %H:%M'),
+                } for tx in recent_transactions]
+            })
+
+        except Exception as e:
+            print(f"Error in tutor revenue: {str(e)}")
+            return Response(
+                {'error': 'Failed to fetch revenue details'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
