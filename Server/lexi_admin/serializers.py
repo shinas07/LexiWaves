@@ -16,7 +16,7 @@ class StudentListSerializer(serializers.ModelSerializer):
 class TutorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id','first_name','last_name','email','date_joined']
         
 
 
@@ -34,7 +34,7 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
 class TutorRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id','first_name','last_name','email','date_joined']
 
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
