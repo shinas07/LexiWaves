@@ -23,23 +23,19 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from lexi_admin.models import StudentCourseEnrollment
+from lexi_admin.models import AdminRevenue
+from tutor.models import TutorRevenue
 from django.conf import settings
 stripe.api_key = settings.STRIPE_SECRET_KEY
 import json
 import uuid
 import boto3
 import random
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 
-# from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-# from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-# from dj_rest_auth.registration.views import SocialLoginView
-
-# class GoogleLogin(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-#     callback_url = "http://localhost:8000/accounts/google/login/callback/"
-#     client_class = OAuth2Client
 
 
 # # Otp Creation
@@ -47,7 +43,7 @@ def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
 
-def     send_otp_email(email, otp):
+def send_otp_email(email, otp):
     subject = 'Verify you email'
     html_message = render_to_string('email_template.html', {'otp': otp})
     plain_message = strip_tags(html_message)
@@ -153,7 +149,11 @@ class UserLoginView(APIView):
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'message': 'Login successful'
+                    'message': 'Login successful',
+                    'user':{
+                        'email':user.email,
+                        'user_type':user.user_type,
+                    }
                 }, status=status.HTTP_200_OK)
             else:
              return Response({'error': 'Invalid password'}, status=status.HTTP_403_FORBIDDEN)
@@ -337,7 +337,7 @@ class UserProfileImageRemoveView(APIView):
 # Home page Latest Courses
 
 # All Courses list
-class CrouseListView(generics.ListAPIView):
+class CourseListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_approved=True).order_by('-created_at')
     serializer_class = CourseSerializer
 
@@ -378,37 +378,37 @@ class CreateCheckoutSession(APIView):
             user = request.user  
             course = Course.objects.get(id=course_id)
 
+            # Add metadata to track the payment
+            metadata = {
+                'course_id': str(course_id),
+                'user_id': str(user.id),
+                'course_price': str(course.price)
+            }
+
             success_url = f"{settings.FRONTEND_URL}/success?session_id={{CHECKOUT_SESSION_ID}}"
-            cancel_url = f"{settings.FRONTEND_URL}/cancel"
+            cancel_url = f"{settings.FRONTEND_URL}/cancel?session_id={{CHECKOUT_SESSION_ID}}"
 
-    
-
-            # Create a Stripe checkout session
+            # Create Stripe checkout session with metadata
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
-                line_items=[
-                    {
-                        'price_data': {
-                            'currency': 'usd',
-                            'unit_amount': int(course.price * 100),  # Stripe uses cents
-                            'product_data': {
-                                'name': course.title,
-                            },
+                line_items=[{
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': int(course.price * 100),
+                        'product_data': {
+                            'name': course.title,
+                            'description': course.description[:300],
                         },
-                        'quantity': 1,
                     },
-                ],
+                    'quantity': 1,
+                }],
                 mode='payment',
                 success_url=success_url,
                 cancel_url=cancel_url,
+                metadata=metadata
             )
 
-            StudentCourseEnrollment.objects.create(
-                user=user,
-                course=course,
-                payment_status='completed',
-                amount_paid=course.price
-            )
+            print('checkout place is working properly ')
 
             return Response({'id': checkout_session.id}, status=status.HTTP_201_CREATED)
         except Course.DoesNotExist:
@@ -416,6 +416,84 @@ class CreateCheckoutSession(APIView):
         except Exception as e:
             print('bad request error', str(e))
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    print("\n=== WEBHOOK CALLED ===")
+    payload = request.body.decode('utf-8')
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    
+    try:
+        # Construct the event
+        event = stripe.Webhook.construct_event(
+            payload.encode('utf-8'),  # Encode back to bytes
+            sig_header,
+            settings.STRIPE_WEBHOOK_SECRET.strip()  # Ensure no whitespace
+        )
+        
+        # Handle the checkout.session.completed event
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            
+            # Get data from session
+            course_id = session['metadata']['course_id']
+            user_id = session['metadata']['user_id']
+            amount = float(session['metadata']['course_price'])
+            
+      
+            
+            try:
+                # Your existing processing code...
+                course = Course.objects.get(id=course_id)
+                user = User.objects.get(id=user_id)
+                
+                # Calculate shares correctly
+                admin_share = amount * 0.20  # 10% of amount
+                tutor_share = amount - admin_share
+
+                enrollment = StudentCourseEnrollment.objects.create(
+                    user=user,
+                    course=course,
+                    payment_status='completed',
+                    amount_paid=amount,
+                    session_id=session['id']
+                )
+                
+                # Create revenue records
+                AdminRevenue.objects.create(
+                    course=course,
+                    amount=admin_share,
+                    payment_id=session['id']
+                )
+                
+                TutorRevenue.objects.create(
+                    course=course,
+                    tutor=course.tutor,
+                    amount=tutor_share,
+                    payment_id=session['id']
+                )
+                
+                # Create enrollment and revenue records...
+                
+                print("Payment processed successfully!")
+                return HttpResponse(status=200)
+                
+            except Exception as e:
+                print(f"Error processing payment: {str(e)}")
+                return HttpResponse(status=500)
+                
+    except ValueError as e:
+        print(f"ValueError: {str(e)}")
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        print(f"SignatureVerificationError: {str(e)}")
+        return HttpResponse(status=400)
+    except Exception as e:
+        print(f"Other error: {str(e)}")
+        return HttpResponse(status=400)
+
+    return HttpResponse(status=200)
 
 # User Enrolled Courses
 class UserEnrolledCourses(generics.ListAPIView):
@@ -447,8 +525,6 @@ class WatchCourseView(APIView):
             return Response({"error": "You are not enrolled in this course or payment is pending."}, status=status.HTTP_403_FORBIDDEN)
     
         try:
-            # Fetch the course along with its lessons
-            # course = Course.objects.prefetch_related('lessons').get(id=33)
             course = enrollment.course 
             serializer = CourseWatchSerializer(course)
             return Response(serializer.data, status=status.HTTP_200_OK)
