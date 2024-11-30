@@ -3,3 +3,4 @@ Testing CI/CD workflow trigger with sonarqube
 ADDED env to git workflow 
 checking SonarQube workflow in CI/CD
 corrected projectkey and organization from sonar properties 
+testing ci/cd
