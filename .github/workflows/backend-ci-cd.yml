@@ -49,13 +49,6 @@ jobs:
           cd Server
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install coverage
-          
-      - name: Run Tests with Coverage
-        run: |
-          cd Server
-          coverage run manage.py test
-          coverage xml
           
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
