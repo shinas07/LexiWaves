@@ -21,32 +21,27 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
-    TokenVerifyView,
 )
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from chat import routing as chat_routing
+from Community_chat import routing as chat_routing
 from django.http import HttpResponse
 
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('accounts/', include('allauth.urls')),
     path('user/',include('accounts.urls')),
     path('student/', include('student.urls')),
     path('tutor/',include('tutor.urls')),
+    path('interaction/',include('ClassChat.urls')),
+    path('video-call/',include('video_call.urls')),
     path('lexi-admin/',include('lexi_admin.urls')),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-
-    path('chat/', include('chat.urls')),
-    #    path('ws/', AuthMiddlewareStack(
-    #     URLRouter(
-    #         chat_routing.websocket_urlpatterns
-    #     )
-    # )),
+    path('chat/', include('Community_chat.urls')),
+ 
 ]
 
 
