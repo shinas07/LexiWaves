@@ -23,6 +23,15 @@ class StudentCourseEnrollment(models.Model):
     payment_status = models.CharField(max_length=20, default='pending')
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+    session_id = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.user.first_name} enrolled in {self.course.title}'
+    
+
+class AdminRevenue(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, default=0,null=True)  
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_id = models.CharField(max_length=100)
+    create_at = models.DateTimeField(auto_now_add=True)
