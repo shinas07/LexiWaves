@@ -59,6 +59,8 @@ jobs:
           args: >
             -Dsonar.projectKey=shinas07_LexiWaves
             -Dsonar.organization=shinas07
+            -Dsonar.sources=Server
+            -Dsonar.python.version=3.10
 
   docker:
     needs: sonarcloud 
