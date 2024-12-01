@@ -1,5 +1,11 @@
 # LexiWaves - Online Language Learning Platform
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shinas07_LexiWaves&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shinas07_LexiWaves)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=shinas07_LexiWaves&metric=coverage)](https://sonarcloud.io/summary/new_code?id=shinas07_LexiWaves)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=shinas07_LexiWaves&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=shinas07_LexiWaves)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=shinas07_LexiWaves&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=shinas07_LexiWaves)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=shinas07_LexiWaves&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=shinas07_LexiWaves)
+
 ![LexiWaves Logo](Server/media/website-previews/preview.png)
 
 ## 🌟 Overview
