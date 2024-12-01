@@ -15,3 +15,4 @@ added the proper pytest.ini file, checking the workflow
 tesitng ci/cd workflow 
 added database image on CI/CD for testing 
 added all env on pipline
+add migrations to pipline
