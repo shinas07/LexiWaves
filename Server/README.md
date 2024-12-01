@@ -18,3 +18,4 @@ added all env on pipline
 added migrations to pipline
 added dummy key
 add env for migrations
+testing workflow
