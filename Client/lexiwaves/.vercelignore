@@ -1,7 +1,50 @@
+# Backend
 Server/
 .github/
 .git/
+
+# Dependencies
 **/node_modules
-README.md
-.gitignore
+**/env
+**/__pycache__
+**/venv
+**/lexi-env
+
+# Config files
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Version control
+.git*
+.gitignore
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+**/coverage
+**/.pytest_cache
+**/htmlcov
+
+# Build outputs
+**/build
+**/dist
+**/.next
+**/.nuxt
+**/.output
+
+# System files
+.DS_Store
+Thumbs.db
