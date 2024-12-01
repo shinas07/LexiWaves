@@ -12,3 +12,4 @@ Testing CI/CD pipline
 checking pipline
 fixed yaml file sysntax and cheking the workflow
 added the proper pytest.ini file, checking the workflow 
+tesitng ci/cd workflow 
