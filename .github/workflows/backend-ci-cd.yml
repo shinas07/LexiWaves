@@ -10,6 +10,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: 'django-insecure-test-key-123'
     services:
       postgres:
         image: postgres:13
@@ -45,7 +47,7 @@ jobs:
 
       - name: Run tests with pytest
         env:
-          SECRET_KEY: 'test-key-123'
+          SECRET_KEY: 'django-insecure-test-key-123'
           DB_HOST: localhost
           DB_NAME: test_db
           DB_USER: postgres
