@@ -10,3 +10,4 @@ removed duplicate conf from CI/CD workflow
 implement pytest test suite with coverage 
 Testing CI/CD pipline
 checking pipline
+fixed yaml file sysntax and cheking the workflow
