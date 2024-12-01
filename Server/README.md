@@ -4,3 +4,4 @@ ADDED env to git workflow
 checking SonarQube workflow in CI/CD
 corrected projectkey and organization from sonar properties 
 testing ci/cd
+disabled Automatic SonarQube Analysis for working  CI-based analysis
