@@ -17,3 +17,4 @@ added database image on CI/CD for testing
 added all env on pipline
 added migrations to pipline
 added dummy key
+add env for migrations
