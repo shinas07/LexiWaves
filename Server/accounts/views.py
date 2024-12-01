@@ -33,7 +33,7 @@ import boto3
 import random
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_POST
 
 
 
@@ -419,6 +419,7 @@ class CreateCheckoutSession(APIView):
 
 
 @csrf_exempt
+@require_POST
 def stripe_webhook(request):
     print("\n=== WEBHOOK CALLED ===")
     payload = request.body.decode('utf-8')
