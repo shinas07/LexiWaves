@@ -49,18 +49,23 @@ jobs:
           cd Server
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
+      - name: Run tests with pytest
+        run: | 
+          cd Server
+          pytest --cov==. --cov-report=xml --cov-report=term-missing
+      
+      -name: Upload coverage to SonarCloud
+       uses: SonarSource/sonarcloud-github-action@master
+       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        # with:
-        #   args: >
-        #     -Dsonar.projectKey=shinas07_LexiWaves
-        #     -Dsonar.organization=shinas07
-        #     -Dsonar.sources=Server
-        #     -Dsonar.python.version=3.10
 
   docker:
     needs: sonarcloud 
