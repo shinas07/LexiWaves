@@ -6,3 +6,4 @@ corrected projectkey and organization from sonar properties
 testing ci/cd
 disabled Automatic SonarQube Analysis for working  CI-based analysis
 update sonar-properties file for python project
+removed duplicate conf from CI/CD workflow
