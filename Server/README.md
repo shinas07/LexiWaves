@@ -9,3 +9,4 @@ update sonar-properties file for python project
 removed duplicate conf from CI/CD workflow
 implement pytest test suite with coverage 
 Testing CI/CD pipline
+checking pipline
