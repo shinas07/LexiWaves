@@ -13,3 +13,4 @@ checking pipline
 fixed yaml file sysntax and cheking the workflow
 added the proper pytest.ini file, checking the workflow 
 tesitng ci/cd workflow 
+added database image on CI/CD for testing 
