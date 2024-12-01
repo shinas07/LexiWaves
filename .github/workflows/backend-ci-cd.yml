@@ -38,6 +38,24 @@ jobs:
           python-version: '3.10'
           
       - name: Install dependencies
+        env:
+          SECRET_KEY: 'django-insecure-test-key-123'
+          DB_HOST: localhost
+          DB_NAME: test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_PORT: 5432
+          STRIPE_SECRET_KEY: 'test-stripe-key'
+          STRIPE_PUBLISHABLE_KEY: 'test-stripe-pub-key'
+          STRIPE_WEBHOOK_SECRET: 'test-webhook-secret'
+          EMAIL_HOST_USER: 'test@example.com'
+          EMAIL_HOST_PASSWORD: 'test-password'
+          AWS_ACCESS_KEY_ID: 'test-aws-key'
+          AWS_SECRET_ACCESS_KEY: 'test-aws-secret'
+          AGORA_APP_ID: 'test-agora-id'
+          AGORA_APP_CERTIFICATE: 'test-agora-cert'
+          CELERY_BROKER_URL: 'redis://localhost:6379/0'
+          CELERY_RESULT_BACKEND: 'redis://localhost:6379/0'
         run: |
           cd Server
           python -m pip install --upgrade pip
@@ -126,3 +144,7 @@ jobs:
           file: ./Server/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
+
+
+
+
