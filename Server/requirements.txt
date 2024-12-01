@@ -19,6 +19,7 @@ click-plugins==1.1.1
 click-repl==0.3.0
 colorama==0.4.6
 constantly==23.10.4
+coverage==7.6.8
 cryptography==43.0.1
 daphne==4.1.2
 defusedxml==0.8.0rc2
@@ -34,11 +35,14 @@ git-filter-repo==2.45.0
 hyperlink==21.0.0
 idna==3.9
 incremental==24.7.2
+iniconfig==2.0.0
 jmespath==1.0.1
 kombu==5.4.2
 msgpack==1.1.0
 oauthlib==3.2.2
+packaging==24.2
 pillow==10.4.0
+pluggy==1.5.0
 prompt_toolkit==3.0.48
 psycopg2==2.9.9
 pyasn1==0.6.1
@@ -46,6 +50,11 @@ pyasn1_modules==0.4.1
 pycparser==2.22
 PyJWT==2.9.0
 pyOpenSSL==24.2.1
+pytest==8.3.3
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+pytest-django==4.9.0
+pytest-mock==3.14.0
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==1.0.1

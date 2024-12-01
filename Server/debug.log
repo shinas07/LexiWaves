@@ -1,0 +1,894 @@
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+HTTPFactory starting on 8000
+Starting factory <daphne.http_protocol.HTTPFactory object at 0x0000023F5CC9EB70>
+Listening on TCP address 127.0.0.1:8000
+Upgraded connection ['127.0.0.1', 58789] to WebSocket
+connected
+WebSocket ['127.0.0.1', 58789] open and established
+WebSocket ['127.0.0.1', 58789] accepted by application
+WebSocket incoming frame on ['127.0.0.1', 58789]
+testing
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Upgraded connection ['127.0.0.1', 58846] to WebSocket
+connected
+WebSocket ['127.0.0.1', 58846] open and established
+WebSocket ['127.0.0.1', 58846] accepted by application
+WebSocket incoming frame on ['127.0.0.1', 58846]
+shinas
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+WebSocket incoming frame on ['127.0.0.1', 58789]
+testing
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+WebSocket incoming frame on ['127.0.0.1', 58846]
+shinas
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+HTTP b'GET' request for ['127.0.0.1', 58931]
+HTTP b'OPTIONS' request for ['127.0.0.1', 58941]
+HTTP 200 response started for ['127.0.0.1', 58941]
+HTTP close for ['127.0.0.1', 58941]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "OPTIONS /user/profile/ HTTP/1.1" 200 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58941]
+HTTP 200 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "GET /student/latest-courses/ HTTP/1.1" 200 512 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'GET' request for ['127.0.0.1', 58931]
+Unauthorized: /user/profile/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "GET /user/profile/ HTTP/1.1" 401 183 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'OPTIONS' request for ['127.0.0.1', 58941]
+HTTP 200 response started for ['127.0.0.1', 58941]
+HTTP close for ['127.0.0.1', 58941]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "OPTIONS /user/refresh-token/ HTTP/1.1" 200 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58941]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:03 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'POST' request for ['127.0.0.1', 58931]
+Unauthorized: /user/refresh-token/
+HTTP 401 response started for ['127.0.0.1', 58931]
+HTTP close for ['127.0.0.1', 58931]
+"127.0.0.1" - - [10/Oct/2024:11:45:04 +0000] "POST /user/refresh-token/ HTTP/1.1" 401 39 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 58931]
+HTTP b'OPTIONS' request for ['127.0.0.1', 59043]
+HTTP 200 response started for ['127.0.0.1', 59043]
+HTTP close for ['127.0.0.1', 59043]
+"127.0.0.1" - - [10/Oct/2024:11:47:17 +0000] "OPTIONS /user/signup/ HTTP/1.1" 200 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59043]
+HTTP b'POST' request for ['127.0.0.1', 59047]
+936229
+HTTP 200 response started for ['127.0.0.1', 59047]
+HTTP close for ['127.0.0.1', 59047]
+"127.0.0.1" - - [10/Oct/2024:11:47:21 +0000] "POST /user/signup/ HTTP/1.1" 200 170 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59047]
+HTTP b'OPTIONS' request for ['127.0.0.1', 59043]
+HTTP 200 response started for ['127.0.0.1', 59043]
+HTTP close for ['127.0.0.1', 59043]
+"127.0.0.1" - - [10/Oct/2024:11:48:02 +0000] "OPTIONS /user/verify-email/ HTTP/1.1" 200 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59043]
+HTTP b'POST' request for ['127.0.0.1', 59047]
+HTTP 201 response started for ['127.0.0.1', 59047]
+HTTP close for ['127.0.0.1', 59047]
+"127.0.0.1" - - [10/Oct/2024:11:48:04 +0000] "POST /user/verify-email/ HTTP/1.1" 201 58 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59047]
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=59045)
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=59049)
+HTTP b'OPTIONS' request for ['127.0.0.1', 59043]
+HTTP 200 response started for ['127.0.0.1', 59043]
+HTTP close for ['127.0.0.1', 59043]
+"127.0.0.1" - - [10/Oct/2024:11:48:26 +0000] "OPTIONS /user/login/ HTTP/1.1" 200 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59043]
+HTTP b'POST' request for ['127.0.0.1', 59047]
+password is checked
+HTTP 200 response started for ['127.0.0.1', 59047]
+HTTP close for ['127.0.0.1', 59047]
+"127.0.0.1" - - [10/Oct/2024:11:48:28 +0000] "POST /user/login/ HTTP/1.1" 200 515 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59047]
+HTTP b'GET' request for ['127.0.0.1', 59047]
+HTTP 200 response started for ['127.0.0.1', 59047]
+HTTP close for ['127.0.0.1', 59047]
+"127.0.0.1" - - [10/Oct/2024:11:48:28 +0000] "GET /student/latest-courses/ HTTP/1.1" 200 512 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59047]
+HTTP b'GET' request for ['127.0.0.1', 59047]
+HTTP 200 response started for ['127.0.0.1', 59047]
+HTTP close for ['127.0.0.1', 59047]
+"127.0.0.1" - - [10/Oct/2024:11:48:30 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 59047]
+Upgraded connection ['127.0.0.1', 59118] to WebSocket
+connected
+WebSocket ['127.0.0.1', 59118] open and established
+WebSocket ['127.0.0.1', 59118] accepted by application
+WebSocket incoming frame on ['127.0.0.1', 59118]
+TestingChat
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+Sent WebSocket packet to client for ['127.0.0.1', 59118]
+WebSocket incoming frame on ['127.0.0.1', 58789]
+testing
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+Sent WebSocket packet to client for ['127.0.0.1', 59118]
+WebSocket incoming frame on ['127.0.0.1', 59118]
+TestingChat
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+Sent WebSocket packet to client for ['127.0.0.1', 59118]
+WebSocket incoming frame on ['127.0.0.1', 58846]
+shinas
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+Sent WebSocket packet to client for ['127.0.0.1', 59118]
+WebSocket incoming frame on ['127.0.0.1', 59118]
+TestingChat
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 58846]
+Sent WebSocket packet to client for ['127.0.0.1', 59118]
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=59043)
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=59047)
+WebSocket closed for ['127.0.0.1', 58846]
+Upgraded connection ['127.0.0.1', 59323] to WebSocket
+connected
+WebSocket ['127.0.0.1', 59323] open and established
+WebSocket ['127.0.0.1', 59323] accepted by application
+WebSocket closed for ['127.0.0.1', 59118]
+Upgraded connection ['127.0.0.1', 59354] to WebSocket
+connected
+WebSocket ['127.0.0.1', 59354] open and established
+WebSocket ['127.0.0.1', 59354] accepted by application
+WebSocket incoming frame on ['127.0.0.1', 59323]
+shinas
+Sent WebSocket packet to client for ['127.0.0.1', 58789]
+Sent WebSocket packet to client for ['127.0.0.1', 59323]
+Sent WebSocket packet to client for ['127.0.0.1', 59354]
+WebSocket closed for ['127.0.0.1', 59323]
+Upgraded connection ['127.0.0.1', 60762] to WebSocket
+connected
+WebSocket ['127.0.0.1', 60762] open and established
+WebSocket ['127.0.0.1', 60762] accepted by application
+WebSocket closed for ['127.0.0.1', 60762]
+WebSocket closed for ['127.0.0.1', 58789]
+WebSocket closed for ['127.0.0.1', 59354]
+Application instance <Task pending name='Task-1' coro=<ProtocolTypeRouter.__call__() running at D:\Brototype\Main-Project\Server\lexi-env\Lib\site-packages\channels\routing.py:62> wait_for=<Future pending cb=[Task.task_wakeup()]>> for connection <WebSocketProtocol client=['127.0.0.1', 58789] path=b'/ws/chat/Spanich/'> took too long to shut down and was killed.
+Application instance <Task pending name='Task-268' coro=<ProtocolTypeRouter.__call__() running at D:\Brototype\Main-Project\Server\lexi-env\Lib\site-packages\channels\routing.py:62> wait_for=<Future pending cb=[Task.task_wakeup()]>> for connection <WebSocketProtocol client=['127.0.0.1', 59354] path=b'/ws/chat/Spanich/'> took too long to shut down and was killed.
+Application instance <Task pending name='Task-276' coro=<ProtocolTypeRouter.__call__() running at D:\Brototype\Main-Project\Server\lexi-env\Lib\site-packages\channels\routing.py:62> wait_for=<Future finished result=None>> for connection <WebSocketProtocol client=['127.0.0.1', 60762] path=b'/ws/chat/Spanich/'> took too long to shut down and was killed.
+Upgraded connection ['127.0.0.1', 64464] to WebSocket
+connected
+WebSocket ['127.0.0.1', 64464] open and established
+WebSocket ['127.0.0.1', 64464] accepted by application
+HTTP b'GET' request for ['127.0.0.1', 64484]
+HTTP 200 response started for ['127.0.0.1', 64484]
+HTTP close for ['127.0.0.1', 64484]
+"127.0.0.1" - - [10/Oct/2024:14:01:12 +0000] "GET /student/latest-courses/ HTTP/1.1" 200 512 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64484]
+WebSocket closed for ['127.0.0.1', 64464]
+HTTP b'GET' request for ['127.0.0.1', 64518]
+HTTP b'GET' request for ['127.0.0.1', 64519]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 64518]
+HTTP close for ['127.0.0.1', 64518]
+"127.0.0.1" - - [10/Oct/2024:14:01:24 +0000] "GET /cart/user-details HTTP/1.1" 404 3337 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64518]
+HTTP 200 response started for ['127.0.0.1', 64519]
+HTTP close for ['127.0.0.1', 64519]
+"127.0.0.1" - - [10/Oct/2024:14:01:24 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64519]
+HTTP b'GET' request for ['127.0.0.1', 64596]
+HTTP b'GET' request for ['127.0.0.1', 64597]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 64596]
+HTTP close for ['127.0.0.1', 64596]
+"127.0.0.1" - - [10/Oct/2024:14:02:12 +0000] "GET /cart/user-details HTTP/1.1" 404 3337 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64596]
+HTTP 200 response started for ['127.0.0.1', 64597]
+HTTP close for ['127.0.0.1', 64597]
+"127.0.0.1" - - [10/Oct/2024:14:02:12 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64597]
+HTTP b'GET' request for ['127.0.0.1', 64707]
+HTTP b'GET' request for ['127.0.0.1', 64708]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 64707]
+HTTP close for ['127.0.0.1', 64707]
+"127.0.0.1" - - [10/Oct/2024:14:03:09 +0000] "GET /cart/user-details HTTP/1.1" 404 3337 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64707]
+HTTP 200 response started for ['127.0.0.1', 64708]
+HTTP close for ['127.0.0.1', 64708]
+"127.0.0.1" - - [10/Oct/2024:14:03:09 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64708]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+Not Found: /chart/user-details
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:03:27 +0000] "GET /chart/user-details HTTP/1.1" 404 3340 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:03:27 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:03:27 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:03:28 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:03:35 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP 200 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:03:35 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:03:55 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:03:55 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:03:58 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP 200 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:03:58 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:04:00 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:04:00 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+Not Found: /chat/user-details
+HTTP 404 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:04:10 +0000] "GET /chat/user-details HTTP/1.1" 404 3471 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP 200 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:04:10 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=64758)
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=64759)
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+Not Found: /chat/user-details/
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:04:37 +0000] "GET /chat/user-details/ HTTP/1.1" 404 3474 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:04:37 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64754]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+Not Found: /chat/user-details/
+HTTP 404 response started for ['127.0.0.1', 64754]
+HTTP close for ['127.0.0.1', 64754]
+"127.0.0.1" - - [10/Oct/2024:14:04:46 +0000] "GET /chat/user-details/ HTTP/1.1" 404 3474 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64754]
+HTTP 200 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:04:46 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+Not Found: /chat/user-details/
+HTTP 404 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:05:30 +0000] "GET /chat/user-details/ HTTP/1.1" 404 3474 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+HTTP b'GET' request for ['127.0.0.1', 64753]
+HTTP 200 response started for ['127.0.0.1', 64753]
+HTTP close for ['127.0.0.1', 64753]
+"127.0.0.1" - - [10/Oct/2024:14:05:30 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 64753]
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=64754)
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=64753)
+HTTP b'GET' request for ['127.0.0.1', 65095]
+HTTP b'GET' request for ['127.0.0.1', 65096]
+Not Found: /chat/user-details/
+HTTP 404 response started for ['127.0.0.1', 65095]
+HTTP close for ['127.0.0.1', 65095]
+"127.0.0.1" - - [10/Oct/2024:14:07:25 +0000] "GET /chat/user-details/ HTTP/1.1" 404 3474 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 65095]
+HTTP 200 response started for ['127.0.0.1', 65096]
+HTTP close for ['127.0.0.1', 65096]
+"127.0.0.1" - - [10/Oct/2024:14:07:25 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 65096]
+Received SIGINT, shutting down.
+Killed 0 pending application instances
+(TCP Port 8000 Closed)
+Stopping factory <daphne.http_protocol.HTTPFactory object at 0x0000023F5CC9EB70>
+Watching for file changes with StatReloader
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+hai
+Unauthorized: /chat/user-details/
+D:\Broto-Final-Project\Main-Project\Server\chat\views.py changed, reloading.
+Watching for file changes with StatReloader
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+Listening on TCP address 127.0.0.1:8000
+HTTP b'GET' request for ['127.0.0.1', 50220]
+HTTP b'GET' request for ['127.0.0.1', 50221]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 50220]
+HTTP close for ['127.0.0.1', 50220]
+HTTP response complete for ['127.0.0.1', 50220]
+HTTP b'POST' request for ['127.0.0.1', 50220]
+HTTP 200 response started for ['127.0.0.1', 50220]
+HTTP close for ['127.0.0.1', 50220]
+HTTP response complete for ['127.0.0.1', 50220]
+HTTP b'GET' request for ['127.0.0.1', 50220]
+HTTP 200 response started for ['127.0.0.1', 50221]
+HTTP close for ['127.0.0.1', 50221]
+HTTP response complete for ['127.0.0.1', 50221]
+HTTP 200 response started for ['127.0.0.1', 50220]
+HTTP close for ['127.0.0.1', 50220]
+HTTP response complete for ['127.0.0.1', 50220]
+HTTP b'GET' request for ['127.0.0.1', 50220]
+HTTP b'GET' request for ['127.0.0.1', 50221]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 50220]
+HTTP close for ['127.0.0.1', 50220]
+HTTP response complete for ['127.0.0.1', 50220]
+HTTP 200 response started for ['127.0.0.1', 50221]
+HTTP close for ['127.0.0.1', 50221]
+HTTP response complete for ['127.0.0.1', 50221]
+HTTP b'POST' request for ['127.0.0.1', 50221]
+HTTP 200 response started for ['127.0.0.1', 50221]
+HTTP close for ['127.0.0.1', 50221]
+HTTP response complete for ['127.0.0.1', 50221]
+HTTP b'GET' request for ['127.0.0.1', 50221]
+HTTP 200 response started for ['127.0.0.1', 50221]
+HTTP close for ['127.0.0.1', 50221]
+HTTP response complete for ['127.0.0.1', 50221]
+HTTP b'GET' request for ['127.0.0.1', 50448]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP 200 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50448]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP 200 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+HTTP 200 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50448]
+Not Found: /cart/user-details
+HTTP 404 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP 200 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP b'GET' request for ['127.0.0.1', 50448]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+HTTP 301 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP b'GET' request for ['127.0.0.1', 50448]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP b'POST' request for ['127.0.0.1', 50448]
+HTTP 200 response started for ['127.0.0.1', 50448]
+HTTP close for ['127.0.0.1', 50448]
+HTTP response complete for ['127.0.0.1', 50448]
+HTTP 200 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP b'OPTIONS' request for ['127.0.0.1', 50528]
+HTTP 200 response started for ['127.0.0.1', 50528]
+HTTP close for ['127.0.0.1', 50528]
+HTTP response complete for ['127.0.0.1', 50528]
+HTTP b'GET' request for ['127.0.0.1', 50449]
+HTTP 200 response started for ['127.0.0.1', 50449]
+HTTP close for ['127.0.0.1', 50449]
+HTTP response complete for ['127.0.0.1', 50449]
+HTTP b'GET' request for ['127.0.0.1', 50797]
+HTTP 200 response started for ['127.0.0.1', 50797]
+HTTP close for ['127.0.0.1', 50797]
+HTTP response complete for ['127.0.0.1', 50797]
+HTTP b'GET' request for ['127.0.0.1', 50797]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 50797]
+HTTP close for ['127.0.0.1', 50797]
+HTTP response complete for ['127.0.0.1', 50797]
+HTTP b'POST' request for ['127.0.0.1', 50797]
+HTTP 200 response started for ['127.0.0.1', 50797]
+HTTP close for ['127.0.0.1', 50797]
+HTTP response complete for ['127.0.0.1', 50797]
+HTTP b'GET' request for ['127.0.0.1', 50797]
+HTTP 200 response started for ['127.0.0.1', 50797]
+HTTP close for ['127.0.0.1', 50797]
+HTTP response complete for ['127.0.0.1', 50797]
+HTTP b'GET' request for ['127.0.0.1', 50964]
+HTTP 200 response started for ['127.0.0.1', 50964]
+HTTP close for ['127.0.0.1', 50964]
+HTTP response complete for ['127.0.0.1', 50964]
+HTTP b'GET' request for ['127.0.0.1', 50964]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 50964]
+HTTP close for ['127.0.0.1', 50964]
+HTTP response complete for ['127.0.0.1', 50964]
+HTTP b'POST' request for ['127.0.0.1', 50964]
+HTTP 200 response started for ['127.0.0.1', 50964]
+HTTP close for ['127.0.0.1', 50964]
+HTTP response complete for ['127.0.0.1', 50964]
+HTTP b'GET' request for ['127.0.0.1', 50964]
+HTTP 200 response started for ['127.0.0.1', 50964]
+HTTP close for ['127.0.0.1', 50964]
+HTTP response complete for ['127.0.0.1', 50964]
+Upgraded connection ['127.0.0.1', 50971] to WebSocket
+WebSocket ['127.0.0.1', 50971] open and established
+WebSocket ['127.0.0.1', 50971] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 50971]
+WebSocket closed for ['127.0.0.1', 50971]
+Upgraded connection ['127.0.0.1', 51038] to WebSocket
+WebSocket ['127.0.0.1', 51038] open and established
+WebSocket ['127.0.0.1', 51038] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51038]
+WebSocket closed for ['127.0.0.1', 51038]
+Upgraded connection ['127.0.0.1', 51050] to WebSocket
+WebSocket ['127.0.0.1', 51050] open and established
+WebSocket ['127.0.0.1', 51050] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51050]
+WebSocket closed for ['127.0.0.1', 51050]
+Upgraded connection ['127.0.0.1', 51060] to WebSocket
+WebSocket ['127.0.0.1', 51060] open and established
+WebSocket ['127.0.0.1', 51060] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51060]
+WebSocket incoming frame on ['127.0.0.1', 51060]
+Sent WebSocket packet to client for ['127.0.0.1', 51060]
+WebSocket closed for ['127.0.0.1', 51060]
+Upgraded connection ['127.0.0.1', 51099] to WebSocket
+WebSocket ['127.0.0.1', 51099] open and established
+WebSocket ['127.0.0.1', 51099] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51099]
+WebSocket incoming frame on ['127.0.0.1', 51099]
+Sent WebSocket packet to client for ['127.0.0.1', 51099]
+WebSocket incoming frame on ['127.0.0.1', 51099]
+Sent WebSocket packet to client for ['127.0.0.1', 51099]
+Killed 1 pending application instances
+WebSocket closed for ['127.0.0.1', 51099]
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+HTTPFactory starting on 8000
+Starting factory <daphne.http_protocol.HTTPFactory object at 0x000002C2F7D12EA0>
+Listening on TCP address 127.0.0.1:8000
+Upgraded connection ['127.0.0.1', 51323] to WebSocket
+WebSocket ['127.0.0.1', 51323] open and established
+WebSocket ['127.0.0.1', 51323] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51323]
+WebSocket incoming frame on ['127.0.0.1', 51323]
+Sent WebSocket packet to client for ['127.0.0.1', 51323]
+WebSocket incoming frame on ['127.0.0.1', 51323]
+Sent WebSocket packet to client for ['127.0.0.1', 51323]
+WebSocket incoming frame on ['127.0.0.1', 51323]
+Sent WebSocket packet to client for ['127.0.0.1', 51323]
+WebSocket closed for ['127.0.0.1', 51323]
+Upgraded connection ['127.0.0.1', 51486] to WebSocket
+WebSocket ['127.0.0.1', 51486] open and established
+WebSocket ['127.0.0.1', 51486] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51486]
+WebSocket closed for ['127.0.0.1', 51486]
+Upgraded connection ['127.0.0.1', 51586] to WebSocket
+WebSocket ['127.0.0.1', 51586] open and established
+WebSocket ['127.0.0.1', 51586] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51586]
+WebSocket closed for ['127.0.0.1', 51586]
+Upgraded connection ['127.0.0.1', 51600] to WebSocket
+WebSocket ['127.0.0.1', 51600] open and established
+WebSocket ['127.0.0.1', 51600] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 51600]
+WebSocket closed for ['127.0.0.1', 51600]
+Upgraded connection ['127.0.0.1', 52222] to WebSocket
+WebSocket ['127.0.0.1', 52222] open and established
+WebSocket ['127.0.0.1', 52222] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52222]
+WebSocket closed for ['127.0.0.1', 52222]
+Upgraded connection ['127.0.0.1', 52274] to WebSocket
+WebSocket ['127.0.0.1', 52274] open and established
+WebSocket ['127.0.0.1', 52274] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52274]
+WebSocket closed for ['127.0.0.1', 52274]
+Upgraded connection ['127.0.0.1', 52278] to WebSocket
+WebSocket ['127.0.0.1', 52278] open and established
+WebSocket ['127.0.0.1', 52278] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52278]
+WebSocket closed for ['127.0.0.1', 52278]
+Upgraded connection ['127.0.0.1', 52287] to WebSocket
+WebSocket ['127.0.0.1', 52287] open and established
+WebSocket ['127.0.0.1', 52287] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52287]
+WebSocket closed for ['127.0.0.1', 52287]
+Upgraded connection ['127.0.0.1', 52311] to WebSocket
+WebSocket ['127.0.0.1', 52311] open and established
+WebSocket ['127.0.0.1', 52311] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52311]
+WebSocket closed for ['127.0.0.1', 52311]
+Upgraded connection ['127.0.0.1', 52366] to WebSocket
+WebSocket ['127.0.0.1', 52366] open and established
+WebSocket ['127.0.0.1', 52366] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52366]
+WebSocket closed for ['127.0.0.1', 52366]
+Upgraded connection ['127.0.0.1', 52372] to WebSocket
+WebSocket ['127.0.0.1', 52372] open and established
+WebSocket ['127.0.0.1', 52372] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52372]
+WebSocket closed for ['127.0.0.1', 52372]
+Upgraded connection ['127.0.0.1', 52383] to WebSocket
+WebSocket ['127.0.0.1', 52383] open and established
+WebSocket ['127.0.0.1', 52383] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52383]
+WebSocket closed for ['127.0.0.1', 52383]
+Upgraded connection ['127.0.0.1', 52447] to WebSocket
+WebSocket ['127.0.0.1', 52447] open and established
+WebSocket ['127.0.0.1', 52447] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52447]
+WebSocket closed for ['127.0.0.1', 52447]
+Upgraded connection ['127.0.0.1', 52510] to WebSocket
+WebSocket ['127.0.0.1', 52510] open and established
+WebSocket ['127.0.0.1', 52510] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52510]
+WebSocket closed for ['127.0.0.1', 52510]
+Upgraded connection ['127.0.0.1', 52923] to WebSocket
+WebSocket ['127.0.0.1', 52923] open and established
+WebSocket ['127.0.0.1', 52923] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 52923]
+WebSocket incoming frame on ['127.0.0.1', 52923]
+Sent WebSocket packet to client for ['127.0.0.1', 52923]
+WebSocket closed for ['127.0.0.1', 52923]
+Upgraded connection ['127.0.0.1', 53246] to WebSocket
+WebSocket ['127.0.0.1', 53246] open and established
+WebSocket ['127.0.0.1', 53246] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 53246]
+WebSocket incoming frame on ['127.0.0.1', 53246]
+Sent WebSocket packet to client for ['127.0.0.1', 53246]
+WebSocket closed for ['127.0.0.1', 53246]
+HTTP b'GET' request for ['127.0.0.1', 53257]
+HTTP b'GET' request for ['127.0.0.1', 53258]
+HTTP disconnect for ['127.0.0.1', 53257]
+HTTP disconnect for ['127.0.0.1', 53258]
+HTTP b'GET' request for ['127.0.0.1', 53260]
+HTTP 200 response started for ['127.0.0.1', 53260]
+HTTP close for ['127.0.0.1', 53260]
+"127.0.0.1" - - [10/Oct/2024:14:54:49 +0000] "GET /chat/coummunity-chat-rooms/ HTTP/1.1" 200 381 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 53260]
+HTTP b'GET' request for ['127.0.0.1', 53260]
+Unauthorized: /chat/user-details/
+HTTP 401 response started for ['127.0.0.1', 53260]
+HTTP close for ['127.0.0.1', 53260]
+"127.0.0.1" - - [10/Oct/2024:14:54:50 +0000] "GET /chat/user-details/ HTTP/1.1" 401 58 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 53260]
+HTTP b'POST' request for ['127.0.0.1', 53260]
+HTTP 200 response started for ['127.0.0.1', 53260]
+HTTP close for ['127.0.0.1', 53260]
+"127.0.0.1" - - [10/Oct/2024:14:54:50 +0000] "POST /user/refresh-token/ HTTP/1.1" 200 242 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 53260]
+HTTP b'GET' request for ['127.0.0.1', 53260]
+HTTP 200 response started for ['127.0.0.1', 53260]
+HTTP close for ['127.0.0.1', 53260]
+"127.0.0.1" - - [10/Oct/2024:14:54:50 +0000] "GET /chat/user-details/ HTTP/1.1" 200 63 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+HTTP response complete for ['127.0.0.1', 53260]
+Upgraded connection ['127.0.0.1', 53273] to WebSocket
+WebSocket ['127.0.0.1', 53273] open and established
+WebSocket ['127.0.0.1', 53273] accepted by application
+Sent WebSocket packet to client for ['127.0.0.1', 53273]
+WebSocket incoming frame on ['127.0.0.1', 53273]
+Sent WebSocket packet to client for ['127.0.0.1', 53273]
+Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=53260)
+Received SIGINT, shutting down.
+Killed 1 pending application instances
+WebSocket closed for ['127.0.0.1', 53273]
+(TCP Port 8000 Closed)
+Stopping factory <daphne.http_protocol.HTTPFactory object at 0x000002C2F7D12EA0>
