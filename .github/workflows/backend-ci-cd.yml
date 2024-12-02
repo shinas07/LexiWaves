@@ -8,8 +8,8 @@ on:
       - 'Server/**'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  # test:
+  #   runs-on: ubuntu-latest
     # env:
     #   SECRET_KEY: 'django-insecure-test-key-123'
     # services:
@@ -27,6 +27,9 @@ jobs:
     #       --health-timeout 5s
     #       --health-retries 5
 
+    build-and-deploy:
+      runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,6 +39,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
           
       - name: Install dependencies
         # env:
@@ -89,7 +93,7 @@ jobs:
       #     pytest --cov=. --cov-report=xml --cov-report=term-missing
 
   sonarcloud:
-    needs: test
+    # needs: test
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     env:
@@ -123,7 +127,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   docker:
-    needs: [test, sonarcloud]
+    needs: [sonarcloud]
     runs-on: ubuntu-latest
 
     steps:
