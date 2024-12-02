@@ -28,8 +28,7 @@ jobs:
     #       --health-retries 5
 
   build-and-deploy:
-      runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -93,7 +92,6 @@ jobs:
       #     pytest --cov=. --cov-report=xml --cov-report=term-missing
 
   sonarcloud:
-    # needs: test
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     env:
@@ -114,12 +112,10 @@ jobs:
       AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
       CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
       CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
-
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -129,7 +125,6 @@ jobs:
   docker:
     needs: [sonarcloud]
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -149,7 +144,12 @@ jobs:
           context: ./Server
           file: ./Server/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
+          cache-to: type=inline
+          platforms: linux/amd64
 
 
 
