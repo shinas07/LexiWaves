@@ -21,3 +21,4 @@ add env for migrations
 testing workflow
 testing ci-cd workflow
 removed pytest from ci-cd 
+test workflow
