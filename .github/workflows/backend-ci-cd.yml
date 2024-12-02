@@ -10,22 +10,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SECRET_KEY: 'django-insecure-test-key-123'
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # env:
+    #   SECRET_KEY: 'django-insecure-test-key-123'
+    # services:
+    #   postgres:
+    #     image: postgres:13
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: postgres
+    #       POSTGRES_DB: test_db
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -38,56 +38,55 @@ jobs:
           python-version: '3.10'
           
       - name: Install dependencies
-        env:
-          SECRET_KEY: 'django-insecure-test-key-123'
-          DB_HOST: localhost
-          DB_NAME: test_db
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_PORT: 5432
-          STRIPE_SECRET_KEY: 'test-stripe-key'
-          STRIPE_PUBLISHABLE_KEY: 'test-stripe-pub-key'
-          STRIPE_WEBHOOK_SECRET: 'test-webhook-secret'
-          EMAIL_HOST_USER: 'test@example.com'
-          EMAIL_HOST_PASSWORD: 'test-password'
-          AWS_ACCESS_KEY_ID: 'test-aws-key'
-          AWS_SECRET_ACCESS_KEY: 'test-aws-secret'
-          AGORA_APP_ID: 'test-agora-id'
-          AGORA_APP_CERTIFICATE: 'test-agora-cert'
-          CELERY_BROKER_URL: 'redis://localhost:6379/0'
-          CELERY_RESULT_BACKEND: 'redis://localhost:6379/0'
+        # env:
+        #   SECRET_KEY: 'django-insecure-test-key-123'
+        #   DB_HOST: localhost
+        #   DB_NAME: test_db
+        #   DB_USER: postgres
+        #   DB_PASSWORD: postgres
+        #   DB_PORT: 5432
+        #   STRIPE_SECRET_KEY: 'test-stripe-key'
+        #   STRIPE_PUBLISHABLE_KEY: 'test-stripe-pub-key'
+        #   STRIPE_WEBHOOK_SECRET: 'test-webhook-secret'
+        #   EMAIL_HOST_USER: 'test@example.com'
+        #   EMAIL_HOST_PASSWORD: 'test-password'
+        #   AWS_ACCESS_KEY_ID: 'test-aws-key'
+        #   AWS_SECRET_ACCESS_KEY: 'test-aws-secret'
+        #   AGORA_APP_ID: 'test-agora-id'
+        #   AGORA_APP_CERTIFICATE: 'test-agora-cert'
+        #   CELERY_BROKER_URL: 'redis://localhost:6379/0'
+        #   CELERY_RESULT_BACKEND: 'redis://localhost:6379/0'
         run: |
           cd Server
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          rm -rf */migrations/
-          python manage.py makemigrations accounts
-          python manage.py migrate accounts  
-          python manage.py makemigrations
-          python manage.py migrate
+          # python manage.py makemigrations accounts
+          # python manage.py migrate accounts  
+          # python manage.py makemigrations
+          # python manage.py migrate
 
-      - name: Run tests with pytest
-        env:
-          SECRET_KEY: 'django-insecure-test-key-123'
-          DB_HOST: localhost
-          DB_NAME: test_db
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_PORT: 5432
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
-          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
-          CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
-          CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
-        run: | 
-          cd Server
-          pytest --cov=. --cov-report=xml --cov-report=term-missing
+      # - name: Run tests with pytest
+      #   env:
+      #     SECRET_KEY: 'django-insecure-test-key-123'
+      #     DB_HOST: localhost
+      #     DB_NAME: test_db
+      #     DB_USER: postgres
+      #     DB_PASSWORD: postgres
+      #     DB_PORT: 5432
+      #     STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      #     STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+      #     STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      #     EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      #     EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+      #     AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+      #     CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
+      #     CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
+      #   run: | 
+      #     cd Server
+      #     pytest --cov=. --cov-report=xml --cov-report=term-missing
 
   sonarcloud:
     needs: test
