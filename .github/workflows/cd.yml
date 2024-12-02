@@ -2,7 +2,7 @@ name: LexiWaves CD
 
 on:
   workflow_run:
-    workflow: ['LexiWaves CI']
+    workflows: ['LexiWaves CI']
     types:  
       - completed
     branches:
