@@ -32,3 +32,4 @@ testing wrokflow
 checking file path
 debug the cd workflow
 correct file path and ensure proper deployment steps in GitHub Actions workflow
+fix docker-compose variable in CD pipline
