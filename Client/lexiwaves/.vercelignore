@@ -3,6 +3,7 @@ Server/
 .github/
 .git/
 
+
 # Dependencies
 **/node_modules
 **/env
