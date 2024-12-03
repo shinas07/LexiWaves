@@ -13,13 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Create and verify deployment files
+      - name: Prepare Deployment Files
         run: |
           cp Server/docker-compose.prod.yml ./docker-compose.prod.yml
           echo "${{ secrets.ENV_FILE }}" > .env
-          ls -la  # Debug: List files
-          cat docker-compose.prod.yml  # Debug: Verify content
-          
+          ls -la
+
       - name: Copy files to EC2
         uses: appleboy/scp-action@master
         with:
@@ -27,10 +26,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "docker-compose.prod.yml,.env"
-          target: "/home/ubuntu/lexiwaves"
-          strip_components: 1  # Added this line
-          
-      - name: Verify and Deploy
+          target: "/home/ubuntu/lexiwaves/"
+
+      - name: Verify and Deploy on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -38,11 +36,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/lexiwaves
-            ls -la  # Debug: List files on EC2
+            ls -la  # Debug files
             docker-compose -f docker-compose.prod.yml down || true
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d
             docker system prune -f
+
 
 # name: LexiWaves CD
 
