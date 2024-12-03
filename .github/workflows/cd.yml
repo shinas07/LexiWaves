@@ -16,7 +16,6 @@ jobs:
       - name: Create deployment files
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
-          echo "${{ secrets.NGINX_CONF }}" > nginx.conf
           
       - name: Copy files to EC2
         uses: appleboy/scp-action@master
@@ -24,7 +23,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.prod.yml,.env,nginx.conf"
+          source: "Server/docker-compose.prod.yml,.env"
           target: "/home/ubuntu/lexiwaves"
           
       - name: Deploy to EC2
