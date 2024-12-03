@@ -1,11 +1,3 @@
-import pytest
-
-def test_example():
-    assert True
-
-
-
-
 # import pytest
 # from django.urls import reverse
 # from rest_framework import status
