@@ -1,0 +1,15 @@
+# Ignore everything except Client directory
+/*
+!Client/
+
+# Ignore node_modules everywhere
+**/node_modules
+
+# Ignore other unnecessary files
+.env
+.env.*
+.git
+README.md
+Server/
+.github/
+sonar-project.properties
