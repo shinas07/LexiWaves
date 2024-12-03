@@ -59,7 +59,6 @@ def send_otp_email(email, otp):
 
 def create_or_resend_otp(email):
     otp = generate_otp()
-    print(otp)
     OTPVerification.objects.update_or_create(
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
