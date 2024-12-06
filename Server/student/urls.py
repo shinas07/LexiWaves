@@ -1,6 +1,6 @@
 from .views import LatestCoursesView
 from django.urls import path
-from .views import QuizView,MarkLessonWatchedView,CompletedLessonsView, CourseEnrolledStudentsView,TutorDetailByCourseView,StudyStreakViewSet
+from .views import QuizView,MarkLessonWatchedView,CompletedLessonsView, CourseEnrolledStudentsView,TutorDetailByCourseView,StudyStreakViewSet, StudyStreakStatus
 
 urlpatterns = [
      path('latest-courses/', LatestCoursesView.as_view(), name='latest-courses'),
@@ -11,5 +11,5 @@ urlpatterns = [
      path('students-details/',CourseEnrolledStudentsView.as_view(), name='course-enrolled-student-list'),
      path('tutor-interaction/<int:tutor_id>/', TutorDetailByCourseView.as_view(), name='tutor-detail-by-course'),
      path('study-streak/',StudyStreakViewSet.as_view()),
-
+     path('check-streak/',StudyStreakStatus.as_view()),
 ]
