@@ -28,7 +28,8 @@ from .models import  LessonCompletion, Lesson,TutorSlot,TutorRevenue
 from .serializers import CourseSerializer, LessonCompletionSerializer,TutorSlotSerializer
 # from accounts.models import Student
 from django.db.models import Sum,Q,FloatField, Case, When
-
+from django.db.models.functions import TruncMonth
+from datetime import datetime, timedelta
 
 def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
@@ -238,10 +239,18 @@ class TutorProfileView(APIView):
     def get(self, request):
         try:
             tutor = Tutor.objects.select_related('user').get(user=request.user)
+            course_count = Course.objects.filter(tutor=tutor.user,is_approved=True).count()
+            student_count = StudentCourseEnrollment.objects.filter(course__tutor=tutor.user,payment_status='completed').values('user').distinct().count()
+            print(student_count)
             serializer = TutorProfileSerializer(tutor)
-            print('user data',serializer.data)
-            return Response(serializer.data)
-        except Tutor.DoesNotExist:
+            data = serializer.data
+            data.update({
+                'total_courses':course_count,
+                'student_count':student_count,
+            })
+            return Response(data)
+        except Tutor.DoesNotExist as e:
+            print(str(e))
             return Response({"error": "Tutor profile not found"}, status=404)
 
 class CourseCreationViewSet(viewsets.ModelViewSet):
@@ -521,6 +530,56 @@ class TutorSlotView(APIView):
             serializer.save(tutor=tutor)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# Dashboard Revenue details
+class TutorRevenueView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            tutor = request.user
+            # Calculate total revenue
+            total_revenue = TutorRevenue.objects.filter(
+                tutor=tutor
+            ).aggregate(
+                total=Sum('amount')
+            )['total'] or 0
+
+            six_months_ago = datetime.now() - timedelta(days=180)
+            monthly_revenue = TutorRevenue.objects.filter(
+                tutor=tutor,
+                created_at__gte=six_months_ago
+            ).annotate(
+                month=TruncMonth('created_at')
+            ).values('month').annotate(
+                total=Sum('amount')
+            ).order_by('month')
+
+            # Prepare chart data
+            revenue_labels = []
+            revenue_data = []
+            
+            for entry in monthly_revenue:
+                revenue_labels.append(entry['month'].strftime('%B %Y'))
+                revenue_data.append(float(entry['total']))
+
+            return Response({
+                'status': 'success',
+                'total_revenue': float(total_revenue),
+                'revenue_labels': revenue_labels,
+                'revenue_data': revenue_data
+            })
+
+        except Exception as e:
+            print(f"Error in TutorRevenueView: {str(e)}")
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+
 
 # Revenue OverView
 class TutorRevenueDetailsView(APIView):
