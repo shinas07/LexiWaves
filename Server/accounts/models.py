@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # for Studets
 class Student(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,, on_delete=models.CASCADE, related_name='student_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student_profile')
     # Add student-specific fields here, for example:
     # grade_level = models.CharField(max_length=20)
 
