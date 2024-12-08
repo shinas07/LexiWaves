@@ -76,6 +76,7 @@ class AllCourseChatBoxesView(APIView):
             ).order_by('-latest_request_time', '-created_at')  
 
             if not enrollments.exists():
+                print('working not enrollement part')
                 return Response(
                     {'error': 'Student not found'}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -108,71 +109,12 @@ class AllCourseChatBoxesView(APIView):
                 },
                 'courses': courses_data
             }
-
+            print(response_data)
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(str(e))
             return Response(
                 {'error': 'Failed to fetch chat boxes'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-# Tutor Messaging View
-# class TutorChatMessageView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, room_id):
-#         try:
-#             # Verify and get chat room
-#             chat_room = get_object_or_404(
-#                 ClassChatRoom.objects.prefetch_related('messages'), 
-#                 room_id=room_id,
-#                 tutor=request.user
-#             )
-
-#             serializer = ChatRoomDetailSerializer(chat_room)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             print(f"Error: {str(e)}")
-#             return Response(
-#                 {'error': 'Failed to fetch messages'}, 
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
-
-#     def post(self, request, room_id):
-#         try:
-#             # Verify chat room
-#             chat_room = get_object_or_404(
-#                 ClassChatRoom, 
-#                 room_id=room_id,
-#                 tutor=request.user
-#             )
-
-#             message_data = {
-#                 'room': chat_room,
-#                 'user': request.user,
-#                 'content': request.data.get('message', '').strip()
-#             }
-
-#             serializer = ChatMessageSerializer(data=message_data)
-#             serializer.is_valid(raise_exception=True)
-#             message = serializer.save()
-
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-#         except serializer.ValidationError as e:
-#             return Response(
-#                 {'error': 'Invalid message data', 'details': e.detail}, 
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-#         except Exception as e:
-#             print(f"Error: {str(e)}")
-#             return Response(
-#                 {'error': 'Failed to send message'}, 
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
-
-# Calculating studey streak 
-
-
