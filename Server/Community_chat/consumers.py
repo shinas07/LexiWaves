@@ -4,6 +4,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ChatRoom, ChatMessage
 from accounts.models import User
 from channels.db import database_sync_to_async
+import jwt
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +14,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     connected_users = {}
 
     async def connect(self):
+        self.user = await self.authenticate_user()
+        if self.user is None:
+            await self.close()
+            return
+        
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
 
@@ -111,3 +119,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(email=email)
         room = ChatRoom.objects.get(name=self.room_name)
         ChatMessage.objects.create(room=room, user=user, content=message)
+
+    async def authenticate_user(self):
+        token = self.scope['query_string'].decode().split('=')[1]
+        logger.info(token)
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user = await database_sync_to_async(get_user_model().objects.get)(id=payload['user_id'])
+            logger.info(user)
+            return user
+        except jwt.ExpiredSignatureError:
+            await self.close()
+            return None
+        except jwt.InvalidTokenError:
+            await self.close()
+            return None
