@@ -9,7 +9,6 @@ from datetime import timedelta
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from rest_framework.status import HTTP_400_BAD_REQUEST
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime, timedelta
@@ -34,9 +33,73 @@ import random
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 
+class GoogleSignInView(APIView):
+    def post(self, request):
+        try:
+            token = request.data.get('token')
+            if not token:
+                return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Verify the token
+            idinfo = id_token.verify_oauth2_token(
+                token,
+                requests.Request(),
+                settings.GOOGLE_OAUTH2_CLIENT_ID
+            )
+            
+            # Extract user information
+            email = idinfo.get('email')
+            first_name = idinfo.get('given_name', '')
+            last_name = idinfo.get('family_name', '')
+            
+            if not email:
+                return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            # Create or get the user
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'user_type': 'student',  # Set default user type
+                    'is_active': True
+                }
+            )
+            if user.user_type != 'student':
+                return Response({'error':'Access deined, This login is only for Students'},status=status.HTTP_403_FORBIDDEN)
+            
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': {
+                    'email': user.email,
+                    'user_type': user.user_type,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except ValueError as e:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(str(e))
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+def generate_token(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token)
+    }
 
 # # Otp Creation
 def generate_otp():
@@ -59,6 +122,7 @@ def send_otp_email(email, otp):
 
 def create_or_resend_otp(email):
     otp = generate_otp()
+    print(otp)
     OTPVerification.objects.update_or_create(
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
@@ -135,8 +199,7 @@ class UserLoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        # Authenticate user
-       
+
         try:
             user = User.objects.get(email=email)
             if user.user_type != 'student':
@@ -365,8 +428,6 @@ class CourseVideoView(APIView):
         
 
 
-
-
 # Stripe Payment option for user
 class CreateCheckoutSession(APIView):
     permission_classes = [IsAuthenticated]
@@ -429,7 +490,7 @@ def stripe_webhook(request):
         event = stripe.Webhook.construct_event(
             payload.encode('utf-8'),  # Encode back to bytes
             sig_header,
-            settings.STRIPE_WEBHOOK_SECRET.strip()  # Ensure no whitespace
+            settings.STRIPE_WEBHOOK_SECRET
         )
         
         # Handle the checkout.session.completed event
@@ -459,6 +520,7 @@ def stripe_webhook(request):
                     amount_paid=amount,
                     session_id=session['id']
                 )
+                print(enrollment)
                 
                 # Create revenue records
                 AdminRevenue.objects.create(
@@ -509,6 +571,78 @@ class UserEnrolledCourses(generics.ListAPIView):
 
 
 
+# class WatchCourseView(APIView):
+#     permission_classes = [IsAuthenticated]
+    
+#     def generate_presigned_url(self, s3_url):
+#         try:
+#             # Extract the key from the full S3 URL
+#             if not s3_url or 'amazonaws.com' not in s3_url:
+#                 return None
+            
+#             # Get the path after the bucket name
+#             key = s3_url.split(f'{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/')[-1]
+            
+#             s3_client = boto3.client(
+#                 's3',
+#                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+#                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+#                 region_name=settings.AWS_S3_REGION_NAME
+#             )
+            
+#             url = s3_client.generate_presigned_url(
+#                 'get_object',
+#                 Params={
+#                     'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+#                     'Key': key
+#                 },
+#                 ExpiresIn=3600  # URL expires in 1 hour
+#             )
+#             return url
+#         except Exception as e:
+#             print(f"Error generating presigned URL: {str(e)}")
+#             return None
+
+#     def get(self, request, courseId):  
+#         try:
+#             # Check enrollment
+#             enrollment = StudentCourseEnrollment.objects.get(
+#                 user=request.user, 
+#                 id=courseId, 
+#                 payment_status='completed'
+#             )
+            
+#             course = enrollment.course
+#             course_data = CourseWatchSerializer(course).data
+            
+#             # Generate presigned URL for course preview video
+#             if course_data.get('video_url'):
+#                 course_data['video_url'] = self.generate_presigned_url(course_data['video_url'])
+            
+#             # Generate presigned URLs for lesson videos
+#             for lesson in course_data.get('lessons', []):
+#                 if lesson.get('lesson_video_url'):
+#                     lesson['lesson_video_url'] = self.generate_presigned_url(
+#                         lesson['lesson_video_url']
+#                     )
+            
+#             return Response(course_data, status=status.HTTP_200_OK)
+            
+#         except StudentCourseEnrollment.DoesNotExist:
+#             return Response(
+#                 {"error": "You are not enrolled in this course or payment is pending."}, 
+#                 status=status.HTTP_403_FORBIDDEN
+#             )
+#         except Course.DoesNotExist:
+#             return Response(
+#                 {"error": "Course not found"}, 
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         except Exception as e:
+#             return Response(
+#                 {"error": f"An error occurred: {str(e)}"}, 
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
 class WatchCourseView(APIView):
     permission_classes = [IsAuthenticated]
     
