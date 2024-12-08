@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
-from django.conf import settings
 from accounts.models import User
 
 # Create your models here.
 
 
 class Tutor(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tutor_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tutor_profile')
 
     def __str__(self):
         return f"Tutor: {self.user.get_full_name()}"
