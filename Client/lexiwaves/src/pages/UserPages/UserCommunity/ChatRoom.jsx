@@ -24,7 +24,7 @@ const ChatRoom = () => {
     const socket = useRef(null);
     const chatContainerRef = useRef(null);
     const [onlineUsers, setOnlineUsers] = useState(0);
-    const [isTyping, setIsTyping] = useState(false); // New typing indicator state
+    const [isTyping, setIsTyping] = useState(false); 
 
     const [isOnline, setIsOnline] = useState(true);
 
@@ -51,7 +51,8 @@ const ChatRoom = () => {
             navigate('/community-chat');
             return;
         }
-        socket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${language}/`);
+        const token = localStorage.getItem('accessToken')
+        socket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${language}/?token=${token}`);
 
         socket.current.onopen = () => {
             setIsConnected(true);
@@ -63,7 +64,7 @@ const ChatRoom = () => {
             if (data.type === 'chat_history') {
                 setMessages(data.messages.map(msg => ({
                     ...msg,
-                    timestamp: new Date(msg.timestamp)
+                    timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
                 })));
             } else if (data.type === 'user_count') {
                 setOnlineUsers(data.count);
@@ -73,7 +74,7 @@ const ChatRoom = () => {
             } else {
                 const newMessage = {
                     ...data,
-                    timestamp: new Date(data.timestamp)
+                    timestamp: data.timestamp ? new Date(data.timestamp).toISOString() : new Date().toISOString()
                 };
                 setMessages(prevMessages => [...prevMessages, newMessage]);
             }
@@ -215,10 +216,11 @@ const ChatRoom = () => {
                                     </div>
                                     <p className="text-sm">{msg.message}</p>
                                     <div className="text-xs opacity-60">
-                                        {new Date(msg.timestamp).toLocaleTimeString([], { 
+                                        {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { 
                                             hour: '2-digit', 
-                                            minute: '2-digit' 
-                                        })}
+                                            minute: '2-digit',
+                                            hour12: true
+                                        }) : 'Just now'}
                                     </div>
                                 </div>
                             </motion.div>
