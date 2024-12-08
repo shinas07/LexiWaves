@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
-from accounts.models import User
 from django.conf import settings
 
 # Create your models here.
@@ -67,7 +66,7 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration = models.PositiveIntegerField(help_text="Duration in hours")
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
-    tutor = models.ForeignKey(User, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_approved = models.BooleanField(default=False)
@@ -88,7 +87,7 @@ class Lesson(models.Model):
         return f'{self.title} ({self.course.title})'
 
 class LessonCompletion(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     completed_at = models.DateTimeField(auto_now_add=True)
 
@@ -107,7 +106,7 @@ class Answer(models.Model):
     is_correct = models.BooleanField(default=False)
 
 class QuizAttempt(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     score = models.IntegerField()
     passed = models.BooleanField(default=False)
@@ -139,7 +138,7 @@ class TutorSlotRateHistory(models.Model):
 
 class TutorRevenue(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    tutor = models.ForeignKey(User, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_id = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)

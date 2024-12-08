@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import User
+from django.conf import settings
 from lexi_admin.models import Language
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -19,7 +19,7 @@ class ChatRoom(models.Model):
 
 class ChatMessage(models.Model):
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

@@ -1,10 +1,11 @@
 from django.db import models
 from accounts.models import User
 from tutor.models import Course
+from django.conf import settings
 
 
 class Admin(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
 
     
 class Language(models.Model):
@@ -18,7 +19,7 @@ class Language(models.Model):
 
 # Course Payment And details Data
 class StudentCourseEnrollment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     payment_status = models.CharField(max_length=20, default='pending')
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)

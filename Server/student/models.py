@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import User
+from django.conf import settings
 from tutor.models import Lesson
 from tutor.models import Course
 from datetime import date, timedelta
@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 # User Watched 
 class UserLesson(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     watched = models.BooleanField(default=False)
     watched_at = models.DateTimeField(auto_now=True)
@@ -18,7 +18,7 @@ class UserLesson(models.Model):
 # Study Steak table
 
 class StudyActivity(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='watch_history')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name='watch_history')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     watch_duration = models.IntegerField(default=0)  # in seconds
     watched_date = models.DateField(auto_now_add=True)
@@ -28,7 +28,7 @@ class StudyActivity(models.Model):
         ordering = ['-watched_date']
 
 class StudyStreak(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='study_streak')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='study_streak')
     current_streak = models.PositiveIntegerField(default=0)
     max_streak = models.PositiveBigIntegerField(default=0)
     last_study_date = models.DateField(null=True, blank=True) 
