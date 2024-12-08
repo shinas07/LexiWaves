@@ -63,12 +63,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-backend:${{ github.sha }}
-            
-      # - name: Build & Push Frontend
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     context: ./frontend
-      #     push: true
-      #     tags: |
-      #       ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-frontend:latest
-      #       ${{ secrets.DOCKERHUB_USERNAME }}/lexiwaves-frontend:${{ github.sha }}
