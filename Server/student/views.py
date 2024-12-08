@@ -18,6 +18,8 @@ from tutor.models import Tutor, TutorDetails
 from lexi_admin.models import StudentCourseEnrollment
 from lexi_admin.serializers import StudentCourseEnrollmentListSerializer
 from .learning_streak_service import StreakService
+from django.utils import timezone
+from django.db.models import Count
 
 
 #Home Page Latest courses
@@ -74,66 +76,54 @@ class CompletedLessonsView(APIView):
             return Response({'status': 'error','message': str(e)}, status=500)
 
 
-class QuizView(APIView):
-    authentication_classes = [TokenAuthentication]
+
+
+
+
+class CourseQuizView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, course_id):
-        """Fetch quiz questions for a course"""
         try:
-            # Get course and verify it exists
             course = get_object_or_404(Course, id=course_id)
+            print(course)
             
-            # Check if user has completed all lessons
-            completed_lessons = course.lessons.filter(
-                lessoncompletion__user=request.user
-            ).count()
-            total_lessons = course.lessons.count()
-
-            if completed_lessons < total_lessons:
+            # Get questions for this course
+            questions = Question.objects.filter(course=course)
+            
+            if not questions.exists():
                 return Response({
-                    'error': 'Please complete all lessons before taking the quiz'
-                }, status=status.HTTP_403_FORBIDDEN)
+                    'status': 'error',
+                    'message': 'No quiz questions available for this course'
+                }, status=404)
 
-            # Check if user has already passed the quiz
-            previous_attempt = QuizAttempt.objects.filter(
+            # Get user's best attempt
+            best_attempt = QuizAttempt.objects.filter(
                 user=request.user,
-                course=course,
-                passed=True
-            ).exists()
+                course=course
+            ).order_by('-score').first()
 
-            if previous_attempt:
-                return Response({
-                    'message': 'You have already passed this quiz'
-                }, status=status.HTTP_200_OK)
-
-            # Fetch questions with answers
-            questions = Question.objects.filter(course_id=course_id).prefetch_related('answers')
-            # Format questions and answers (excluding correct answer flags)
-            formatted_questions = []
-            for question in questions:
-                formatted_questions.append({
-                    'id': question.id,
-                    'text': question.text,
-                    'answers': [
-                        {'id': answer.id, 'text': answer.text}
-                        for answer in question.answers.all()
-                    ]
-                })
+            quiz_data = {
+                'total_questions': questions.count(),
+                'best_score': best_attempt.score if best_attempt else None,
+                'passed': best_attempt.passed if best_attempt else False,
+                'last_attempt': best_attempt.date_attempted.strftime("%Y-%m-%d %H:%M") if best_attempt else None,
+                'has_attempted': best_attempt is not None
+            }
 
             return Response({
-                'course_id': course_id,
-                'questions': formatted_questions
-            }, status=status.HTTP_200_OK)
+                'status': 'success',
+                'course_title': course.title,
+                'quiz_data': quiz_data
+            })
 
-        except Course.DoesNotExist:
-            return Response({
-                'error': 'Course not found'
-            }, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            print(f"Error in CourseQuizListView: {str(e)}")
             return Response({
-                'error': str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+        
 
     def post(self, request, course_id):
         """Submit and validate quiz answers"""
@@ -270,7 +260,7 @@ class StudyStreakViewSet(APIView):
         duration = request.data.get('duration')
         print(course_id, duration)
 
-        if not all([course_id, duration]):
+        if not all([course_id]):
             return Response({'error':'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
@@ -279,3 +269,50 @@ class StudyStreakViewSet(APIView):
             return Response(StreakSerializer(streak).data)
         except Course.DoesNotExist:
             return Response({'error':'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class StudentDashboardStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            user = request.user
+            enrolled_courses = StudentCourseEnrollment.objects.filter(
+                user=user,
+            ).select_related('course', 'course__tutor')
+             
+            # Basic stats
+            stats = {
+                'enrolled_count': enrolled_courses.count(),
+                'completed_count': enrolled_courses.filter(payment_status='completed').count(),
+                'study_hours': enrolled_courses.filter(payment_status='completed').count() * 2,
+                'certificates': 0
+            }
+
+            # Get recent courses
+            recent_courses_data = []
+            for enrollment in enrolled_courses.order_by('-created_at')[:3]:
+                course_data = {
+                    'name': enrollment.course.title,
+                    'desc': enrollment.course.description,
+                    'lastAccessed': enrollment.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    'instructor': enrollment.course.tutor.first_name,  # Adjust based on your Tutor model
+                    'course_id': enrollment.course.id,
+                    'amount_paid': float(enrollment.amount_paid)
+                }
+                recent_courses_data.append(course_data)
+
+            return Response({
+                'status': 'success',
+                'data': {
+                    'stats': stats,
+                    'recent_courses': recent_courses_data
+                }
+            })
+        except Exception as e:
+            print(f"Error in StudentDashboardStatsView: {str(e)}")
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
