@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'video_call',
     'storages',
     'channels',
+    'social_django',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -82,11 +83,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # 'allauth.account.middleware.AccountMiddleware'
 ]
 
 
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+# Google OAuth credentials
+GOOGLE_OAUTH2_CLIENT_ID = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+GOOGLE_OAUTH2_CLIENT_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 
 # If you want to use email as the username field:
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
