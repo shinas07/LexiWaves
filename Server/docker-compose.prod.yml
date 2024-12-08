@@ -10,6 +10,7 @@ services:
       - redis
     command: >
       sh -c "
+        python manage.py migrate accounts &&
         python manage.py migrate &&
         gunicorn lexiWaves.wsgi:application --bind 0.0.0.0:8000
       "
