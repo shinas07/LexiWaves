@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.conf import settings
 # from tutor.models import Course
 
 
@@ -51,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # for Studets
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,, on_delete=models.CASCADE, related_name='student_profile')
     # Add student-specific fields here, for example:
     # grade_level = models.CharField(max_length=20)
 
