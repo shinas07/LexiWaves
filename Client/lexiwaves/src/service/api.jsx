@@ -5,7 +5,7 @@ import { logout } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     withCredentials: true,
 });
 
