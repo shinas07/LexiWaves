@@ -21,7 +21,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    google_id = models.CharField(max_length=100, blank=True, null=True)
+    google_id = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
