@@ -34,8 +34,7 @@ SECRET_KEY = config('SECRET_KEY')
 # DEBUG = os.getenv('DEBUG') == 'True'
 DEBUG = True
 
-# ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '0.0.0.0']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
 
 
 
@@ -181,6 +180,20 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL ='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+# for Production
+# Static files configuration
+# STATIC_URL = '/static/'  # Note the leading slash
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Add this line
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'staticfiles'),  # Optional: for additional static files
+# ]
+
+# # Media files configuration
+# MEDIA_URL = '/media/'  # This is correct
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # This is correct
 
 
 # Load environment variables from .env file
