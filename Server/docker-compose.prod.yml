@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
       - redis
+    expose:
+      - 8000
     command: >
       sh -c "
         python manage.py migrate accounts &&
@@ -33,6 +35,16 @@ services:
     restart: always
     volumes:
       - redis_data:/data
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
