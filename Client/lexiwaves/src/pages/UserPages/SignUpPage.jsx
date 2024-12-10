@@ -4,6 +4,12 @@ import { DotBackground } from "../../components/Background";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../service/api";
 import { toast } from "sonner";
+import { FaAws } from "react-icons/fa";
+import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { login } from "../../redux/authSlice";
+
+import { useDispatch } from "react-redux";
 
 
 
@@ -21,6 +27,7 @@ const SignUPForm = () => {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const dispatch = useDispatch()
 
 
 
@@ -83,6 +90,31 @@ const SignUPForm = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await api.post('/user/google-signin/',{
+        token: credentialResponse.credential
+      });
+      if(response.data){
+        const { refresh, access,user } = response.data;
+  
+        // Save the tokens to localStorage
+        localStorage.setItem('refreshToken', refresh);
+        localStorage.setItem('accessToken', access);
+
+        dispatch(login({
+          accessToken: access,  
+          refreshToken: refresh,
+          user:user,
+          userRole:user.user_type,
+      }));
+      navigate('/')
+      }
+    }catch(error){
+      toast.error('Google sign in faild')
+    }
+
+  }
   return (
     <DotBackground>
     <div className="max-w-md mt-10 w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
@@ -132,7 +164,33 @@ const SignUPForm = () => {
             <BottomGradient />
           </button>
 
+          <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-black text-gray-500">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => {
+            toast.error('Google sign in failed');
+          }}
+          useOneTap
+          theme="filled_black"
+          text="continue_with"
+          shape="rectangular"
+          width="100%"
+        />
+          </GoogleOAuthProvider>
+
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
 
          
       </form>
