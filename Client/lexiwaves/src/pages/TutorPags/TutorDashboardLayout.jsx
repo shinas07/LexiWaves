@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sidebar, SidebarBody } from '../../components/ui/Account_sidebar.jsx';
 import {
@@ -9,15 +9,18 @@ import {
   IconBook,
   IconLogout,
 } from '@tabler/icons-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/authSlice.jsx';
 import { toast } from 'sonner';
 import api from '../../service/api.jsx';
 import { cn } from '../../lib/utils.jsx';
 import { DollarSign } from 'lucide-react';
+import { use } from 'react';
 
 const LogoutModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
+
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -137,7 +140,7 @@ const TutorDashboardLayout = ({ children }) => {
       <div className={cn("flex flex-col md:flex-row w-full border-x border-neutral-200 dark:border-neutral-700 overflow-hidden")}>
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-10">
-            <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            <div className="flex flex-col flex-1 overflow-x-hidden">
               {/* Sidebar Links */}
               <div className="mt-8 flex flex-col text-white gap-2">
                 {links.map((link, idx) => (
@@ -152,7 +155,7 @@ const TutorDashboardLayout = ({ children }) => {
           </SidebarBody>
         </Sidebar>
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-neutral-900">
+        <div className="flex-1  bg-gray-50 dark:bg-neutral-900">
           {/* Main Content Header with Project Name */}
           <div className="bg-indigo-600 text-white p-6 flex items-center justify-between">
             <h1 className="text-3xl font-semibold">lexiWaves</h1>
