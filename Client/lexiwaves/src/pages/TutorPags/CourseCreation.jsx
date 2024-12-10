@@ -5,6 +5,7 @@ import api from '../../service/api';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import{ motion } from 'framer-motion';
+import TutorDashboardLayout from './TutorDashboardLayout';
 
 const CourseCreationForm = () => {
   const [languages, setLanguages] = useState([]);
@@ -87,24 +88,7 @@ const handleChange = (e) => {
   }));
 };
 
-  // const handleChange = (e) => {
-  //   const { name, value, files } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: files ? files[0] : value
-  //   }));
-  // };
 
-  // const handleLessonChange = (index, e) => {
-  //   const { name, value, files } = e.target;
-  //   const updatedLessons = [...formData.lessons];
-  //   if (name === 'lesson_video_url' && files && files[0]) {
-  //     updatedLessons[index] = { ...updatedLessons[index], [name]: files[0] };
-  //   } else {
-  //     updatedLessons[index] = { ...updatedLessons[index], [name]: value };
-  //   }
-  //   setFormData((prev) => ({ ...prev, lessons: updatedLessons }));
-  // };
 
   const handleLessonChange = (index, e) => {
     const { name, files } = e.target;
@@ -295,7 +279,7 @@ const handleChange = (e) => {
 
 
   return (
-    <DotBackground>
+    <TutorDashboardLayout>
       <div className="mt-16 max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8 text-center text-white">Create New Course</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -531,7 +515,7 @@ const handleChange = (e) => {
         </form>
       </div>
       {loading && <Loader progress={progress} />}
-    </DotBackground>
+      </TutorDashboardLayout>
   );
 };
 
