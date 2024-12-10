@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { PlayCircle, Pause, RotateCcw, Download, Maximize, Minimize } from 'lucide-react';
+import { PlayCircle, Pause, RotateCcw, Maximize, Minimize } from 'lucide-react';
 import api from '../../service/api';
 import { DotBackground } from '../../components/Background';
 
 const CourseVideo = () => {
   const { id } = useParams();
-  const [course, setCourse] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -15,18 +15,18 @@ const CourseVideo = () => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchVideoUrl = async () => {
       try {
-        const response = await api.get(`user/courses/video/${id}`);
-        setCourse(response.data);
+        const response = await api.get(`/user/courses/video/${id}`);
+        setVideoUrl(response.data.video_url);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load course details');
+        setError('Failed to load video');
         setLoading(false);
       }
     };
-   
-    fetchCourse();
+
+    fetchVideoUrl();
   }, [id]);
 
   const handlePlayPause = () => {
@@ -101,8 +101,9 @@ const CourseVideo = () => {
           <video 
             ref={videoRef}
             className="w-full rounded-lg shadow-md" 
-            src={course.video_url}
+            src={videoUrl}
             type="video/mp4"
+            controls
           />
           <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-black bg-opacity-50 rounded-lg p-2">
             <button onClick={handlePlayPause} className="text-white hover:text-blue-500 transition-colors">
@@ -111,9 +112,6 @@ const CourseVideo = () => {
             <button onClick={handleRestart} className="text-white hover:text-blue-500 transition-colors">
               <RotateCcw size={24} />
             </button>
-            <a href={course.video_url} download className="text-white hover:text-blue-500 transition-colors">
-              <Download size={24} />
-            </a>
             <button onClick={toggleFullscreen} className="text-white hover:text-blue-500 transition-colors">
               {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
             </button>
