@@ -7,7 +7,8 @@ import api from "../../service/api";
 import { toast } from "sonner";
 import { login } from "../../redux/authSlice";
 import { useDispatch } from "react-redux";
-
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import Loader from "../Loader";
 
 // import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -68,6 +69,46 @@ const Login = () => {
         }
     }, [message]);
 
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            setLoading(true);
+            const response = await api.post('/user/google-signin/', {
+                token: credentialResponse.credential
+            });
+
+            if (response.data) {
+                const { refresh, access, user } = response.data;
+
+                localStorage.setItem('refreshToken', refresh);
+                localStorage.setItem('accessToken', access);
+
+                dispatch(login({
+                    accessToken: access,
+                    refreshToken: refresh,
+                    user: user,
+                    userRole: user.user_type,
+                }));
+                toast.success('Successfully signed in with Google!');
+                navigator('/');
+            }
+        } catch (error) {
+        
+            toast.error('Google sign in failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    if (loading){
+    
+        <DotBackground>
+        <Loader/>
+        </DotBackground>
+    }
+
+
     
 
     return (
@@ -119,6 +160,33 @@ const Login = () => {
               <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
      
             </form>
+
+               <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white dark:bg-black text-gray-500">
+                            Or continue with
+                        </span>
+                    </div>
+                </div>
+
+                <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => {
+                            toast.error('Google sign in failed');
+                        }}
+                        useOneTap
+                        theme="filled_black"
+                        text="continue_with"
+                        shape="rectangular"
+                        width="100%"
+                    />
+                </GoogleOAuthProvider>
+
+                
     
             <div className="text-sm text-center mt-4">
               <Link to="/signup" className="text-white hover:underline hover:decoration-cyan-500">
