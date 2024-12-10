@@ -6,6 +6,9 @@ import FloatingNavbar from '../../components/Navbar';
 import { FaCheckCircle, FaLock } from 'react-icons/fa';
 import Quiz from './Quiz';
 import Loader from '../Loader';
+import { toast } from 'sonner';
+import { duration } from '@mui/material';
+// import { toast } from 'react-hot-toast';
 
 const CourseWatchingPage = () => {
     const { courseId } = useParams();
@@ -26,9 +29,10 @@ const CourseWatchingPage = () => {
     const watchTimeRef = useRef(0);
     const MINIMUM_WATCH_TIME = 300;
     const [accumulatedWatchTime, setAccumulatedWatchTime] = useState(0);
-
-
-    
+    const [dailyStreak, setDailyStreak] = useState({
+        hasStreakToday: false,
+        streakCount: 0
+    });
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -39,7 +43,6 @@ const CourseWatchingPage = () => {
                 });
                 
                 setCourse(courseResponse.data);
-                console.log(courseResponse.data)
                 setCourseDataId(courseResponse.data.id);
                 setCurrentLessonVideo(courseResponse.data.video_url);
                 // Fetch completed lessons
@@ -81,7 +84,6 @@ const CourseWatchingPage = () => {
     };
 
     const allLessonsCompleted = course && completedLessons.length === course.lessons.length;
-    // console.log('tutorid',course.tutor)
     const handleTutorInteraction = () => {
      
         if (course && course.tutor) {
@@ -90,25 +92,42 @@ const CourseWatchingPage = () => {
     };
 
     const handleTimeUpdate = async () => {
-        if (videoRef.current) {
-            const currentTime = Math.floor(videoRef.current.currentTime);
-            watchTimeRef.current = currentTime;
-
-            // Update accumulated time every 60 seconds (or your preferred interval)
-            if (currentTime % 1 === 0 && currentTime !== 0) {
-                try {
-                    await api.post('/student/study-streak/', {
-                        course_id: course.id,
-                        duration: 60  // sending duration in seconds
+        if (!videoRef.current) return;
+        const currentTime = Math.floor(videoRef.current.currentTime);
+        const duration = Math.floor(videoRef.current.duration);
+        const today = new Date().toDateString();
+        const lastRecordedStreak = localStorage.getItem('lastRecordedStreak');
+        const MINIMUM_WATCH_TIME = 10
+    
+        if (currentTime >= MINIMUM_WATCH_TIME && 
+            lastRecordedStreak !== today && 
+            !localStorage.getItem('apiCallInProgress')) {
+            
+            try {
+                localStorage.setItem('apiCallInProgress', 'true');
+                const response = await api.post('/student/study-streak/', {
+                    course_id: course.id,
+                    duration: duration
+                });
+    
+                const streakData = response.data;
+                
+                if (streakData.current_streak) {
+                    setDailyStreak({
+                        hasStreakToday: true,
+                        streakCount: streakData.current_streak
                     });
-                    console.log('one streak')
-                } catch (error) {
-                    console.error('Failed to update study streak:', error);
+    
+                    localStorage.setItem('lastRecordedStreak', today);
+                    videoRef.current.removeEventListener('timeupdate', handleTimeUpdate);
                 }
+            } catch (error) {
+                console.error('Failed to update study streak:');
+            } finally {
+                localStorage.removeItem('apiCallInProgress');
             }
         }
     };
-    
 
     const handleLessonClick = (lesson) => {
         setExpandedLessonId(expandedLessonId === lesson.id ? null : lesson.id);
