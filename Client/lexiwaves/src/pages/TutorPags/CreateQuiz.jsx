@@ -15,6 +15,10 @@ const CreateQuiz = () => {
     const searchParams = new URLSearchParams(location.search);
     const courseName = searchParams.get('courseTitle') || 'Untitled Course';
 
+    useEffect(() => {
+        window.scroll(0,0)
+    },[])
+
     const handleQuestionChange = (index, value) => {
         const newQuestions = [...questions];
         newQuestions[index].text = value;
