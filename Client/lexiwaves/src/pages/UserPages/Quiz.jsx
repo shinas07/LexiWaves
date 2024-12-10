@@ -6,6 +6,7 @@ import { DotBackground } from '../../components/Background';
 import FloatingNavbar from '../../components/Navbar';
 import { FaClock, FaExclamationTriangle } from 'react-icons/fa';
 import { toast } from 'sonner';
+import Loader from '../Loader';
 
 const Countdown = ({ startTime, onComplete }) => {
     const [timeLeft, setTimeLeft] = useState(startTime);
@@ -26,9 +27,11 @@ const Countdown = ({ startTime, onComplete }) => {
     }, [onComplete]);
 
     return (
+        <DotBackground>
         <div className="text-2xl text-white">
             Starting in {timeLeft} seconds...
         </div>
+        </DotBackground>
     );
 };
 
@@ -42,6 +45,7 @@ const QuizPage = () => {
     const [quizStarted, setQuizStarted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(100); 
     const [quizCompleted, setQuizCompleted] = useState(false);
+    const [hasQuiz, setHasQuiz] = useState(true);
 
     useEffect(() => {
         fetchQuizQuestions();
@@ -53,11 +57,34 @@ const QuizPage = () => {
             const response = await api.get(`/student/course-quiz/${courseId}/`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setQuestions(response.data);
+            
+            const quizData = response.data.quiz_data;
+            
+            // Check if quiz exists and hasn't been passed
+            if (!quizData || quizData.total_questions === 0) {
+                setHasQuiz(false);
+                setLoading(false);
+                return;
+            }
+
+            // If user has already passed, redirect
+            if (quizData.passed) {
+                toast.success("You've already passed this quiz!");
+                navigate(-1);
+                return;
+            }
+
+            // If there's a previous attempt and it wasn't passed
+            if (quizData.has_attempted && !quizData.passed) {
+                toast.info(`Previous best score: ${quizData.best_score || 0}%`);
+            }
+
+            setQuestions(response.data.questions || []);
             setLoading(false);
         } catch (error) {
             console.error('Failed to load quiz questions:', error);
             setLoading(false);
+            setHasQuiz(false);
         }
     };
 
@@ -84,29 +111,34 @@ const QuizPage = () => {
     };
 
     const handleSubmitQuiz = async () => {
-        // Check if the current question is the last one
         if (currentQuestion === questions.length - 1) {
             try {
                 const token = localStorage.getItem('accessToken');
-                const response = await api.post(`/student/course-quiz/validate`, answers, {
+                const response = await api.post(`/student/course-quiz/validate`, {
+                    course_id: courseId,
+                    answers: answers
+                }, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 
-                if (response.data.passed) {
-                    toast.success("Congratulations! You passed the quiz.");
+                const score = response.data.score || 0;
+                const passed = response.data.passed;
+
+                if (passed) {
+                    toast.success(`Congratulations! You passed with ${score}%`);
                 } else {
-                    toast.alert("You didn't pass. Try again.");
+                    toast.error(`You scored ${score}%. Need 70% to pass.`);
                 }
-    
-                setQuizCompleted(true); // Mark quiz as completed
-                setQuizStarted(false);  // Stop the quiz
+
+                setQuizCompleted(true);
+                setQuizStarted(false);
             } catch (error) {
                 console.error('Failed to validate answers:', error);
+                toast.error("Failed to submit quiz. Please try again.");
             }
         } else {
-            // Move to the next question and deduct time
             setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1));
-            setTimeLeft(prev => prev - 10); // Deduct time on each question
+            setTimeLeft(prev => prev - 10);
         }
     };
     
@@ -130,7 +162,42 @@ const QuizPage = () => {
     }, [quizStarted, quizCompleted]);
 
     if (loading) {
-        return <div className="text-white">Loading questions...</div>;
+        return (
+            <DotBackground>
+                <FloatingNavbar />
+                <Loader/>
+            </DotBackground>
+        );
+    }
+
+      // Add this check for no quiz
+      if (!hasQuiz) {
+        return (
+            <DotBackground>
+                <FloatingNavbar />
+                <div className="container mt-32 mx-auto p-6 mt-16">
+                    <div className="bg-gray-800 rounded-lg p-8 text-center max-w-2xl mx-auto">
+                        <div className="mb-6">
+                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-medium text-white mb-4">
+                            No Quiz Available
+                        </h3>
+                        <p className="text-gray-400 mb-6">
+                            This course doesn't have a quiz yet. Please check back later or continue with your course content.
+                        </p>
+                        <button 
+                            onClick={() => navigate(-1)} 
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Return to Course
+                        </button>
+                    </div>
+                </div>
+            </DotBackground>
+        );
     }
 
     if (!quizStarted) {
