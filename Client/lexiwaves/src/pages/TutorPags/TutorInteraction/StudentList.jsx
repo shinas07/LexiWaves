@@ -54,14 +54,6 @@ const InteractionStudentsList = () => {
     navigate(`/tutor/students/course-chats/${studentId}`);
   };
 
-  const handleVideoCallRequest = async (studentId) => {
-    try {
-      await api.post(`/video-call/request/${studentId}`);
-      toast.success('Video call request sent successfully');
-    } catch (error) {
-      toast.error('Failed to send video call request');
-    }
-  };
 
   const filteredStudents = students.filter(student => {
     const searchLower = searchTerm.toLowerCase();
@@ -113,7 +105,7 @@ const InteractionStudentsList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Student</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Last Active</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-300">Actions</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-300 pr-16">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
@@ -146,7 +138,7 @@ const InteractionStudentsList = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2 pr-12">
                         <button
                           onClick={() => handleMessageClick(student.id)}
                           className="p-2 rounded-full hover:bg-gray-600 text-gray-300 hover:text-white transition-colors relative"
@@ -155,12 +147,6 @@ const InteractionStudentsList = () => {
                           {student.hasUnreadMessages && (
                             <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full" />
                           )}
-                        </button>
-                        <button
-                          onClick={() => handleVideoCallRequest(student.id)}
-                          className="p-2 rounded-full hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
-                        >
-                          <Video className="h-5 w-5" />
                         </button>
                       </div>
                     </td>
