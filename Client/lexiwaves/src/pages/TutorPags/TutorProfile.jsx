@@ -29,18 +29,14 @@ const TutorProfile = () => {
         };
         fetchProfile();
     }, []);
-    
 
-
-    if (loading) {
-        return (
-            <TutorDashboardLayout>
-                <div className="h-screen flex items-center justify-center">
-                    <Loader />
-                </div>
-            </TutorDashboardLayout>
-        );
-    }
+    if (loading) return (
+        <TutorDashboardLayout>
+            <div className="h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        </TutorDashboardLayout>
+    );
 
     return (
         <TutorDashboardLayout>
@@ -68,7 +64,7 @@ const TutorProfile = () => {
 
                 {/* Main Content */}
                 <div className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column */}
+                    {/* Left Column - About & Subjects */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* About Section */}
                         <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
@@ -78,42 +74,79 @@ const TutorProfile = () => {
                             </p>
                         </div>
 
-                        {/* Subjects & Expertise */}
+                        {/* Subjects Section */}
                         <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
                             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                                 <BookOpen className="w-5 h-5 mr-2" />
                                 Subjects Offered
                             </h2>
                             <div className="flex flex-wrap gap-2">
-                                {(profile.detials.subjects_offered || '').split(',').map((subject, index) => (
-                                    <span 
-                                        key={index}
-                                        className="px-3 py-1 bg-indigo-600/20 text-indigo-400 rounded-full text-sm"
-                                    >
+                                {profile.detials.subjects_offered.split(',').map((subject, index) => (
+                                    <span key={index} className="px-3 py-1 bg-indigo-600/20 text-indigo-400 rounded-full text-sm">
                                         {subject.trim()}
                                     </span>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Achievements Section */}
+                        {/* Education Section */}
+                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+                            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                                <GraduationCap className="w-5 h-5 mr-2" />
+                                Education
+                            </h2>
+                            <div className="space-y-4">
+                                <div className="flex items-center text-gray-300">
+                                    <span className="font-semibold mr-2">Degree:</span>
+                                    {profile.detials.degrees}
+                                </div>
+                                <div className="flex items-center text-gray-300">
+                                    <span className="font-semibold mr-2">Institution:</span>
+                                    {profile.detials.educational_institutions}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column - Stats & Contact */}
+                    <div className="space-y-8">
+                        {/* Stats Cards */}
                         <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
                             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                                 <Award className="w-5 h-5 mr-2" />
-                                Achievements
+                                Statistics
                             </h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-gray-700/50 p-4 rounded-xl">
                                     <div className="text-3xl font-bold text-indigo-400 mb-1">
-                                        {profile.courses_count || 0}
+                                        {profile.total_courses}
                                     </div>
-                                    <div className="text-gray-400">Courses Created</div>
+                                    <div className="text-gray-400">Courses</div>
                                 </div>
                                 <div className="bg-gray-700/50 p-4 rounded-xl">
                                     <div className="text-3xl font-bold text-indigo-400 mb-1">
-                                        {profile.students_count || 0}
+                                        {profile.student_count}
                                     </div>
                                     <div className="text-gray-400">Students</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Contact Info */}
+                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+                            <h2 className="text-xl font-semibold text-white mb-4">Contact Information</h2>
+                            <div className="space-y-4">
+                                <div className="flex items-center text-gray-300">
+                                    <Mail className="w-5 h-5 mr-3" />
+                                    {profile.user.email}
+                                </div>
+                                <div className="flex items-center text-gray-300">
+                                    <Phone className="w-5 h-5 mr-3" />
+                                    {profile.detials.phone_number}
+                                </div>
+                                <div className="flex items-center text-gray-300">
+                                    <MapPin className="w-5 h-5 mr-3" />
+                                    {profile.detials.address}
                                 </div>
                             </div>
                         </div>
