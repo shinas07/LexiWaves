@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import UserDashboardLayout from "./DashboardLayout";
 import { Link } from "react-router-dom";
 import { 
@@ -14,61 +14,76 @@ import {
   Calendar
 } from 'lucide-react';
 import StudyStreak from "./StudyStreak";
+import { toast } from "sonner";
+import { set } from "date-fns";
+import Loader from "../Loader";
+import api from '../../service/api';
+import { useState } from "react";
 
 const AccountDashboard = () => {
-  // Mock data - replace with actual data from your backend
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      enrolled_count: 0,
+      completed_count: 0,
+      study_hours: 0,
+      certificates: 0
+    },
+    recent_courses: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await api.get('/student/dashboard-stats/');
+        if (response.data.status === 'success') {
+          setDashboardData(response.data.data);
+        }
+      } catch (error) {
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <UserDashboardLayout>
+        <Loader />
+      </UserDashboardLayout>
+    );
+  }
+
   const stats = [
     {
       title: "Enrolled Courses",
-      value: "12",
+      value: dashboardData.stats.enrolled_count,
       icon: <BookOpen className="w-6 h-6 text-blue-400" />,
       color: "from-blue-500/20 to-transparent"
     },
-    {
-      title: "Completed Courses",
-      value: "5",
-      icon: <GraduationCap className="w-6 h-6 text-green-400" />,
-      color: "from-green-500/20 to-transparent"
-    },
-    {
-      title: "Hours Learned",
-      value: "48",
-      icon: <Clock className="w-6 h-6 text-purple-400" />,
-      color: "from-purple-500/20 to-transparent"
-    },
+    // {
+    //   title: "Completed Courses",
+    //   value: dashboardData.stats.completed_count,
+    //   icon: <GraduationCap className="w-6 h-6 text-green-400" />,
+    //   color: "from-green-500/20 to-transparent"
+    // },
+    // {
+    //   title: "Hours Learned",
+    //   value: dashboardData.stats.study_hours,
+    //   icon: <Clock className="w-6 h-6 text-purple-400" />,
+    //   color: "from-purple-500/20 to-transparent"
+    // },
     {
       title: "Certificates Earned",
-      value: "3",
+      value: dashboardData.stats.certificates,
       icon: <Award className="w-6 h-6 text-yellow-400" />,
       color: "from-yellow-500/20 to-transparent"
     }
   ];
 
-  const recentCourses = [
-    {
-      name: "Advanced English Conversation",
-      progress: 65,
-      nextLesson: "Idiomatic Expressions",
-      lastAccessed: "2 hours ago",
-      instructor: "Dr. Sarah Johnson"
-    },
-    {
-      name: "Business English Writing",
-      progress: 30,
-      nextLesson: "Email Etiquette",
-      lastAccessed: "Yesterday",
-      instructor: "Prof. Michael Smith"
-    },
-    {
-      name: "IELTS Preparation",
-      progress: 45,
-      nextLesson: "Speaking Practice",
-      lastAccessed: "3 days ago",
-      instructor: "Ms. Emily Brown"
-    }
-  ];
-
- 
   return (
     <UserDashboardLayout>
       <div className="container mx-auto p-6 space-y-6 mt-12">
@@ -116,33 +131,37 @@ const AccountDashboard = () => {
               </div>
               
               <div className="space-y-4">
-                {recentCourses.map((course, index) => (
-                  <div key={index} className="bg-gray-700/30 rounded-xl p-4 hover:bg-gray-700/50 transition-all">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-white font-medium">{course.name}</h3>
-                        <p className="text-gray-400 text-sm mt-1">Next: {course.nextLesson}</p>
-                        <p className="text-gray-500 text-xs mt-2">
-                          Instructor: {course.instructor}
-                        </p>
+                {dashboardData.recent_courses.length > 0 ? (
+                  dashboardData.recent_courses.map((course, index) => (
+                    <div key={index} className="bg-gray-700/30 rounded-xl p-4 hover:bg-gray-700/50 transition-all">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-white font-medium">{course.name}</h3>
+                          <p className="text-gray-400 text-sm mt-1">Next: {course.desc}</p>
+                          <p className="text-gray-500 text-xs mt-2">
+                            Instructor: {course.instructor}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-400">${course.amount_paid}</div>
+                          <p className="text-gray-500 text-xs mt-1">
+                            {new Date(course.lastAccessed).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-400">{course.progress}%</div>
-                        <p className="text-gray-500 text-xs mt-1">{course.lastAccessed}</p>
-                      </div>
+                     
                     </div>
-                    <div className="mt-3 bg-gray-600/50 rounded-full h-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full transition-all"
-                        style={{ width: `${course.progress}%` }}
-                      />
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-400 py-8">
+                    No courses enrolled yet
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
-          </div>
+        </div>
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <Link 
@@ -155,16 +174,16 @@ const AccountDashboard = () => {
           </Link>
           
           <Link 
-  to="/enrolled-courses"
-  className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 p-6 rounded-2xl hover:from-purple-500/30 hover:to-violet-500/30 transition-all group"
->
-  <BookOpen className="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform" />
-  <h3 className="text-white font-medium mt-4">Enrolled Courses</h3>
-  <div className="flex items-center gap-2 mt-1">
-    <span className="text-purple-400 font-semibold">12</span>
-    <p className="text-gray-400 text-sm">Active Courses</p>
-  </div>
-</Link>
+            to="/enrolled-courses"
+            className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 p-6 rounded-2xl hover:from-purple-500/30 hover:to-violet-500/30 transition-all group"
+          >
+            <BookOpen className="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform" />
+            <h3 className="text-white font-medium mt-4">Enrolled Courses</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-purple-400 font-semibold">{dashboardData.stats.enrolled_count}</span>
+              <p className="text-gray-400 text-sm">Active Courses</p>
+            </div>
+          </Link>
           
           <Link 
             to="/certificates"
