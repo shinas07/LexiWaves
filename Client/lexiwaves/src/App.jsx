@@ -32,7 +32,7 @@ import QuizPage from "./pages/UserPages/Quiz";
 import StudentUnauthorized from "./pages/UserPages/StudentUnauthorized";
 import DocsPage from "./pages/Docs";
 import LexiSupportPage from "./pages/Support";
-
+import UserConnection from "./pages/UserPages/UserInteractions/UserTutorConnection";
 //Tutor pages import
 import TutorSignUP from "./pages/TutorPags/SignUp";
 import TutorOtpVerification from "./pages/TutorPags/TutorOtp";
@@ -130,6 +130,7 @@ const App = () => {
 
 // For Tutor 
 const isTutorAllowed = () => {
+
   const isAuthenticatedUser = !!localStorage.getItem('accessToken');
   const hasSubmittedDetails = localStorage.getItem('hasSubmittedDetails') === 'true';
   const adminApproved = localStorage.getItem('adminApproved') === 'true';
@@ -142,7 +143,8 @@ const isTutorAllowed = () => {
   return (
     
     <div className="dark">
-      {<Toaster expan={false} position="top-right" />}
+      {<Toaster expan={false} position="top-right" richColors theme="dark"/>}
+   
       <Router>
         <Routes>
 
@@ -167,8 +169,11 @@ const isTutorAllowed = () => {
           <Route path="/chat/:language" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <ChatRoom />} />
           <Route path="/quiz/:courseId" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <QuizPage />} />
           <Route path='/student/unauthorized' element={<StudentUnauthorized/>}/>
-          <Route path='/docs' element={<DocsPage/>}/>
+          <Route path='/docs' element={!isAuthenticatedUser ? <Navigate to='/signin'/> : <DocsPage/>}/>
           <Route path='/lexi-support' element={<LexiSupportPage/>}/>
+
+          {/* {Chat with Tutor} */}
+          <Route path='/connect-tutor' element={<UserConnection/>}/>
 
           {/* Video call route */}
           <Route path="/video-call-room/:requestId" element={<VideoCallRoom/>}/>
@@ -182,7 +187,7 @@ const isTutorAllowed = () => {
         <Route path="/tutor-otp" element={<ProtectedRoute><TutorOtpVerification /></ProtectedRoute>}/> 
         <Route path="/tutor-signin" element={<ProtectedRoute><TutorLogin /></ProtectedRoute>}/>
         <Route path="/tutor-details" element={<TutorUnauthorizedRoute><TutorDetailForm /></TutorUnauthorizedRoute>}/>
-        <Route path="/tutor/dashboard"element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/waiting-for-approval'/>} />
+        <Route path="/tutor/dashboard" element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/waiting-for-approval'/>} />
           <Route path="/tutor-setup" element={<TutorSetup />} />
             <Route path="/tutor-requests" element={!isAuthenticatedUser ? <Navigate to="/tutor-signin" /> : <TutorRequests />} />
             <Route path="/waiting-for-approval" element={<TutorUnauthorizedRoute><WaitingForApproval /></TutorUnauthorizedRoute>} />
