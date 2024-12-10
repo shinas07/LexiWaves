@@ -96,8 +96,7 @@ const OtpVerification = () => {
             navigate('/signin');
             toast.success('Signup successful! Please log in')
         } else{
-      
-            setErrorMessage(response.data.error || "Verification failed. Please check your OTP.");
+            setErrorMessage("Verification failed. Please check your OTP.");
          
         }
     } catch (error) {
