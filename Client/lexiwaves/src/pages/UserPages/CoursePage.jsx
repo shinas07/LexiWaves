@@ -113,7 +113,7 @@ const CourseList = () => {
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [showAllCourses, setShowAllCourses] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   // Calculate pagination indexes
   const indexOfLastCourse = currentPage * itemsPerPage;
