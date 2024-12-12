@@ -65,12 +65,6 @@ const AccountDashboard = () => {
       color: "from-blue-500/20 to-transparent"
     },
     // {
-    //   title: "Completed Courses",
-    //   value: dashboardData.stats.completed_count,
-    //   icon: <GraduationCap className="w-6 h-6 text-green-400" />,
-    //   color: "from-green-500/20 to-transparent"
-    // },
-    // {
     //   title: "Hours Learned",
     //   value: dashboardData.stats.study_hours,
     //   icon: <Clock className="w-6 h-6 text-purple-400" />,
