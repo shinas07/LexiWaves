@@ -30,9 +30,6 @@ const TutorDetailForm = () => {
     // Teaching Subjects and Skills
     subjects_offered: "",
     skill_levels: "",
-
- 
-
     // Fee Structure
     hourly_rate: "",
 
