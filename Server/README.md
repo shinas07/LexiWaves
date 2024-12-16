@@ -6,3 +6,4 @@ testing ci/cd workflow after changed that prod.yml file
 correct the ALLOWED_HOST part
 add pytest on CI/CD workflow
 add pytest on CI/CD workflow
+add pytest on CI/CD workflow
