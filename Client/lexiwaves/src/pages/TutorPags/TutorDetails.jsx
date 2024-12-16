@@ -85,7 +85,7 @@ const TutorDetailForm = () => {
 
     try {
        // Make the API request without sending any token
-       const response = await axios.post('http://localhost:8000/tutor/details/', formData, {
+       const response = await api.post('/tutor/details/', formData, {
 
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -109,7 +109,6 @@ const TutorDetailForm = () => {
      
  
     } catch (error) {
-      
       toast.error('Details is already submited');
        
     } 
