@@ -1,46 +1,46 @@
-name: LexiWaves CD
+# name: LexiWaves CD
 
-on:
-  workflow_run:
-    workflows: ['LexiWaves CI']
-    types:
-      - completed
-    branches:
-      - main
+# on:
+#   workflow_run:
+#     workflows: ['LexiWaves CI']
+#     types:
+#       - completed
+#     branches:
+#       - main
 
 
-jobs:
-  deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+# jobs:
+#   deploy:
+#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
       
-      - name: Create and verify deployment files
-        run: |
-          sed "s/\${DOCKERHUB_USERNAME}/${{ secrets.DOCKERHUB_USERNAME }}/g" Server/docker-compose.prod.yml > docker-compose.prod.yml
-          echo "${{ secrets.ENV_FILE }}" > .env
+#       - name: Create and verify deployment files
+#         run: |
+#           sed "s/\${DOCKERHUB_USERNAME}/${{ secrets.DOCKERHUB_USERNAME }}/g" Server/docker-compose.prod.yml > docker-compose.prod.yml
+#           echo "${{ secrets.ENV_FILE }}" > .env
           
-      - name: Copy files to EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.prod.yml,.env"
-          target: "/home/ubuntu/lexiwaves"
+#       - name: Copy files to EC2
+#         uses: appleboy/scp-action@master
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ubuntu
+#           key: ${{ secrets.EC2_SSH_KEY }}
+#           source: "docker-compose.prod.yml,.env"
+#           target: "/home/ubuntu/lexiwaves"
           
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/lexiwaves
-            docker-compose -f docker-compose.prod.yml down || true
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d
-            docker system prune -f
+#       - name: Deploy
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ubuntu
+#           key: ${{ secrets.EC2_SSH_KEY }}
+#           script: |
+#             cd /home/ubuntu/lexiwaves
+#             docker-compose -f docker-compose.prod.yml down || true
+#             docker-compose -f docker-compose.prod.yml pull
+#             docker-compose -f docker-compose.prod.yml up -d
+#             docker system prune -f
 
 
