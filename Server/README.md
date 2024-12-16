@@ -7,3 +7,4 @@ correct the ALLOWED_HOST part
 add pytest on CI/CD workflow
 add pytest on CI/CD workflow
 add pytest on CI/CD workflow
+add pytest on CI/CD workflow
