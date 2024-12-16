@@ -19,7 +19,7 @@ const Modal = ({ isOpen, onClose }) => {
                 </p>
                 <div className="flex justify-end">
                     <button
-                        onClick={() => navigate('/tutor-dashboard')}
+                        onClick={() => navigate('/waiting-for-approval')}
                         className="bg-gradient-to-br from-blue-500 to-blue-700 text-sm text-white font-medium py-2 px-4 rounded-md shadow-lg hover:from-blue-600 hover:to-blue-800 transition ease-in-out duration-300 flex items-center"
                     >
                         Home &rarr;

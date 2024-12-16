@@ -8,6 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 const TutorDetailForm = () => {
@@ -47,7 +48,6 @@ const TutorDetailForm = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const navigate = useNavigate();
 
 
@@ -100,16 +100,13 @@ const TutorDetailForm = () => {
        if (response.status === 201) {
         setIsModalOpen(true);
       }
-
-      //  console.log("Details submitted successfully", response.data);
        toast.success("Details saved successfully!");
-      //  setShowModal(true);
-      // setIsModalOpen(true)
- 
+   
      
  
     } catch (error) {
       toast.error('Details is already submited');
+ 
        
     } 
  };
