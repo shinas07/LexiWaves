@@ -34,7 +34,6 @@ const TutorLogin = () => {
         accessToken: response.data.access,  
         refreshToken: response.data.refresh 
     }));
-      
 
     
       localStorage.setItem("accessToken", response.data.access);
@@ -42,18 +41,7 @@ const TutorLogin = () => {
       localStorage.setItem("adminApproved", response.data.admin_approved);
       localStorage.setItem('hasSubmittedDetails', response.data.has_submitted_details);
       localStorage.setItem('userRole',response.data.role)
-
-
-      if (!response.data.has_submitted_details) {
-        console.log('tutordetails subminted',response.data.has_submitted_details)
-          navigate('/tutor-details');
-      } else if (!response.data.admin_approved) {
-        console.log('admin approval',response.data.admin_approved)
-          navigate('/waiting-for-approval');
-      } else {
-        console.log('dashboard')
-          navigate('/tutor/dashboard');
-      }
+      navigate('/tutor/dashboard');
       
   } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -64,8 +52,6 @@ const TutorLogin = () => {
         setLoading(false)
       }
   }
-
-    //     localStorage.setItem("tutor", JSON.stringify({ email }));
   };
 
   useEffect(() => {
