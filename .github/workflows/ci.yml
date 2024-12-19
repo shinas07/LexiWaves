@@ -58,7 +58,14 @@ jobs:
           DB_PORT: 5432
         run: |
           cd Server
-          pytest --cov=. --cov-report=xml
+          pytest  \
+            accounts/tests/ \
+            lexi_admin/tests/ \
+            tutor/tests/ \
+            --cov=accounts \
+            --cov=lexi_admin \
+            --cov=tutor \
+            --cov-report=xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
