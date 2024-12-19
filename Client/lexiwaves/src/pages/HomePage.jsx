@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import Layout from "../components/Layout";
 import { FlipWords } from "../components/ui/flip-words";
 import TypewriterEffect from "./TutorPags/TypeWriterEffect";
@@ -10,6 +10,25 @@ import { useNavigate } from "react-router-dom";
 function Home() {
   const isAuthenticatedUser = useSelector((state) => state.auth.isAuthenticated);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const  userRole = localStorage.getItem('userRole')
+    if(isAuthenticatedUser && userRole){
+      switch (userRole){
+        case 'tutor':
+          navigate('/tutor/dashboard')
+          break;
+      case 'admin':
+        navigate('/admin-dashboard')
+        break;
+      case 'student':
+        break;
+      }
+    }
+
+  },[isAuthenticatedUser])
+
+  
 
   const handleChatRedirect = () => {
     navigate('/community-chat');
