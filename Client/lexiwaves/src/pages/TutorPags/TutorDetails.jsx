@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DotBackground } from "../../components/Background";
 import { toast } from "sonner";
 import { cn } from "../../lib/utils";
@@ -8,10 +8,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 
 const TutorDetailForm = () => {
+
   const [formData, setFormData] = useState({
     // Personal Information
     profilePicture: null,
@@ -50,9 +50,64 @@ const TutorDetailForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const adminApproved = localStorage.getItem('adminApproved');
+    const hasSubmittedDetails = localStorage.getItem('hasSubmittedDetails') === 'true';
+    if(adminApproved && hasSubmittedDetails){
+      navigate('/waiting-for-approval')
+    }
+  },[])
+
 
   const handleChange = (e) => {
     const { id, value, type, checked, files } = e.target;
+
+     // Validate Profile Picture
+     if (id === "profilePicture" && files.length > 0) {
+      const file = files[0];
+      const allowedTypes = ["image/jpeg", "image/png"]; // Allowed file types
+      const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
+
+      if (!allowedTypes.includes(file.type)) {
+          setErrors((prevErrors) => ({
+              ...prevErrors,
+              profilePicture: "Invalid file type. Please upload a JPEG or PNG."
+          }));
+          return; // Exit the function if the file type is invalid
+      } else if (file.size > maxSize) {
+          setErrors((prevErrors) => ({
+              ...prevErrors,
+              profilePicture: "File size exceeds 2 MB. Please upload a smaller file."
+          }));
+          return; // Exit the function if the file size is too large
+      } else {
+          // Clear the error if the file type and size are valid
+          setErrors((prevErrors) => ({
+              ...prevErrors,
+              profilePicture: null
+          }));
+      }
+  }
+
+
+    if (id === "identity_proof" && files.length > 0) {
+      const file = files[0];
+      const allowedTypes = ["image/jpeg", "image/png", "application/pdf"]; // Allowed file types
+
+      if (!allowedTypes.includes(file.type)) {
+          setErrors((prevErrors) => ({
+              ...prevErrors,
+              identity_proof: "Invalid file type. Please upload a JPEG, PNG, or PDF."
+          }));
+          return; // Exit the function if the file type is invalid
+      } else {
+          // Clear the error if the file type is valid
+          setErrors((prevErrors) => ({
+              ...prevErrors,
+              identity_proof: null
+          }));
+      }
+  }
     setFormData((prevData) => ({
       ...prevData,
       [id]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
@@ -132,6 +187,7 @@ const TutorDetailForm = () => {
             type="file"
             accept="image/*"
         />
+        {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
     </LabelInputContainer>
     <LabelInputContainer>
         <Label htmlFor="phone_number">Phone Number</Label>
