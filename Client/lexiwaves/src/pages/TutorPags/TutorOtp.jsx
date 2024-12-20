@@ -32,6 +32,24 @@ const TutorOtpVerification = () => {
     }
   }, []);
 
+    // Add this effect to handle navigation
+    useEffect(() => {
+      // Check if user is already verified
+      const isVerified = sessionStorage.getItem('isVerified');
+      if (isVerified === 'true') {
+        navigate('/tutor-signin', { replace: true });
+      }
+  
+      // Prevent going back
+      window.history.pushState(null, '', window.location.href);
+      const handlePopState = () => {
+        window.history.pushState(null, '', window.location.href);
+      };
+  
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }, [navigate]);
+
   const startTimer = () => {
     const interval = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -50,6 +68,7 @@ const TutorOtpVerification = () => {
     setLoading(true);
   
     const email = localStorage.getItem('userEmail');
+    console.log(email)
   
     try {
       const response = await api.post('/tutor/resend-otp/', { email });
