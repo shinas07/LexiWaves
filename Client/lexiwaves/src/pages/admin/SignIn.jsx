@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { login } from "../../redux/authSlice";
 import { useDispatch } from "react-redux";
 
-const AdminSignup = () => {
+const AdminSignin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -29,35 +29,38 @@ const AdminSignup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await api.post('/lexi-admin/admin-login/', {
                 email,
                 password
             });
-            
-            const { refresh, access,user } = response.data;
-            console.log(user)
-    
-            // localStorage.setItem('userRole',response.data.role);
-            // localStorage.setItem('accessToken', response.data.access);
-            // localStorage.setItem('refreshToken', response.data.refresh);
-            
-            dispatch(login({
-                accessToken: access,  
-                refreshToken: refresh,
-                user:user,
-                userRole:user.user_type,
-            }));
+            if (response.status === 401){
+                toast.error('Invalid credentials or not a staff user')
+            }
 
-            toast.success('SignIn Successful');
-            navigator('/admin-dashboard');
+            // Check if the response is successful
+            if (response.status === 200) {
+                const { refresh, access, user } = response.data;
+
+                dispatch(login({
+                    accessToken: access,
+                    refreshToken: refresh,
+                    user: user,
+                    userRole: user.user_type,
+                }));
+
+                toast.success('SignIn Successful');
+                navigator('/admin-dashboard');
+            } else {
+                // Handle unexpected response status
+                toast.error('Unexpected response from server');
+            }
         } catch (error) {
-            console.log(error)
-            const errorMessage = error.response?.data?.error || 'An error occurred, try again'
+            const errorMessage = error.response?.data?.error || 'An error occurred, please try again';
             toast.error(errorMessage);
-        }finally{
-            setLoading(false)
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -192,4 +195,4 @@ const Label = React.forwardRef(({ className, ...props }, ref) => (
     />
 ));
 
-export default AdminSignup;
+export default AdminSignin;
