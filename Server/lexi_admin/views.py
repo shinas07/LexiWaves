@@ -53,7 +53,7 @@ class AdminLoginView(APIView):
                 }
             }, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Invalid credentials or not a staff user"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Invalid credentials or not a staff user"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentListView(APIView):
@@ -99,6 +99,7 @@ class TutorRequests(APIView):
 
     def get(self, request):
         tutors = User.objects.filter(user_type='tutor', tutor_profile__tutordetails__admin_approved=False) 
+        print(tutors)
         serializer = TutorRequestSerializer(tutors, many=True) 
         return Response(serializer.data)
 
@@ -148,7 +149,11 @@ class LanguageCreateView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = LanguageSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save()
+            language = serializer.save()
+            chatroom = ChatRoom.objects.create(
+                language=language,
+                name=f"Community for {language}"
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({"error": "Invalid data", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
