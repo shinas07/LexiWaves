@@ -322,7 +322,6 @@ class AdminDashboardView(APIView):
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Dashboard Error: {str(e)}")
             return Response({
                 'error': 'Failed to fetch dashboard statistics',
                 'details': str(e)
@@ -410,7 +409,6 @@ class AdminReportsView(APIView):
             })
 
         except Exception as e:
-            print(f"Error in reports: {str(e)}")
             return Response(
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -463,7 +461,6 @@ class AdminRevenueView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Error in revenue details: {str(e)}")
             return Response(
                 {'error': 'Failed to fetch revenue details'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
