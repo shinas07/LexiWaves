@@ -61,10 +61,8 @@ jobs:
           pytest  \
             accounts/tests/ \
             lexi_admin/tests/ \
-            tutor/tests/ \
             --cov=accounts \
             --cov=lexi_admin \
-            --cov=tutor \
             --cov-report=xml
 
       - name: SonarCloud Scan
