@@ -117,19 +117,6 @@ const WaitingForApproval = () => {
 
                     {/* Action Cards */}
                     <div className="grid md:grid-cols-2 gap-4 mt-8">
-                    <motion.div>  
-                    <Link 
-                        to="/tutor-details"  
-                        className="group p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300 block"
-                    >
-                        <h3 className="text-white text-lg font-semibold mb-2">
-                            Complete Profile
-                        </h3>
-                        <p className="text-gray-400 text-sm">
-                            Ensure all your details are up to date
-                        </p>
-                    </Link>
-                </motion.div>
                 <motion.div  
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}

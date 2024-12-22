@@ -3,8 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import api from '../../service/api';
 import { toast } from 'sonner';
-import { DotBackground } from '../../components/Background';
 import TutorDashboardLayout from './TutorDashboardLayout';
+import Loader from '../Loader';
 
 
 const CreateQuiz = () => {
@@ -14,10 +14,31 @@ const CreateQuiz = () => {
     const [questions, setQuestions] = useState([{ text: '', answers: [{ text: '', isCorrect: false }] }]);
     const searchParams = new URLSearchParams(location.search);
     const courseName = searchParams.get('courseTitle') || 'Untitled Course';
+    const [existingQuiz, setExistingQuiz] = useState(null);
+    const [course, setCourse] = useState(null);
+    const [loading, setLoading] = useState(true)
+    const isApproved = searchParams.get('isApproved')
+
+    
 
     useEffect(() => {
+        const fetchExistingQuiz = async () => {
+            try{
+                const response = await api.get(`tutor/courses/${courseId}/quiz/`);
+                if (response.data && response.data.length > 0){
+                    setExistingQuiz({questions: response.data});
+                }
+                console.log(response.data)
+            } catch(error){
+                return
+            }finally{
+                setLoading(false);
+            }
+        };
+         fetchExistingQuiz();
         window.scroll(0,0)
-    },[])
+    },[courseId])
+
 
     const handleQuestionChange = (index, value) => {
         const newQuestions = [...questions];
@@ -67,7 +88,6 @@ const CreateQuiz = () => {
         try {
 
             const token = localStorage.getItem('accessToken');
-            console.log(courseId)
             const response = await api.post(`tutor/courses/${courseId}/quiz/`, {
                 questions: questions.map(q => ({
                     text: q.text,
@@ -79,10 +99,76 @@ const CreateQuiz = () => {
             toast.success('Quiz created successfully!');
             navigate(`/tutor/courses/details/${courseId}`);
         } catch (error) {
-            console.error('Error creating quiz:', error);
+            console.error('Error creating quiz:');
             toast.error('Failed to create quiz. Please try again.');
         }
     };
+
+    if (loading) {
+        return (
+            <TutorDashboardLayout>
+               <Loader/>
+            </TutorDashboardLayout>
+        );
+    }
+
+
+    
+    if (isApproved === 'false') {
+        return (
+            <TutorDashboardLayout>
+                <div className="container mx-auto p-4 mt-12 min-h-screen">
+                    <h1 className="text-3xl font-bold mb-6 mt-6 text-center text-red-500">
+                        You are not allowed to create a quiz after getting approval.
+                    </h1>
+                    <p className="text-center text-neutral-200">
+                    You can only get permission to create a quiz after receiving approval
+                    </p>
+                </div>
+            </TutorDashboardLayout>
+        );
+    }
+
+
+
+
+    if (existingQuiz) {
+        return (
+            <TutorDashboardLayout>
+                <div className="container mx-auto p-4 mt-12 min-h-screen">
+                    <h1 className="text-3xl font-bold mb-6 mt-6 text-center text-neutral-200">
+                        Existing Quiz for<span className='ml-2 text-neutral-100'>{courseName}</span>
+                    </h1>
+                    
+                    <div className="space-y-6">
+                        {existingQuiz.questions && existingQuiz.questions.map((question, index) => (
+                            <div key={question.id} className="bg-white p-6 rounded-lg shadow-md">
+                                <h2 className="text-xl font-semibold mb-4">
+                                    Question {index + 1}: {question.text}
+                                </h2>
+                                <div className="space-y-2">
+                                    {question.answers && question.answers.map((answer) => (
+                                        <div key={answer.id} 
+                                            className={`p-2 rounded ${
+                                                answer.is_correct 
+                                                    ? 'bg-green-100 border-green-500' 
+                                                    : 'bg-gray-50'
+                                            }`}
+                                        >
+                                            {answer.text}
+                                            {answer.is_correct && (
+                                                <span className="ml-2 text-green-600">(Correct Answer)</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </TutorDashboardLayout>
+        );
+    }
 
     return (
         <TutorDashboardLayout>

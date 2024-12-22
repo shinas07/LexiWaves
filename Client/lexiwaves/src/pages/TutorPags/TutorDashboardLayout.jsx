@@ -128,7 +128,7 @@ const TutorDashboardLayout = ({ children }) => {
 
   const SidebarLink = ({ link }) => {
     return (
-      <Link to={link.to} className="flex items-center p-2 hover:bg-indigo-500 hover:text-white transition-all duration-300">
+      <Link to={link.to} className="flex items-center p-2 hover:bg-gray-900 hover:text-white hover:rounded-xl transition-all duration-300">
         {link.icon}
         <span className="ml-3">{link.label}</span>
       </Link>
@@ -136,7 +136,7 @@ const TutorDashboardLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-800 flex">
+    <div className="min-h-screen flex">
       <div className={cn("flex flex-col md:flex-row w-full border-x border-neutral-200 dark:border-neutral-700 overflow-hidden")}>
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-10">
@@ -147,8 +147,8 @@ const TutorDashboardLayout = ({ children }) => {
                   <SidebarLink key={idx} link={link} />
                 ))}
               </div>
-              <div className="flex items-center mt-4 cursor-pointer" onClick={openLogoutModal}>
-                <IconLogout className="text-neutral-700 ml-2 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+              <div className="flex items-center hover:bg-gray-900 hover:rounded-xl py-2 mt-2  cursor-pointer" onClick={openLogoutModal}>
+                <IconLogout className="text-neutral-700 ml-3 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
                 <span className="ml-2 text-white">Logout</span>
               </div>
             </div>
@@ -157,8 +157,11 @@ const TutorDashboardLayout = ({ children }) => {
 
         <div className="flex-1  bg-gray-50 dark:bg-neutral-900">
           {/* Main Content Header with Project Name */}
-          <div className="bg-indigo-600 text-white p-6 flex items-center justify-between">
+          <div className="bg-gray-800/50 text-white p-6 flex items-center justify-between">
+          <div className='w-12 flex gap-4'>
+            <img className='rounded-full' src="https://i.imghippo.com/files/qJMT7659cYw.jpg"></img>
             <h1 className="text-3xl font-semibold">lexiWaves</h1>
+            </div>
             <div className="flex items-center">
               <IconUser className="h-6 w-6 mr-2" />
               <span className="text-lg">Welcome, Tutor</span>

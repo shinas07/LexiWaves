@@ -32,7 +32,6 @@ const TutorChatRoom = () => {
             }
           });
           setEmail(response.data.email);
-          console.log(response.data)
         } catch (error) {
           toast.error('Failed to load UserName');
         } finally {
@@ -68,7 +67,6 @@ const TutorChatRoom = () => {
         websocket.current.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log('Received data:', data);
 
             if (data.type === 'chat_message') {
               setMessages(prev => [...prev, {

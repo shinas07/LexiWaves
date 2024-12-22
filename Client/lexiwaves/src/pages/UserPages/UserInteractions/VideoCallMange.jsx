@@ -10,7 +10,9 @@ import {
 import api from '../../../service/api';
 import { useNavigate } from 'react-router-dom';
 
-const VideoCallSection = ({ tutorId, courseId, setParentCount }) => {
+
+const VideoCallSection = ({ tutorId, courseId }) => {
+
   const [requestStatus, setRequestStatus] = useState('idle');
   const [existingRequest, setExistingRequest] = useState(null);
   const [timeUntilCall, setTimeUntilCall] = useState(null);
@@ -28,14 +30,12 @@ const VideoCallSection = ({ tutorId, courseId, setParentCount }) => {
         
         if (response.data.request) {
           setExistingRequest(response.data.request);
-          setParentCount(response.data.count)
           setRequestStatus(response.data.request.status);
         }
       } catch (error) {
         toast.error('Error checking request:');
       }
     };
-
     checkExistingRequest();
   }, [tutorId, courseId]);
 
@@ -51,7 +51,7 @@ const VideoCallSection = ({ tutorId, courseId, setParentCount }) => {
           checkExistingRequest(); // Refresh the request data
           setIsExpired(true);
         } catch (error) {
-          console.error('Failed to mark call as expired:', error);
+          console.error('Failed to mark call as expired:');
         }
       }
     };
@@ -175,18 +175,7 @@ const VideoCallSection = ({ tutorId, courseId, setParentCount }) => {
               </h4>
               <div className="space-y-3">
                 
-                {/* {!existingRequest.is_reviewed && (
-                  <div className="mt-4">
-                    <Button
-                      onClick={() => navigate(`/review-session/${existingRequest.id}`)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 
-                               rounded-lg flex items-center gap-2 mx-auto"
-                    >
-                      <Star className="w-5 h-5" />
-                      Leave Review
-                    </Button>
-                  </div>
-                )} */}
+            
 
                 <Button
                   // onClick={() => setRequestStatus('idle')}
@@ -289,7 +278,6 @@ const VideoCallSection = ({ tutorId, courseId, setParentCount }) => {
     }
 
     // Check for expired status
-    console.log(existingRequest.scheduledTime)
     const isCallExpired = new Date(existingRequest.scheduled_time).getTime() + (60 * 60 * 1000) < new Date().getTime();
     
     if (isCallExpired || isExpired) {

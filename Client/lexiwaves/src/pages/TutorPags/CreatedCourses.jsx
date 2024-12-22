@@ -36,7 +36,6 @@ const TutorCreatedCourses = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response.data)
 
         if (response.status === 200) {
           setCourses(response.data);
@@ -184,7 +183,7 @@ const TutorCreatedCourses = () => {
                             Edit
                           </Link>
                           <Link
-                            to={`/create-quiz/${course.id}`}
+                            to={`/create-quiz/${course.id}?courseTitle=${encodeURIComponent(course.title)}&isApproved=${course.is_approved}`}
                             className="text-green-400 hover:text-green-300 transition duration-300"
                           >
                             Quiz

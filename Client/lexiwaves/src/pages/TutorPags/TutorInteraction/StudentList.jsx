@@ -31,8 +31,9 @@ const InteractionStudentsList = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      
+  
       const formattedStudents = response.data.map(student => ({
+        student_id: student.student_id,
         id: student.id,
         name: student.student_name,
         email: student.student_email,
@@ -43,7 +44,6 @@ const InteractionStudentsList = () => {
       
       setStudents(formattedStudents);
     } catch (error) {
-      console.error('Error fetching students:', error);
       toast.error('Failed to load students');
     } finally {
       setLoading(false);
@@ -140,7 +140,7 @@ const InteractionStudentsList = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2 pr-12">
                         <button
-                          onClick={() => handleMessageClick(student.id)}
+                          onClick={() => handleMessageClick(student.student_id)}
                           className="p-2 rounded-full hover:bg-gray-600 text-gray-300 hover:text-white transition-colors relative"
                         >
                           <MessageCircle className="h-5 w-5" />

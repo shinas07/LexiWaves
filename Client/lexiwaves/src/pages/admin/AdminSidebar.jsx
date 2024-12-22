@@ -48,7 +48,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       <aside className={`bg-white dark:bg-neutral-900 transition-all duration-300 ${isOpen ? 'w-64' : 'w-20'} overflow-hidden border-r border-neutral-200 dark:border-neutral-700`}>
         <div className="p-5">
           <Link to="/admin-dashboard" className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20">
-            <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+            <div className='w-12'>
+            <img className='rounded-full' src="https://i.imghippo.com/files/qJMT7659cYw.jpg"></img>
+            </div>
             {isOpen && <span className="font-medium whitespace-pre">LexiWaves Admin</span>}
           </Link>
           <nav className="mt-8">

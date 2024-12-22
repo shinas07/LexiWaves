@@ -14,7 +14,7 @@ const TutorDetailForm = () => {
 
   const [formData, setFormData] = useState({
     // Personal Information
-    profilePicture: null,
+    profile_picture: null,
     phone_number: "",
     address: "",
     biography:"",
@@ -63,7 +63,7 @@ const TutorDetailForm = () => {
     const { id, value, type, checked, files } = e.target;
 
      // Validate Profile Picture
-     if (id === "profilePicture" && files.length > 0) {
+     if (id === "profile_picture" && files.length > 0) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png"]; // Allowed file types
       const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
@@ -71,22 +71,27 @@ const TutorDetailForm = () => {
       if (!allowedTypes.includes(file.type)) {
           setErrors((prevErrors) => ({
               ...prevErrors,
-              profilePicture: "Invalid file type. Please upload a JPEG or PNG."
+              profile_picture: "Invalid file type. Please upload a JPEG or PNG."
           }));
           return; // Exit the function if the file type is invalid
       } else if (file.size > maxSize) {
           setErrors((prevErrors) => ({
               ...prevErrors,
-              profilePicture: "File size exceeds 2 MB. Please upload a smaller file."
+              profile_picture: "File size exceeds 2 MB. Please upload a smaller file."
           }));
           return; // Exit the function if the file size is too large
       } else {
           // Clear the error if the file type and size are valid
           setErrors((prevErrors) => ({
               ...prevErrors,
-              profilePicture: null
+              profile_picture: null
           }));
       }
+
+          setFormData((prevData) => ({
+        ...prevData,
+        [id]: type === "checkbox" ? checked : type === "file" ? files[0] : value, // Ensure files[0] is used
+    }));
   }
 
 
@@ -135,7 +140,7 @@ const TutorDetailForm = () => {
     if(!validate())
       return
 
-    const token = localStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken');
 
 
     try {
@@ -146,11 +151,6 @@ const TutorDetailForm = () => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
       }
-
-      
-
-
-
        });
        if (response.status === 201) {
         setIsModalOpen(true);
@@ -160,7 +160,9 @@ const TutorDetailForm = () => {
      
  
     } catch (error) {
+      console.log(error)
       toast.error('Details is already submited');
+      navigate('/waiting-for-approval')
  
        
     } 
@@ -180,14 +182,14 @@ const TutorDetailForm = () => {
           <h3 className="font-semibold text-white text-lg mb-4">Personal Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <LabelInputContainer>
-        <Label htmlFor="profilePicture">Profile Picture</Label>
+        <Label htmlFor="profile_picture">Profile Picture</Label>
         <Input
-            id="profilePicture"
+            id="profile_picture"
             onChange={handleChange}
             type="file"
             accept="image/*"
         />
-        {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
+        {errors.profile_picture && <p className="text-red-500 text-sm">{errors.profile_picture}</p>}
     </LabelInputContainer>
     <LabelInputContainer>
         <Label htmlFor="phone_number">Phone Number</Label>

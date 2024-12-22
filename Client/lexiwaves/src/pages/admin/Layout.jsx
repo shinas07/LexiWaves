@@ -12,10 +12,10 @@ export default function Layout({ children }) {
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-2xl text-gray-700 dark:text-gray-300">
             {sidebarOpen ? '⮜' : '☰'}
           </button>
-          <div className="flex items-center space-x-4">
-            {/* <button className="text-xl text-gray-700 dark:text-gray-300">🔔</button> */}
+          {/* <div className="flex items-center space-x-4">
+            <button className="text-xl text-gray-700 dark:text-gray-300">🔔</button>
             <button className="text-xl text-gray-700 dark:text-gray-300">👤</button>
-          </div>
+          </div> */}
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-neutral-800">
           <div className="container mx-auto px-6 py-8">

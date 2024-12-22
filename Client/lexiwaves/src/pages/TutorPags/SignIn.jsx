@@ -41,7 +41,6 @@ const TutorLogin = () => {
       localStorage.setItem("adminApproved", response.data.admin_approved);
       localStorage.setItem('hasSubmittedDetails', response.data.has_submitted_details);
       localStorage.setItem('userRole',response.data.role)
-      navigate('/tutor/dashboard');
       
   } catch (error) {
       if (error.response && error.response.status === 401) {

@@ -20,7 +20,6 @@ const StudyStreak = () => {
     const fetchStreakData = async () => {
         try {
             const response = await api.get('student/study-streak/');
-            console.log(response.data)
             setStreakData(response.data);
         } catch (error) {
             console.error('Failed to fetch streak data:');

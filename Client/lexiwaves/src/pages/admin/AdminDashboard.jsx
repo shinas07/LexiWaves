@@ -16,22 +16,9 @@ export default function AdminDashboard() {
     totalCourses: 0,
   });
 
-  const [revenueData, setRevenueData] = useState([
-    { month: 'Jan', totalRevenue: 4000, adminRevenue: 1000, tutorRevenue: 3000 },
-    { month: 'Feb', totalRevenue: 5000, adminRevenue: 1250, tutorRevenue: 3750 },
-    { month: 'Mar', totalRevenue: 6000, adminRevenue: 1500, tutorRevenue: 4500 },
-    { month: 'Apr', totalRevenue: 7000, adminRevenue: 1750, tutorRevenue: 5250 },
-    { month: 'May', totalRevenue: 8000, adminRevenue: 2000, tutorRevenue: 6000 },
-    { month: 'Jun', totalRevenue: 9000, adminRevenue: 2250, tutorRevenue: 6750 },
-  ]);
+  const [revenueData, setRevenueData] = useState([]);
 
-  const [enrollmentData, setEnrollmentData] = useState([
-    { course: 'English Basic', students: 120, completionRate: 85 },
-    { course: 'French A1', students: 90, completionRate: 78 },
-    { course: 'German Basic', students: 75, completionRate: 82 },
-    { course: 'English Advanced', students: 60, completionRate: 90 },
-    { course: 'Spanish Basic', students: 45, completionRate: 75 },
-  ]);
+  const [enrollmentData, setEnrollmentData] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -43,11 +30,12 @@ export default function AdminDashboard() {
       const response = await api.get('/lexi-admin/dashboard-view/', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log(response.data)
       setStats(response.data.stats);
       setRevenueData(response.data.revenueData);
       setEnrollmentData(response.data.enrollmentData);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error('Error fetching dashboard data:');
     } finally {
       setLoading(false);
     }

@@ -223,7 +223,7 @@ const handleChange = (e) => {
           toast.success('Course created successfully!');
           navigate('/tutor-course-list');
         } else {
-          console.log('Something went wrong', response);
+          toast.error('Something went wrong');
         }
       } catch (error) {
         toast.error('Failed to create course');
@@ -239,7 +239,6 @@ const handleChange = (e) => {
   // Loader
   const Loader = ({ progress }) => {
     const [message, setMessage] = useState('Preparing your course...');
-    console.log(progress)
   
     useEffect(() => {
       if (progress < 20) {

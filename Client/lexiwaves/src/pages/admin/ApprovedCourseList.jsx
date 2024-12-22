@@ -61,21 +61,6 @@ export default function ApprovedCoursesPage() {
     setFilteredCourses(filtered);
   }, [searchTerm, coursesData]);
 
-  const handleDelete = async (courseId) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      await api.delete(`/lexi-admin/delete-course/${courseId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success("Course deleted successfully!");
-      setCoursesData((prevData) => prevData.filter((course) => course.id !== courseId));
-    } catch (error) {
-      toast.error("Failed to delete course.");
-    }
-  };
-
   const handleViewDetails = (courseId) => {
     navigate(`/admin-course-details/${courseId}`);
   };
@@ -159,12 +144,6 @@ export default function ApprovedCoursesPage() {
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200 mr-2"
                           >
                             View Details
-                          </button>
-                          <button
-                            onClick={() => handleDelete(course.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
-                          >
-                            Delete
                           </button>
                         </td>
                       </tr>

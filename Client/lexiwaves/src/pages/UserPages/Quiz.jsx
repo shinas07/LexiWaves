@@ -27,11 +27,21 @@ const Countdown = ({ startTime, onComplete }) => {
     }, [onComplete]);
 
     return (
-        <DotBackground>
-        <div className="text-2xl text-white">
-            Starting in {timeLeft} seconds...
+        <DotBackground>        
+            <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-2">
+                Starting in
+            </h2>
+            <span className="text-4xl font-bold text-indigo-400">
+                {timeLeft}
+            </span>
+            <span className="text-2xl text-white ml-2">
+                seconds...
+            </span>
         </div>
-        </DotBackground>
+    </div>
+</DotBackground>
     );
 };
 
@@ -46,6 +56,7 @@ const QuizPage = () => {
     const [timeLeft, setTimeLeft] = useState(100); 
     const [quizCompleted, setQuizCompleted] = useState(false);
     const [hasQuiz, setHasQuiz] = useState(true);
+    const [quizResults, setQuizResults] = useState(null);
 
     useEffect(() => {
         fetchQuizQuestions();
@@ -58,31 +69,36 @@ const QuizPage = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             
-            const quizData = response.data.quiz_data;
+            console.log('Quiz Response:', response.data);
             
-            // Check if quiz exists and hasn't been passed
-            if (!quizData || quizData.total_questions === 0) {
-                setHasQuiz(false);
-                setLoading(false);
-                return;
-            }
+            if (response.data.status === 'success') {
+                // Check if quiz exists
+                if (!response.data.quiz_data || response.data.quiz_data.total_questions === 0) {
+                    setHasQuiz(false);
+                    toast.error("No quiz available for this course");
+                    return;
+                }
 
-            // If user has already passed, redirect
-            if (quizData.passed) {
-                toast.success("You've already passed this quiz!");
-                navigate(-1);
-                return;
-            }
+                // If user has already passed
+                if (response.data.quiz_data.passed) {
+                    toast.success("You've already passed this quiz!");
+                    navigate(-1);
+                    return;
+                }
 
-            // If there's a previous attempt and it wasn't passed
-            if (quizData.has_attempted && !quizData.passed) {
-                toast.info(`Previous best score: ${quizData.best_score || 0}%`);
+                // Set the questions from the response
+                const quizQuestions = response.data.questions || [];
+                if (quizQuestions.length > 0) {
+                    setQuestions(quizQuestions);
+                    setLoading(false);
+                } else {
+                    setHasQuiz(false);
+                    toast.error("No questions available in this quiz");
+                }
             }
-
-            setQuestions(response.data.questions || []);
-            setLoading(false);
         } catch (error) {
             console.error('Failed to load quiz questions:', error);
+            toast.error("Failed to load quiz questions");
             setLoading(false);
             setHasQuiz(false);
         }
@@ -114,31 +130,42 @@ const QuizPage = () => {
         if (currentQuestion === questions.length - 1) {
             try {
                 const token = localStorage.getItem('accessToken');
-                const response = await api.post(`/student/course-quiz/validate`, {
-                    course_id: courseId,
-                    answers: answers
-                }, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const formattedAnswers = {};
                 
-                const score = response.data.score || 0;
-                const passed = response.data.passed;
+                // Format answers for submission
+                Object.keys(answers).forEach(questionId => {
+                    formattedAnswers[questionId] = answers[questionId].id;
+                });
 
-                if (passed) {
-                    toast.success(`Congratulations! You passed with ${score}%`);
+                const response = await api.post(
+                    `/student/courses/${courseId}/quiz/validate/`, 
+                    {
+                        answers: formattedAnswers
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+                
+                const { quiz_results, message } = response.data;
+
+                if (quiz_results.passed) {
+                    toast.success(message);
                 } else {
-                    toast.error(`You scored ${score}%. Need 70% to pass.`);
+                    toast.error(message);
                 }
 
+                // Show detailed results
+                setQuizResults(quiz_results);
                 setQuizCompleted(true);
                 setQuizStarted(false);
+                
             } catch (error) {
-                console.error('Failed to validate answers:', error);
+                console.error('Failed to submit quiz:', error);
                 toast.error("Failed to submit quiz. Please try again.");
             }
         } else {
             setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1));
-            setTimeLeft(prev => prev - 10);
         }
     };
     
@@ -305,13 +332,6 @@ const QuizPage = () => {
                     )}
 
                     <div className="flex justify-between">
-                        <button
-                            onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
-                            disabled={currentQuestion === 0}
-                            className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-                        >
-                            Previous
-                        </button>
                         
                         {currentQuestion === questions.length - 1 ? (
                             <button

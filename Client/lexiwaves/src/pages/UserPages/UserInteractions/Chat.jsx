@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import api from '../../../service/api';
 import Loader from '../../Loader';
 import { Send as SendIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const formatMessageTime = (timestamp) => {
   if (!timestamp) return '';
@@ -44,6 +45,9 @@ const ChatSection = ({ roomId }) => {
   const [username, setUsername] = useState('');
   const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [isConnected, setIsConnected] = useState(false);
+  const reconnectTimeoutRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,75 +77,107 @@ const ChatSection = ({ roomId }) => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    const connectWebSocket = () => {
-      if (!roomId) {
-        // console.error('Invalid room ID');
-        setConnectionStatus('error');
-        return;
-      }
+  const disconnectWebSocket = () => {
+    if (websocket.current && isConnected) {
+      websocket.current.close(1000, 'User left the chat');
+      websocket.current = null;
+      setIsConnected(false);
+    }
+  };
 
-      if (websocket.current) {
-        websocket.current.close();
-      }
+  const connectWebSocket = () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token || !roomId) return;
 
-      try {
-        const wsUrl = `ws://127.0.0.1:8000/ws/classchat/${roomId}/`;
-        // console.log('Attempting connection to:', wsUrl);
+      websocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/classchat/${roomId}/`);
+
+      websocket.current.onopen = () => {
+        console.log('WebSocket Connected');
+        setIsConnected(true);
+        setConnectionStatus('connected');
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+        }
+      };
+
+      websocket.current.onclose = (event) => {
+        console.log('WebSocket Closed:', event.code);
+        setIsConnected(false);
+        setConnectionStatus('disconnected');
         
-        websocket.current = new WebSocket(wsUrl);
+        if (event.code !== 1000) {
+          reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
+        }
+      };
 
-        websocket.current.onopen = () => {
-          // console.log('WebSocket Connected Successfully');
-          setConnectionStatus('connected');
-        };
-
-        websocket.current.onclose = (e) => {
-          // console.log('WebSocket Closed:', e);
-          setConnectionStatus('disconnected');
-        };
-
-        websocket.current.onerror = (error) => {
-          // console.error('WebSocket Error:', error);
-          setConnectionStatus('error');
-        };
-
-        websocket.current.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-     
-            if (data.type === 'chat_message') {
-              setMessages(prev => [...prev, {
-                message: data.message,
-                email: data.email,
-                timestamp: data.message.timestamp || new Date().toISOString()
-              }]);
-            } else if (data.type === 'chat_history') {
-              setMessages(data.messages.map(msg => ({
-                ...msg,
-                timestamp: msg.timestamp || new Date().toISOString()
-              })));
-            }
-          } catch (error) {
-            console.error('Error parsing message:', error);
-          }
-        };
-      } catch (error) {
-        console.error('Error creating WebSocket:', error);
+      websocket.current.onerror = (error) => {
+        console.error('WebSocket Error:', error);
         setConnectionStatus('error');
-      }
-    };
+      };
 
+      websocket.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+     
+          if (data.type === 'chat_message') {
+            setMessages(prev => [...prev, {
+              message: data.message,
+              email: data.email,
+              timestamp: data.message.timestamp || new Date().toISOString()
+            }]);
+          } else if (data.type === 'chat_history') {
+            setMessages(data.messages.map(msg => ({
+              ...msg,
+              timestamp: msg.timestamp || new Date().toISOString()
+            })));
+          }
+        } catch (error) {
+          console.error('Error parsing message:');
+        }
+      };
+    } catch (error) {
+      console.error('Error creating WebSocket:', error);
+      setConnectionStatus('error');
+    }
+  };
+
+  useEffect(() => {
     connectWebSocket();
 
     return () => {
-      const isLoggingOut = !localStorage.getItem('accessToken');
-      if (isLoggingOut && websocket.current) {
-        websocket.current.close();
+      if (websocket.current) {
+        websocket.current.close(1000, 'Component unmounting');
         websocket.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
       }
     };
   }, [roomId]);
+
+  useEffect(() => {
+    const pingInterval = setInterval(() => {
+      if (websocket.current?.readyState === WebSocket.OPEN) {
+        websocket.current.send(JSON.stringify({ type: 'ping' }));
+      }
+    }, 30000);
+
+    return () => clearInterval(pingInterval);
+  }, []);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !isConnected) {
+        connectWebSocket();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isConnected]);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -156,7 +192,6 @@ const ChatSection = ({ roomId }) => {
 
         setMessage('');
       } catch (error) {
-        console.error('Error sending message:', error);
         toast.error('Error Sending Message');
       }
     }

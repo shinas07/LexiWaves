@@ -1,71 +1,111 @@
-
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { DotBackground } from '../../components/Background';
+import { BookOpen, Clock, DollarSign, Users, Award, ChevronRight } from 'lucide-react';
 
+const FeatureCard = ({ icon: Icon, title, description }) => (
+ <div className="bg-gray-800/50 backdrop-blur-sm p-6  rounded-xl border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300">
+   <div className="flex items-start space-x-4">
+     <div className="p-3 bg-indigo-500/10 rounded-lg">
+       <Icon className="w-6 h-6 text-indigo-400" />
+     </div>
+     <div>
+       <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+       <p className="text-gray-400 leading-relaxed">{description}</p>
+     </div>
+   </div>
+ </div>
+);
 const TutorLearnMore = () => {
+ const features = [
+   {
+     icon: Clock,
+     title: "Flexible Schedule",
+     description: "Set your own hours and work when it's convenient for you."
+   },
+   {
+     icon: DollarSign,
+     title: "Competitive Pay",
+     description: "Earn competitive rates based on your expertise and experience."
+   },
+   {
+     icon: Users,
+     title: "Global Reach",
+     description: "Connect with students from around the world."
+   },
+   {
+     icon: Award,
+     title: "Professional Growth",
+     description: "Access training and development opportunities."
+   }
+ ];
   return (
-    <DotBackground>
-      <div className="max-w-5xl mx-auto p-8 mt-12 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">Learn More About LexiWaves</h1>
-        
-        <section className="mb-8 text-white">
-          <h2 className="text-3xl font-semibold mb-4">About LexiWaves</h2>
-          <p className="text-lg mb-4">
-            LexiWaves is an innovative online platform designed to connect students with qualified tutors. 
-            Our mission is to provide personalized learning experiences that empower students to achieve their academic goals.
-          </p>
-        </section>
-
-        <section className="mb-8 text-white">
-          <h2 className="text-3xl font-semibold mb-4">How to Become a Tutor</h2>
-          <p className="text-lg mb-4">
-            Becoming a tutor on LexiWaves is simple and rewarding. Follow these steps to get started:
-          </p>
-          <ol className="list-decimal list-inside text-lg space-y-2">
-            <li>Sign up on our website and create your tutor profile.</li>
-            <li>Complete the application process, including submitting your qualifications.</li>
-            <li>Once approved, you can start offering your tutoring services to students.</li>
-            <li>Set your own schedule and rates to fit your availability and expertise.</li>
-          </ol>
-        </section>
-
-        <section className="mb-8 text-white">
-          <h2 className="text-3xl font-semibold mb-4">What You Will Get</h2>
-          <p className="text-lg mb-4">
-            As a tutor on LexiWaves, you will enjoy numerous benefits, including:
-          </p>
-          <ul className="list-disc list-inside text-lg space-y-2">
-            <li>Flexible scheduling to accommodate your availability.</li>
-            <li>Access to a wide range of students seeking help in various subjects.</li>
-            <li>Competitive pay rates based on your qualifications and experience.</li>
-            <li>Support from our dedicated team to help you succeed.</li>
-            <li>Opportunities for professional development and training.</li>
-          </ul>
-        </section>
-
-        <section className="mb-8 text-white">
-          <h2 className="text-3xl font-semibold mb-4">Join Us Today!</h2>
-          <p className="text-lg mb-4">
-            Ready to make a difference in students' lives? Join LexiWaves today and start your journey as a tutor!
-          </p>
-          <Link 
-            to="/tutor-signup" 
-            className="mt-4 inline-block bg-blue-600 text-white rounded-md px-6 py-3 transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-          >
-            Sign Up Now
-          </Link>
-        </section>
-
-        <div className="text-center">
-          <Link to="/" className="text-blue-400 text-sm hover:underline">
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    </DotBackground>
-  );
+   <DotBackground>
+     <div className="max-w-6xl mx-auto p-6  lg:p-8 space-y-16 py-16">
+       {/* Hero Section */}
+       <div className="text-center mt-8 space-y-6">
+         <h1 className="text-4xl lg:text-5xl font-bold text-white">
+           Begin Your Teaching Journey with{" "}
+           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+             LexiWaves
+           </span>
+         </h1>
+         <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+           Join our community of expert tutors and make a difference in students' lives while growing your teaching career.
+         </p>
+       </div>
+        {/* Features Grid */}
+       <div className="grid md:grid-cols-2 gap-6">
+         {features.map((feature, index) => (
+           <FeatureCard key={index} {...feature} />
+         ))}
+       </div>
+        {/* How to Become a Tutor */}
+       <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50">
+         <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+           <BookOpen className="w-8 h-8 mr-3 text-indigo-400" />
+           How to Become a Tutor
+         </h2>
+         <div className="space-y-6">
+           {[
+             "Create your professional profile",
+             "Submit your qualifications for review",
+             "Get approved and set up your courses",
+             "Start teaching and earning"
+           ].map((step, index) => (
+             <div key={index} className="flex items-center space-x-4">
+               <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">
+                 {index + 1}
+               </div>
+               <p className="text-gray-300">{step}</p>
+             </div>
+           ))}
+         </div>
+       </div>
+        {/* CTA Section */}
+       <div className="text-center space-y-6">
+         <h2 className="text-3xl font-bold text-white">Ready to Start Teaching?</h2>
+         <p className="text-gray-400 max-w-2xl mx-auto">
+           Join LexiWaves today and become part of our growing community of educators making a difference.
+         </p>
+         <div className="space-x-4">
+           <Link 
+             to="/tutor-signup" 
+             className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200"
+           >
+             Get Started
+             <ChevronRight className="w-5 h-5 ml-2" />
+           </Link>
+           <Link 
+             to="/" 
+             className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all duration-200"
+           >
+              Home
+           </Link>
+         </div>
+       </div>
+     </div>
+   </DotBackground>
+ );
 };
-
 export default TutorLearnMore;

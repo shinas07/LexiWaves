@@ -3,12 +3,15 @@ import { useParams } from 'react-router-dom';
 import api from '../../service/api';
 import Layout from './Layout';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function TutorDetail() {
   const { tutorId } = useParams();
   const [tutor, setTutor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchTutorDetail = async () => {
@@ -44,6 +47,8 @@ export default function TutorDetail() {
         }
       );
       setTutor({ ...tutor, admin_approved: status });
+      toast.success('approved successful')
+      navigate('/admin-tutor-requests')
     } catch (error) {
       setError('Failed to update approval status');
     }
@@ -102,13 +107,6 @@ export default function TutorDetail() {
                 disabled={tutor.admin_approved}
               >
                 {tutor.admin_approved ? 'Approved' : 'Approve'}
-              </button>
-              <button
-                className={`px-4 py-2 ${!tutor.admin_approved ? 'bg-gray-300' : 'bg-red-500 hover:bg-red-600'} text-white rounded`}
-                onClick={() => handleApproval(false)}
-                disabled={!tutor.admin_approved}
-              >
-                {!tutor.admin_approved ? 'Disapproved' : 'Disapprove'}
               </button>
             </div>
           </div>

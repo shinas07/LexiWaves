@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 
 const AdminProtectedRoute = ({ children }) => {
     const userRole = useSelector((state) => state.auth.userRole)
-    console.log('admin only',userRole)
 
     if (userRole !== 'admin'){
         return <Navigate to='/admin-unauthorized'/>

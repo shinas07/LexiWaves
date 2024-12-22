@@ -11,6 +11,7 @@ const CourseAndQuizDetails = () => {
     const navigate = useNavigate()
     const [course, setCourse] = useState(null)
     const [loading, setLoading] = useState(true)
+
     
     useEffect(() => {
         const fetchCourseDetails = async () => {
@@ -22,7 +23,6 @@ const CourseAndQuizDetails = () => {
                 });
                 setCourse(response.data);
             } catch (error) {
-                console.log('error ',error)
                 toast.error('Failed to fetch course details');
             } finally {
                 setLoading(false);
@@ -31,6 +31,7 @@ const CourseAndQuizDetails = () => {
         fetchCourseDetails()
 
     },[courseId]);
+
 
     if (loading) {
         return (

@@ -50,6 +50,7 @@ export default function CourseApprovingPage() {
           course.id === courseId ? { ...course, is_approved: !isApproved } : course
         )
       );
+      navigate('/admin-Approved-courses-list')
     } catch (error) {
       toast.error("Failed to update course approval status.");
     }

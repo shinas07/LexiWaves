@@ -28,6 +28,7 @@ const StudentCourseChats = () => {
 
   const fetchStudentAndCourses = async () => {
     try {
+     
      const token = localStorage.getItem('accessToken')
       const response = await api.get(`interaction/chat-boxes/${studentId}/`,{
         headers: {
@@ -38,7 +39,7 @@ const StudentCourseChats = () => {
       setStudent(response.data.student);
       setCourses(response.data.courses);
     } catch (error) {
-      toast.error('Failed to load student courses');
+      toast.error('Failed to load student chatbox');
     } finally {
       setLoading(false);
     }

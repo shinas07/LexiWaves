@@ -27,7 +27,6 @@ const CourseEdit = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setCourse(response.data);
-                console.log(response.data)
             } catch (error) {
                 setError('Failed to fetch course details');
             } finally {

@@ -37,9 +37,18 @@ ChartJS.register(
 );
 
 const TutorDashboard = () => {
+
+  useEffect(() => {
+    const adminApproved = localStorage.getItem('adminApproved') === 'false';
+    if(adminApproved){
+      navigate('/waiting-for-approval')
+    }
+  },[])
+
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]); // To store student data
+  const [data, setData] = useState([]); 
   const [revenueData, setRevenueData] = useState({
     labels: [],
     datasets: [{
@@ -51,6 +60,9 @@ const TutorDashboard = () => {
   });
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalStudents, setTotalStudents] = useState(0);
+  const [activeCourses, setActiveCourses] = useState(0);
+  const [monthlyEarnings, setMonthlyEarnings] = useState(0);
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -64,15 +76,18 @@ const TutorDashboard = () => {
           },
         });
         setData(studentResponse.data); // Setting the response data to state
+        console.log('student details', studentResponse)
 
         // Fetch revenue details
-        const revenueResponse = await api.get('tutor/revenue/', { // Adjusted endpoint
+        const revenueResponse = await api.get('tutor/dashboard-details/', { // Adjusted endpoint
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
         setTotalRevenue(revenueResponse.data.total_revenue); // Set total revenue from response
-        setTotalStudents(studentResponse.data.length); // Total students from the student data
+        setTotalStudents(studentResponse.data.length);
+        setActiveCourses(revenueResponse.data.active_courses_count)
+        setMonthlyEarnings(revenueResponse.data.monthly_earnings)
 
         // Prepare revenue chart data
         setRevenueData({
@@ -93,6 +108,8 @@ const TutorDashboard = () => {
     };
     fetchDashboardData();
   }, []);
+
+  
 
   if (loading) {
     return (
@@ -117,14 +134,14 @@ const TutorDashboard = () => {
     },
     { 
       title: "Active Courses", 
-      value: "12", // This can also be fetched dynamically if needed
+      value: activeCourses, 
       icon: <BookOpen className="w-6 h-6" />,
       color: "bg-purple-500/10 text-purple-500"
     },
     { 
-      title: "Course Views", 
-      value: "2.4K", // This can also be fetched dynamically if needed
-      icon: <TrendingUp className="w-6 h-6" />,
+      title: "This Month's Earnings", 
+      value: `$${monthlyEarnings}`, // This can also be fetched dynamically if needed
+      icon: <Calendar className="w-6 h-6" />,
       color: "bg-orange-500/10 text-orange-500"
     }
   ];

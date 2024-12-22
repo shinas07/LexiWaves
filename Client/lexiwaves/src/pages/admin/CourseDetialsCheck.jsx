@@ -31,7 +31,7 @@ export default function CourseDetailsCheckPage() {
 
     return (
         <Layout>
-        <div className="flex flex-col items-center p-6 text-white min-h-screen">
+        <div className="flex flex-col items-center p-6  text-white min-h-screen">
             {loading && (
                 <div className="flex items-center justify-center h-40">
                     <Loader className="animate-spin h-10 w-10 text-indigo-500" />
@@ -60,19 +60,19 @@ export default function CourseDetailsCheckPage() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="bg-gray-800 p-4 rounded-lg text-center">
                                     <span className="block text-indigo-400 text-sm">Category</span>
-                                    <span className="text-xl font-semibold">{course.category}</span>
+                                    <span className="text-xl md:text-sm font-semibold">{course.category}</span>
                                 </div>
                                 <div className="bg-gray-800 p-4 rounded-lg text-center">
                                     <span className="block text-indigo-400 text-sm">Price</span>
-                                    <span className="text-xl font-semibold">${course.price}</span>
+                                    <span className="text-xl md:text-sm font-semibold">${course.price}</span>
                                 </div>
                                 <div className="bg-gray-800 p-4 rounded-lg text-center">
                                     <span className="block text-indigo-400 text-sm">Duration</span>
-                                    <span className="text-xl font-semibold">{course.duration}h</span>
+                                    <span className="text-xl md:text-sm font-semibold">{course.duration}h</span>
                                 </div>
                                 <div className="bg-gray-800 p-4 rounded-lg text-center">
                                     <span className="block text-indigo-400 text-sm">Difficulty</span>
-                                    <span className="text-xl font-semibold">{course.difficulty}</span>
+                                    <span className="text-xl md:text-sm font-semibold">{course.difficulty}</span>
                                 </div>
                             </div>
                         </div>
