@@ -143,7 +143,7 @@ function Home() {
                 description: "Face off against friends, colleagues, and a thriving community. Let the spirit of competition drive you toward mastering your language skills."
               }
             ].map((feature, index) => (
-              <div key={index} className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] rounded-2xl p-8 hover:bg-white/[0.05] transition-colors">
+              <div key={index} className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] rounded-2xl p-8  transition-colors">
                 <h2 className="text-2xl font-semibold mb-4">{feature.title}</h2>
                 <p className="text-neutral-400 text-sm leading-relaxed">
                   {feature.description}
