@@ -99,7 +99,6 @@ class TutorRequests(APIView):
 
     def get(self, request):
         tutors = User.objects.filter(user_type='tutor', tutor_profile__tutordetails__admin_approved=False) 
-        print(tutors)
         serializer = TutorRequestSerializer(tutors, many=True) 
         return Response(serializer.data)
 
@@ -259,13 +258,13 @@ class AdminDashboardView(APIView):
                 total=Sum('amount')
             )['total'] or 0
 
+
             stats = {
                 'totalRevenue': float(total_admin_revenue),  # This is now actual admin revenue (10%)
                 'totalStudents': User.objects.filter(user_type='student', is_active=True).count(),
-                'totalTutors': User.objects.filter(user_type='tutor', is_active=True).count(),
+                'totalTutors': TutorDetails.objects.filter(tutor__user__user_type='tutor', admin_approved=True).count(),
                 'totalCourses': Course.objects.filter(is_approved=True).count(),
             }
-
             # Get monthly revenue data from AdminRevenue
             revenue_data = AdminRevenue.objects.filter(
                 create_at__gte=start_of_year
@@ -322,6 +321,7 @@ class AdminDashboardView(APIView):
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
+
             return Response({
                 'error': 'Failed to fetch dashboard statistics',
                 'details': str(e)
