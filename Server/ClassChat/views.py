@@ -70,13 +70,9 @@ class AllCourseChatBoxesView(APIView):
             enrollments = StudentCourseEnrollment.objects.filter(
                 user_id=student_id,
                 course__tutor=request.user,
-                payment_status='completed'
-            ).select_related('user', 'course').annotate(
-                latest_request_time=Subquery(latest_requests)
-            ).order_by('-latest_request_time', '-created_at')  
+                payment_status='completed')
 
             if not enrollments.exists():
-                print('working not enrollement part')
                 return Response(
                     {'error': 'Student not found'}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -98,7 +94,6 @@ class AllCourseChatBoxesView(APIView):
                     'course_name': enrollment.course.title,
                     'room_id': chat_room.room_id,
                     'created_at': enrollment.created_at,
-                    'latest_request_time': enrollment.latest_request_time
                 })
 
             response_data = {
@@ -109,11 +104,9 @@ class AllCourseChatBoxesView(APIView):
                 },
                 'courses': courses_data
             }
-            print(response_data)
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(str(e))
             return Response(
                 {'error': 'Failed to fetch chat boxes'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
