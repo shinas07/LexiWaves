@@ -10,10 +10,13 @@ services:
       - redis
     expose:
       - 8000
+    volumes:
+       - /run/daphne:/run/daphne
     command: >
       sh -c "
         python manage.py migrate accounts &&
         python manage.py migrate &&
+        mkdir -p /run/daphne &&
         daphne -u /run/daphne/daphne.sock lexiWaves.asgi:application
       "
   db:
