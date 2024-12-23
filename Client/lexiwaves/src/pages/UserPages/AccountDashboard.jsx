@@ -180,7 +180,7 @@ const AccountDashboard = () => {
           </Link>
           
           <Link 
-            to="/certificates"
+            to="/student/certificates"
             className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-6 rounded-2xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all group"
           >
             <Award className="w-8 h-8 text-green-400 group-hover:scale-110 transition-transform" />
