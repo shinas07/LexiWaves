@@ -5,6 +5,7 @@ from rest_framework import serializers
 from accounts.models import User
 
 class TutorStudentListSerializer(serializers.ModelSerializer):
+    student_id = serializers.IntegerField(source='user.id')
     student_name = serializers.CharField(source='user.first_name')
     student_email = serializers.CharField(source='user.email')
     course_name = serializers.CharField(source='course.title')
@@ -14,6 +15,7 @@ class TutorStudentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentCourseEnrollment
         fields = [
+            'student_id',
             'id',
             'student_name',
             'student_email',
