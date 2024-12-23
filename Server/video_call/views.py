@@ -36,7 +36,6 @@ class UserVideoCallRequestView(APIView):
             active_request = VideoCallRequest.objects.filter(student=student,tutor=tutor,course=course,
                                                              status__in=['pending','accepted']).first()
             
-            print(active_request)
             if(active_request):
                 return Response({
                     'details':'You already have an active request for this course.',
@@ -108,7 +107,6 @@ class CheckVideoRequestView(APIView):
                 tutor_id=tutor_id,
                 course_id=course_id
             ).latest('created_at')
-            print(request)
 
             serializer = VideoCallRequestSerializer(request)
             return Response({
@@ -131,12 +129,12 @@ class StudentVideoRequestsView(APIView):
             
             student = User.objects.get(id=student_id)
             requests = VideoCallRequest.objects.filter(student=student,tutor=request.user).order_by('-created_at')
-
             serializer = VideoCallRequestSerializer(requests, many=True)
             
             return Response({'requests': serializer.data}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
+
             return Response({'error': 'Student not found'},status=status.HTTP_404_NOT_FOUND)
 
 class VideoCallRequestView(APIView):
@@ -216,7 +214,6 @@ def handle_video_call_request(request, request_id):
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
-        print(str(e))
         return Response(
             {'error': str(e)}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -228,23 +225,17 @@ class AgoraVideoCallTokenView(APIView):
     
     def get(self, request, request_id):
         try:
-            print(f"Processing token request for video call ID: {request_id}")
-            print(f"Authenticated user: {request.user.email}")
             
             video_request = VideoCallRequest.objects.get(id=request_id)
-            print(f"Found video request: ID={video_request.id}, Status={video_request.status}")
-            print(f"Request participants: Student={video_request.student.email}, Tutor={video_request.tutor.email}")
+
             
             if request.user not in [video_request.student, video_request.tutor]:
-                print(f"Authorization failed: User {request.user.email} not authorized")
-                print('error')
                 return Response(
                     {'error': 'Not authorized for this video call'},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
             if video_request.status != 'accepted':
-                print(f"Status check failed: Current status is {video_request.status}")
                 return Response(
                     {'error': 'Call must be accepted before joining'},
                     status=status.HTTP_403_FORBIDDEN
@@ -267,7 +258,6 @@ class AgoraVideoCallTokenView(APIView):
                 role=1,
                 privilegeExpiredTs=privilegeExpiredTs
             )
-            print('the responce sended')
             return Response({
                 "token": token,
                 "channelName": channel_name,
@@ -283,7 +273,6 @@ class AgoraVideoCallTokenView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print("Error:", str(e))
             return Response(
                 {"error": str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -344,7 +333,6 @@ class MarkVideoCallExpiredView(APIView):
 
             video_request.status = 'expired'
             video_request.save()
-            print('saved as expired')
 
             return Response({'status':'expired'})
         except VideoCallRequest.DoesNotExist:
