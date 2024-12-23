@@ -39,38 +39,26 @@ let refreshInProgress = false;
 api.interceptors.response.use(
     response => response,
     async (error) => {
-        // We can’t use React hooks like `useNavigate` or `useDispatch` here, so we’ll use them outside the interceptor
-        if (error.response.status === 401 && !error.config._retry && !refreshInProgress) {
-            error.config._retry = true; // Prevent infinite retry loop
-
-             // Prevent infinite refresh loop
-             refreshInProgress = true;
+        if (error.response?.status === 401 && !error.config._retry && !refreshInProgress) {
+            error.config._retry = true;
+            refreshInProgress = true;
 
             try {
                 const accessToken = await refreshAccessToken();
                 error.config.headers['Authorization'] = `Bearer ${accessToken}`;
-                return api(error.config); // Retry the original request
+                return api(error.config);
             } catch (refreshError) {
-                // Handle the failure to refresh the token
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 toast.info('Session expired. Please log in again.');
-
-                // Redirect to login (from a component using navigate or history)
-                window.location.href = "/"; // This can be replaced with React's `navigate("/signin")` if you handle routing better.
-
-                // Dispatch logout action
-                const dispatch = useDispatch(); // Make sure this is used in a React component
-                dispatch(logout());
-
-                return Promise.reject(refreshError); // Reject the refresh error
-            }finally{
-                
-                refreshInProgress = false
+                window.history.pushState({}, '', '/signin');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                return Promise.reject(refreshError);
+            } finally {
+                refreshInProgress = false;
             }
         }
-
-        return Promise.reject(error); // Handle other errors
+        return Promise.reject(error);
     }
 );
 
