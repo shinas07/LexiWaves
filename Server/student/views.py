@@ -6,8 +6,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import status,generics, viewsets
 from accounts.serializers import CourseSerializer
 from tutor.models import Lesson
-from .models import UserLesson,StudyStreak
-from .serializers import UserLessonSerializer, TutorSerializer, TutorProfileShowingSerializer,TutorInteractionSerializer,StreakSerializer,StudeyActivitySerializer
+from .models import UserLesson,StudyStreak, Certificate
+from .serializers import UserLessonSerializer, TutorSerializer, TutorProfileShowingSerializer,TutorInteractionSerializer,StreakSerializer,StudeyActivitySerializer, certificateSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from tutor.models import Question,QuizAttempt,Answer
@@ -86,7 +86,6 @@ class CourseQuizView(APIView):
     def get(self, request, course_id):
         try:
             course = get_object_or_404(Course, id=course_id)
-            print(course)
             
             # Get questions for this course
             questions = Question.objects.filter(course=course)
@@ -103,6 +102,7 @@ class CourseQuizView(APIView):
                 course=course
             ).order_by('-score').first()
 
+            # Prepare quiz data
             quiz_data = {
                 'total_questions': questions.count(),
                 'best_score': best_attempt.score if best_attempt else None,
@@ -111,105 +111,194 @@ class CourseQuizView(APIView):
                 'has_attempted': best_attempt is not None
             }
 
+            # Prepare questions with their answers
+            questions_data = []
+            for question in questions:
+                answers = question.answers.all()  # Assuming you have a related_name='answers'
+                answers_data = [
+                    {
+                        'id': answer.id,
+                        'text': answer.text,
+                        # Don't send is_correct to frontend for security
+                    } for answer in answers
+                ]
+                
+                questions_data.append({
+                    'id': question.id,
+                    'text': question.text,
+                    'answers': answers_data
+                })
+
             return Response({
                 'status': 'success',
                 'course_title': course.title,
-                'quiz_data': quiz_data
+                'quiz_data': quiz_data,
+                'questions': questions_data  # Add questions to response
             })
-
+            
         except Exception as e:
-            print(f"Error in CourseQuizListView: {str(e)}")
             return Response({
                 'status': 'error',
                 'message': str(e)
             }, status=500)
         
 
-    def post(self, request, course_id):
-        """Submit and validate quiz answers"""
-        try:
-            # Validate input
-            if not request.data.get('answers'):
-                return Response({
-                    'error': 'No answers provided'
-                }, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request, course_id):
+    #     """Submit and validate quiz answers"""
+    #     try:
+    #         # Validate input
+    #         if not request.data.get('answers'):
+    #             return Response({
+    #                 'error': 'No answers provided'
+    #             }, status=status.HTTP_400_BAD_REQUEST)
 
-            course = get_object_or_404(Course, id=course_id)
-            user_answers = request.data.get('answers')
+    #         course = get_object_or_404(Course, id=course_id)
+    #         user_answers = request.data.get('answers')
             
-            # Get all questions for this course
-            questions = Question.objects.filter(
-                course_id=course_id
-            ).prefetch_related('answers')
+    #         # Get all questions for this course
+    #         questions = Question.objects.filter(
+    #             course_id=course_id
+    #         ).prefetch_related('answers')
 
-            if not questions.exists():
+    #         if not questions.exists():
+    #             return Response({
+    #                 'error': 'No questions found for this course'
+    #             }, status=status.HTTP_404_NOT_FOUND)
+
+    #         # Calculate score
+    #         total_questions = questions.count()
+    #         correct_answers = 0
+
+    #         for question in questions:
+    #             user_answer_id = user_answers.get(str(question.id))
+    #             if user_answer_id:
+    #                 is_correct = Answer.objects.filter(
+    #                     id=user_answer_id,
+    #                     question=question,
+    #                     is_correct=True
+    #                 ).exists()
+    #                 if is_correct:
+    #                     correct_answers += 1
+
+    #         # Calculate percentage
+    #         score = (correct_answers / total_questions) * 100
+    #         passed = score >= 70  # 70% passing threshold
+
+    #         # Save quiz attempt
+    #         QuizAttempt.objects.create(
+    #             user=request.user,
+    #             course=course,
+    #             score=score,
+    #             passed=passed
+    #         )
+
+    #         # Prepare detailed response
+    #         response_data = {
+    #             'score': score,
+    #             'passed': passed,
+    #             'total_questions': total_questions,
+    #             'correct_answers': correct_answers,
+    #             'message': 'Congratulations! You passed the quiz!' if passed 
+    #                       else 'Keep practicing and try again.',
+    #             'feedback': []
+    #         }
+
+    #         # Add detailed feedback for each question
+    #         for question in questions:
+    #             user_answer_id = user_answers.get(str(question.id))
+    #             correct_answer = question.answers.filter(is_correct=True).first()
+                
+    #             response_data['feedback'].append({
+    #                 'question': question.text,
+    #                 'correct': user_answer_id and Answer.objects.filter(
+    #                     id=user_answer_id,
+    #                     is_correct=True
+    #                 ).exists(),
+    #                 'correct_answer': correct_answer.text if correct_answer else None
+    #             })
+
+    #         return Response(response_data, status=status.HTTP_200_OK)
+
+    #     except Course.DoesNotExist:
+    #         return Response({
+    #             'error': 'Course not found'
+    #         }, status=status.HTTP_404_NOT_FOUND)
+    #     except Exception as e:
+    #         return Response({
+    #             'error': str(e)
+    #         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class QuizValidationView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, course_id):
+        try:
+            course = get_object_or_404(Course, id=course_id)
+            user_answers = request.data.get('answers', {})
+            if not user_answers:
                 return Response({
-                    'error': 'No questions found for this course'
-                }, status=status.HTTP_404_NOT_FOUND)
+                    'status': 'error',
+                    'message': 'No answers provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
 
-            # Calculate score
+            questions = Question.objects.filter(course=course).prefetch_related('answers')
             total_questions = questions.count()
+            if total_questions == 0:
+                return Response({
+                    'status': 'error',
+                    'message': 'No questions found for this course'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Calculate score
             correct_answers = 0
-
+            question_feedback = []
             for question in questions:
-                user_answer_id = user_answers.get(str(question.id))
-                if user_answer_id:
-                    is_correct = Answer.objects.filter(
-                        id=user_answer_id,
-                        question=question,
-                        is_correct=True
-                    ).exists()
+                question_id = str(question.id)
+                user_answer_id = user_answers.get(question_id)
+                
+                correct_answer = question.answers.filter(is_correct=True).first()
+                
+                is_correct = False
+                if user_answer_id and correct_answer:
+                    is_correct = str(user_answer_id) == str(correct_answer.id)
                     if is_correct:
                         correct_answers += 1
-
-            # Calculate percentage
-            score = (correct_answers / total_questions) * 100
-            passed = score >= 70  # 70% passing threshold
-
-            # Save quiz attempt
-            QuizAttempt.objects.create(
+                question_feedback.append({
+                    'question_text': question.text,
+                    'is_correct': is_correct,
+                    'correct_answer': correct_answer.text if correct_answer else None
+                })
+            # Calculate final score
+            score = round((correct_answers / total_questions) * 100, 2)
+            passed = score >= 70
+            # Save the attempt
+            quiz_attempt = QuizAttempt.objects.create(
                 user=request.user,
                 course=course,
                 score=score,
-                passed=passed
+                passed=passed,
+                date_attempted=timezone.now()
             )
-
-            # Prepare detailed response
             response_data = {
-                'score': score,
-                'passed': passed,
-                'total_questions': total_questions,
-                'correct_answers': correct_answers,
+                'status': 'success',
+                'quiz_results': {
+                    'score': score,
+                    'passed': passed,
+                    'total_questions': total_questions,
+                    'correct_answers': correct_answers,
+                    'attempt_date': quiz_attempt.date_attempted.strftime("%Y-%m-%d %H:%M"),
+                    'feedback': question_feedback
+                },
                 'message': 'Congratulations! You passed the quiz!' if passed 
-                          else 'Keep practicing and try again.',
-                'feedback': []
+                            else 'Keep practicing! You need 70% to pass.'
             }
-
-            # Add detailed feedback for each question
-            for question in questions:
-                user_answer_id = user_answers.get(str(question.id))
-                correct_answer = question.answers.filter(is_correct=True).first()
-                
-                response_data['feedback'].append({
-                    'question': question.text,
-                    'correct': user_answer_id and Answer.objects.filter(
-                        id=user_answer_id,
-                        is_correct=True
-                    ).exists(),
-                    'correct_answer': correct_answer.text if correct_answer else None
-                })
-
             return Response(response_data, status=status.HTTP_200_OK)
-
-        except Course.DoesNotExist:
-            return Response({
-                'error': 'Course not found'
-            }, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({
-                'error': str(e)
+                'status': 'error',
+                'message': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 # Course Enrolled Student Details
 class CourseEnrolledStudentsView(APIView):
@@ -218,7 +307,7 @@ class CourseEnrolledStudentsView(APIView):
 
     def get(self, request, *args, **kwargs):
         # Fetch enrolled courses for the authenticated user
-        enrollments = StudentCourseEnrollment.objects.filter(user=request.user).select_related('course')
+        enrollments = StudentCourseEnrollment.objects.filter(course__tutor=request.user).select_related('course')
         serializer = StudentCourseEnrollmentListSerializer(enrollments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -258,7 +347,6 @@ class StudyStreakViewSet(APIView):
     def post(self, request):
         course_id = request.data.get('course_id')
         duration = request.data.get('duration')
-        print(course_id, duration)
 
         if not all([course_id]):
             return Response({'error':'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
@@ -281,13 +369,13 @@ class StudentDashboardStatsView(APIView):
             enrolled_courses = StudentCourseEnrollment.objects.filter(
                 user=user,
             ).select_related('course', 'course__tutor')
-             
+            certificate_count = Certificate.objects.filter(user=request.user).count()
             # Basic stats
             stats = {
                 'enrolled_count': enrolled_courses.count(),
                 'completed_count': enrolled_courses.filter(payment_status='completed').count(),
                 'study_hours': enrolled_courses.filter(payment_status='completed').count() * 2,
-                'certificates': 0
+                'certificates': certificate_count
             }
 
             # Get recent courses
@@ -316,3 +404,84 @@ class StudentDashboardStatsView(APIView):
                 'status': 'error',
                 'message': str(e)
             }, status=500)
+
+# Quiz Certificate Download
+class CertificateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        try:
+            course = get_object_or_404(Course, id=course_id)
+
+            quiz_attempt = QuizAttempt.objects.filter(
+                user=request.user,
+                course=course,
+                passed=True
+            ).first()
+
+            if not quiz_attempt:
+                return Response({
+                    'status':'error',
+                    'message': 'You have not passed the quiz for this course'
+                },status=status.HTTP_403_FORBIDDEN)
+            
+            certificate, created = Certificate.objects.get_or_create(
+                user=request.user,
+                course=course,
+                defaults={'issue_date': timezone.now()}
+            )
+
+            serializer = certificateSerializer(certificate)
+            data = serializer.data
+            print(data)
+
+            data.update({
+                'course_description': course.description,
+               'issue_date': certificate.issue_date.strftime("%Y-%m-%d"),
+            })
+
+            return Response({
+                'status':'success',
+                'data' : data
+            })
+        
+        except Exception as e:
+           print(str(e))
+           return Response({
+               'status': 'error',
+               'message': str(e)
+           }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AllCertificateViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = certificateSerializer
+
+    def get(self, request):
+        try:
+            certificates = Certificate.objects.filter(user=request.user).select_related('course', 'user')
+            
+            if not certificates.exists():
+                return Response(
+                    {'message': 'No certificates found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            data = [{
+                'id': cert.id,
+                'certificate_id': str(cert.certificate_id), 
+                'course_id': cert.course.id,
+                'course_title': cert.course.title,
+                'issue_date': cert.issue_date.strftime('%B %d, %Y'),
+                'is_valid': cert.is_valid,
+                'created_at': cert.issue_date
+            } for cert in certificates]
+            
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print('Error details:', str(e))
+            return Response(
+                {'error': 'Failed to fetch certificates'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
