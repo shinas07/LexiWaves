@@ -10,3 +10,4 @@ add pytest on CI/CD workflow
 add pytest on CI/CD workflow
 testing CI/CD workflow 
 test the sonarqube scaning
+test the sonarqube scaning
