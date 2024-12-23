@@ -20,7 +20,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
         
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f'chat_{self.room_name}'
+        self.room_group_name = f"chat_{self.room_name.replace(' ', '_')}"
 
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -122,11 +122,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def authenticate_user(self):
         token = self.scope['query_string'].decode().split('=')[1]
-        logger.info(token)
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
             user = await database_sync_to_async(get_user_model().objects.get)(id=payload['user_id'])
-            logger.info(user)
             return user
         except jwt.ExpiredSignatureError:
             await self.close()
