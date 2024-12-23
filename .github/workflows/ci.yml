@@ -72,10 +72,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=your_project_key
+            -Dsonar.projectKey= ${{ secrets.PROJECT_KEY }}
             -Dsonar.sources=.
             -Dsonar.coverageReportPaths=coverage.xml
-
+ 
   build-and-push:
     needs: analyze-and-build
     runs-on: ubuntu-latest
