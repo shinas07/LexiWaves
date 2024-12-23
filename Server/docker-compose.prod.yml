@@ -14,7 +14,7 @@ services:
       sh -c "
         python manage.py migrate accounts &&
         python manage.py migrate &&
-        daphne -p 8000 lexiWaves.asgi:application  
+        daphne -b 0.0.0.0 -p 8000 lexiWaves.asgi:application 
       "
   db:
     image: postgres:13
