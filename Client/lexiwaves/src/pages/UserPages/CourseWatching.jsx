@@ -3,12 +3,10 @@ import { useParams, useNavigate, useAsyncError } from 'react-router-dom';
 import api from '../../service/api';
 import { DotBackground } from '../../components/Background';
 import FloatingNavbar from '../../components/Navbar';
-import { FaCheckCircle, FaLock } from 'react-icons/fa';
+import { FaCheckCircle, FaLock, FaCertificate } from 'react-icons/fa';
 import Quiz from './Quiz';
 import Loader from '../Loader';
 import { toast } from 'sonner';
-import { duration } from '@mui/material';
-// import { toast } from 'react-hot-toast';
 
 const CourseWatchingPage = () => {
     const { courseId } = useParams();
@@ -18,8 +16,6 @@ const CourseWatchingPage = () => {
     const [currentLessonVideo, setCurrentLessonVideo] = useState(null);
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [completedLessons, setCompletedLessons] = useState([]);
-    const [quizStarted, setQuizStarted] = useState(false);
-    const [quizCompleted, setQuizCompleted] = useState(false);
     const [showCertificate, setShowCertificate] = useState(false);
     const [quizQuestions, setQuizQuestions] = useState([]);
     const [quizScore, setQuizScore] = useState(null);
@@ -28,6 +24,11 @@ const CourseWatchingPage = () => {
     const videoRef = useRef(null);
     const watchTimeRef = useRef(0);
     const MINIMUM_WATCH_TIME = 300;
+    const [quizStatus, setQuizStatus] = useState({
+        passed: false,
+        hasAttempted: false
+    });
+
     const [accumulatedWatchTime, setAccumulatedWatchTime] = useState(0);
     const [dailyStreak, setDailyStreak] = useState({
         hasStreakToday: false,
@@ -60,7 +61,26 @@ const CourseWatchingPage = () => {
                 setLoading(false)
             }
         };
-    
+        
+        // checking status of quiz 
+        const checkQuizStatus = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await api.get(`/student/course-quiz/${courseId}/`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                
+                if (response.data.status === 'success') {
+                    setQuizStatus({
+                        passed: response.data.quiz_data.passed,
+                        hasAttempted: response.data.quiz_data.has_attempted
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch quiz status:', error);
+            }
+        };
+         checkQuizStatus()
         fetchCourse();
     }, [courseId]);
 
@@ -97,7 +117,7 @@ const CourseWatchingPage = () => {
         const duration = Math.floor(videoRef.current.duration);
         const today = new Date().toDateString();
         const lastRecordedStreak = localStorage.getItem('lastRecordedStreak');
-        const MINIMUM_WATCH_TIME = 10
+        const MINIMUM_WATCH_TIME = 20
     
         if (currentTime >= MINIMUM_WATCH_TIME && 
             lastRecordedStreak !== today && 
@@ -195,8 +215,8 @@ const CourseWatchingPage = () => {
                             )}
                         </div>
 
-                        {/* Quiz Section */}
-                        <div className="mt-6 bg-gray-800 rounded-lg p-6 transition-all duration-300 ease-in-out">
+                        {/* Quiz and Certificate Section */}
+                        <div className="mt-6 bg-gray-800 rounded-lg p-6">
                             <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
                                 Course Quiz
                                 {allLessonsCompleted ? (
@@ -205,47 +225,45 @@ const CourseWatchingPage = () => {
                                     <FaLock className="ml-2 text-yellow-500" />
                                 )}
                             </h2>
+                            
                             {!allLessonsCompleted ? (
                                 <p className="text-yellow-300 text-sm mb-4">
                                     Complete all lessons to unlock the quiz!
                                 </p>
-                            ) : !quizCompleted ? (
+                            ) : quizStatus.passed ? (
+                                <div className="space-y-4">
+                                    <div className="bg-green-500/20 border border-green-500 rounded-lg p-4">
+                                        <p className="text-green-400 font-semibold mb-4">
+                                            🎉 Congratulations! You've successfully passed the quiz!
+                                        </p>
+                                        <button 
+                                            onClick={() => navigate(`/certificate/download/${courseId}`)}
+                                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 flex items-center justify-center gap-2"
+                                        >
+                                            <FaCertificate className="text-xl" />
+                                            Download Your Certificate
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
                                 <>
                                     <p className="text-white text-sm mb-4">
-                                        Congratulations on completing all lessons! You're now ready to take the quiz.
+                                        Ready to test your knowledge? Take the quiz now!
                                     </p>
                                     <button 
                                         onClick={handleStartQuiz}
-                                        className="bg-blue-500 text-sm hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+                                        className="bg-blue-500 text-sm hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                                     >
                                         Start Quiz
                                     </button>
                                 </>
-                            ) : (
-                                <p className="text-green-300 text-sm mb-4">
-                                    Quiz completed! You can now generate your certificate.
-                                </p>
                             )}
                         </div>
-
-                        {/* Certificate Generator */}
-                        {showCertificate && (
-                            <div className="mt-6 bg-gray-800 rounded-lg p-6 transition-all duration-300 ease-in-out">
-                                <h2 className="text-2xl font-bold mb-4 text-white">Congratulations!</h2>
-                                <p className="text-gray-300 text-sm mb-4">You've completed the course and passed the quiz. Generate your certificate now!</p>
-                                <button 
-                                    onClick={handleGenerateCertificate}
-                                    className="bg-yellow-500 text-sm hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
-                                >
-                                    Generate Certificate
-                                </button>
-                            </div>
-                        )}
                     </div>
 
                     {/* Lesson List */}
                     <div>
-                        <div className="bg-gray-800 rounded-lg p-4">
+                        <div className="bg-gray-800 mt-12 rounded-lg p-4">
                             <h2 className="text-xl font-semibold mb-4 text-white">Lessons</h2>
                             <ul className="space-y-2">
                                 {course.lessons.length > 0 ? (
