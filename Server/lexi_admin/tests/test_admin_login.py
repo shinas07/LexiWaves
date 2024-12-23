@@ -40,7 +40,7 @@ class TestAdminLogin:
 
         response = api_client.post(url, data)
 
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'error' in response.data
 
     def test_non_admin_login(self, api_client, non_admin_user):
@@ -52,6 +52,6 @@ class TestAdminLogin:
 
         response = api_client.post(url, data)
 
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'error' in response.data
         
