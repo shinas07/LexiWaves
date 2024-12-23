@@ -30,4 +30,5 @@ EXPOSE 8000
 RUN mkdir -p /app/staticfiles /app/mediafiles
 
 # Run the application.
-CMD ["python","manage.py","runserver"]
+# CMD ["python","manage.py","runserver"]
+CMD ["daphne", "-u", "/run/daphne/daphne.sock", "lexiWaves.asgi:application"]
