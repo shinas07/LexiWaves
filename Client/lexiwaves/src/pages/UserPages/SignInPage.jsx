@@ -48,10 +48,10 @@ const Login = () => {
             toast.success('Login successful!')
             navigator('/');
         }catch(error){
-            if (error.response && error.response.status === 401) {
+            if (error.response && error.response.status === 401 || error.response.status === 403) {
                 toast.error('Wrong email or password');
             } else {
-                toast.error(error.response.data.error);
+                toast.info('Please fill in all required fields correctly.');
             }
         }finally{
           setLoading(false)
