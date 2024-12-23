@@ -12,3 +12,4 @@ testing CI/CD workflow
 test the sonarqube scaning
 test the sonarqube scaning
 test the sonarqube scaning
+test CI/CD workflow for production
