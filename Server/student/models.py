@@ -3,6 +3,9 @@ from django.conf import settings
 from tutor.models import Lesson
 from tutor.models import Course
 from datetime import date, timedelta
+from django.utils import timezone
+import uuid
+from accounts.models import User
 # Create your models here.
 
 # User Watched 
@@ -57,3 +60,16 @@ class StudyStreak(models.Model):
 
     # def __str__(self):
     #     return f"{self.user.username}'s streak: {self.current_streak} days"
+
+class Certificate(models.Model):
+   certificate_id = models.UUIDField(default=uuid.uuid4, editable=False,unique=True)
+   user = models.ForeignKey(User, on_delete=models.CASCADE)
+   course = models.ForeignKey(Course, on_delete=models.CASCADE)
+   issue_date = models.DateTimeField(default=timezone.now)
+   is_valid = models.BooleanField(default=True)
+   
+   class Meta:
+       unique_together = ('user', 'course')
+       
+   def __str__(self):
+       return f"Certificate-{self.certificate_id[:8]} - {self.user.email} - {self.course.title}"
