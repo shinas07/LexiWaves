@@ -77,6 +77,7 @@ const TutorSignUP = () => {
       navigate('/tutor-otp')
     } catch (error) {
       let errorMessage = 'Signup failed. Please try again.';
+      setIsSubmitting(false);
         
       if (error.response && error.response.data) {
           // Handle specific backend error messages
