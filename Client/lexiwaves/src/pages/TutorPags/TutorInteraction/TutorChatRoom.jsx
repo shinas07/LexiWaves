@@ -45,7 +45,8 @@ const TutorChatRoom = () => {
     const connectWebSocket = () => {
       try {
         // Create WebSocket connection
-        const wsUrl = `ws://127.0.0.1:8000/ws/classchat/${roomId}/`;
+        // const wsUrl = `ws://127.0.0.1:8000/ws/classchat/${roomId}/`;
+        const wsUrl = `wss://api.lexiwaves.online/ws/classchat/${roomId}/`;
         websocket.current = new WebSocket(wsUrl);
 
         websocket.current.onopen = () => {
