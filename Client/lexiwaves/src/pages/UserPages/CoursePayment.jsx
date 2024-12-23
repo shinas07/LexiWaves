@@ -46,7 +46,6 @@ const PaymentEnrollButton = ({ courseId }) => {
                 });
 
                 if (result.error) {
-                    console.log(result.error)
                     toast.error('Failed to redirect to payment. Please try again.');
                 } else {
                     // Handle successful enrollment (if needed)
