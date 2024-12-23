@@ -28,7 +28,7 @@ const PaymentEnrollButton = ({ courseId }) => {
                 navigate('/enrolled-courses');
             } else {
                 // Call your backend to create a Checkout Session
-                const response = await api.post('http://localhost:8000/user/course-checkout-session/', {
+                const response = await api.post('/user/course-checkout-session/', {
                     course_id: courseId,
                 }, {
                     headers: {
