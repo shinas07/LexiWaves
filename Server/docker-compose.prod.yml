@@ -14,7 +14,7 @@ services:
       sh -c "
         python manage.py migrate accounts &&
         python manage.py migrate &&
-        gunicorn lexiWaves.wsgi:application --bind 0.0.0.0:8000
+        daphne -u /run/daphne/daphne.sock lexiwaves.asgi:application
       "
   db:
     image: postgres:13
