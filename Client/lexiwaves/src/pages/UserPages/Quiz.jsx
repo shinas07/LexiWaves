@@ -69,7 +69,6 @@ const QuizPage = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             
-            console.log('Quiz Response:', response.data);
             
             if (response.data.status === 'success') {
                 // Check if quiz exists
