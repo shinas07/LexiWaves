@@ -40,10 +40,8 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
             tutor = user.tutor_profile
         else:
             raise ValueError("User does not have a tutor profile")
-
-        #
+        
         tutor_details = TutorDetails.objects.create(tutor=tutor, **validated_data)
-        print('tutor created',tutor_details)
 
         # Handle the file uploads if they exist
         if profile_picture:
@@ -51,7 +49,6 @@ class TutorDetailsSerializer(serializers.ModelSerializer):
         if identity_proof:
             tutor_details.identity_proof = identity_proof
 
-        # Save the changes
         tutor_details.save()
         return tutor_details
     
