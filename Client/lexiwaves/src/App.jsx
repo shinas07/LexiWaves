@@ -33,6 +33,9 @@ import StudentUnauthorized from "./pages/UserPages/StudentUnauthorized";
 import DocsPage from "./pages/Docs";
 import LexiSupportPage from "./pages/Support";
 import UserConnection from "./pages/UserPages/UserInteractions/UserTutorConnection";
+import CertificateDownload from "./pages/UserPages/CourseQuizCerificates";
+import StudentCertificates from "./pages/UserPages/StudentCertificates";
+
 //Tutor pages import
 import TutorSignUP from "./pages/TutorPags/SignUp";
 import TutorOtpVerification from "./pages/TutorPags/TutorOtp";
@@ -63,7 +66,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import StudentsPage from "./pages/admin/StudentsList";
 import Tutorlist from "./pages/admin/ApprovedTutorList";
 import TutorRequests from "./pages/admin/TutorRequests";
-import AdminSignup from "./pages/admin/SignIn";
+import AdminSignin from "./pages/admin/SignIn";
 import CreateCoursePage from "./pages/TutorPags/CourseCreation";
 import TutorDetail from "./pages/admin/TutorDetail";
 import AdminLanguages from "./pages/admin/LanguageCreate";
@@ -130,12 +133,10 @@ const App = () => {
 
 // For Tutor 
 const isTutorAllowed = () => {
-
-  const isAuthenticatedUser = !!localStorage.getItem('accessToken');
+  const isAuthenticatedUser = localStorage.getItem('accessToken') ;
   const hasSubmittedDetails = localStorage.getItem('hasSubmittedDetails') === 'true';
-  const adminApproved = localStorage.getItem('adminApproved') === 'true';
 
-  return isAuthenticatedUser && hasSubmittedDetails && adminApproved;
+  return isAuthenticatedUser && hasSubmittedDetails;
 };
 
 
@@ -147,7 +148,6 @@ const isTutorAllowed = () => {
    
       <Router>
         <Routes>
-
           {/* student routes here */}
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={isAuthenticatedUser ? <Navigate to="/" /> : <SignUPForm />}/>
@@ -179,6 +179,10 @@ const isTutorAllowed = () => {
           <Route path="/video-call-room/:requestId" element={<VideoCallRoom/>}/>
           <Route path='/review-session/:requestId' element={<ReviewSession/>}/>
           <Route path="/tutor/video-call-room/:requestId" element={<TutorVideoRoom />} />
+
+          {/* Quiz certificates */}
+          <Route path="/certificate/download/:courseId" element={<CertificateDownload/>}/>
+          <Route path="/student/certificates" element={<StudentCertificates/>}/>
           
           
 
@@ -187,7 +191,7 @@ const isTutorAllowed = () => {
         <Route path="/tutor-otp" element={<ProtectedRoute><TutorOtpVerification /></ProtectedRoute>}/> 
         <Route path="/tutor-signin" element={<ProtectedRoute><TutorLogin /></ProtectedRoute>}/>
         <Route path="/tutor-details" element={<TutorUnauthorizedRoute><TutorDetailForm /></TutorUnauthorizedRoute>}/>
-        <Route path="/tutor/dashboard" element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/waiting-for-approval'/>} />
+        <Route path="/tutor/dashboard" element={isTutorAllowed() ? <TutorHomePage /> : <Navigate to='/tutor-details'/>} />
           <Route path="/tutor-setup" element={<TutorSetup />} />
             <Route path="/tutor-requests" element={!isAuthenticatedUser ? <Navigate to="/tutor-signin" /> : <TutorRequests />} />
             <Route path="/waiting-for-approval" element={<TutorUnauthorizedRoute><WaitingForApproval /></TutorUnauthorizedRoute>} />
@@ -215,7 +219,7 @@ const isTutorAllowed = () => {
 
 
           {/* Admin routes here */}
-          <Route path="/admin-login" element={<AdminSignup />} />
+          <Route path="/admin-login" element={<AdminSignin />} />
           <Route path="/admin-dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
           <Route path="/admin-students-list" element={<AdminProtectedRoute><StudentsPage/></AdminProtectedRoute>} />
           <Route path="/admin-tutor-list" element={<AdminProtectedRoute><Tutorlist /></AdminProtectedRoute>} />
