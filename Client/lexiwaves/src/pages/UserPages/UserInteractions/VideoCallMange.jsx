@@ -10,8 +10,8 @@ import {
 import api from '../../../service/api';
 import { useNavigate } from 'react-router-dom';
 
-
 const VideoCallSection = ({ tutorId, courseId }) => {
+
 
   const [requestStatus, setRequestStatus] = useState('idle');
   const [existingRequest, setExistingRequest] = useState(null);
@@ -33,7 +33,7 @@ const VideoCallSection = ({ tutorId, courseId }) => {
           setRequestStatus(response.data.request.status);
         }
       } catch (error) {
-        toast.error('Error checking request:');
+        toast.info('Faild to check the request');
       }
     };
     checkExistingRequest();
