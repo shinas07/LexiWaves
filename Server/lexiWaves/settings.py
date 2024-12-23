@@ -32,7 +32,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.getenv('DEBUG') == 'True'
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
 
@@ -41,6 +41,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:5173').split(',')
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173').split(',')
+
 
 
 CORS_ALLOW_CREDENTIALS = True
@@ -183,14 +184,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL ='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-
-
-
-# # Media files configuration
-# MEDIA_URL = '/media/'  # This is correct
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # This is correct
 
 
 # Load environment variables from .env file
