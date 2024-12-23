@@ -55,7 +55,7 @@ class GoogleSignInView(APIView):
             email = idinfo.get('email')
             first_name = idinfo.get('given_name', '')
             last_name = idinfo.get('family_name', '')
-            
+            google_id = idinfo.get('sub')
             if not email:
                 return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -64,14 +64,21 @@ class GoogleSignInView(APIView):
             user, created = User.objects.get_or_create(
                 email=email,
                 defaults={
+                    'goggle_id': google_id,
                     'first_name': first_name,
                     'last_name': last_name,
-                    'user_type': 'student',  # Set default user type
+                    'user_type': 'student',  
                     'is_active': True
                 }
             )
+
+
             if user.user_type != 'student':
                 return Response({'error':'Access deined, This login is only for Students'},status=status.HTTP_403_FORBIDDEN)
+
+            if not created and not user.google_id:
+                user.google_id = google_id
+                user.save()
             
             # Generate tokens
             refresh = RefreshToken.for_user(user)
@@ -90,7 +97,6 @@ class GoogleSignInView(APIView):
         except ValueError as e:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(str(e))
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -122,7 +128,6 @@ def send_otp_email(email, otp):
 
 def create_or_resend_otp(email):
     otp = generate_otp()
-    print(otp)
     OTPVerification.objects.update_or_create(
         email=email,
         defaults={'otp': otp, 'created_at': timezone.now()}
@@ -239,7 +244,6 @@ class RequestotpView(View):
             request.session['otp_email'] = email
 
             if send_otp_email(email, otp):
-                print('otp send successful')
                 return JsonResponse({'message': 'OTP sent successfully!'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User with this email does not exist.'}, status=400)
@@ -384,7 +388,6 @@ class UserProfileImageRemoveView(APIView):
             try:
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'profile_images/{image_key}')
             except Exception as e:
-                print('error while removing',str())
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # Remove the profile image from the user model
@@ -392,7 +395,6 @@ class UserProfileImageRemoveView(APIView):
             user.save()  # Save the changes
             
             return Response({"message": "Profile image removed successfully"}, status=status.HTTP_204_NO_CONTENT)
-        print('')
         return Response({"error": "No profile image to remove."}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -468,20 +470,17 @@ class CreateCheckoutSession(APIView):
                 metadata=metadata
             )
 
-            print('checkout place is working properly ')
 
             return Response({'id': checkout_session.id}, status=status.HTTP_201_CREATED)
         except Course.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print('bad request error', str(e))
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
-    print("\n=== WEBHOOK CALLED ===")
     payload = request.body.decode('utf-8')
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
     
@@ -520,7 +519,6 @@ def stripe_webhook(request):
                     amount_paid=amount,
                     session_id=session['id']
                 )
-                print(enrollment)
                 
                 # Create revenue records
                 AdminRevenue.objects.create(
@@ -538,21 +536,16 @@ def stripe_webhook(request):
                 
                 # Create enrollment and revenue records...
                 
-                print("Payment processed successfully!")
                 return HttpResponse(status=200)
                 
             except Exception as e:
-                print(f"Error processing payment: {str(e)}")
                 return HttpResponse(status=500)
                 
     except ValueError as e:
-        print(f"ValueError: {str(e)}")
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
-        print(f"SignatureVerificationError: {str(e)}")
         return HttpResponse(status=400)
     except Exception as e:
-        print(f"Other error: {str(e)}")
         return HttpResponse(status=400)
 
     return HttpResponse(status=200)
@@ -567,82 +560,6 @@ class UserEnrolledCourses(generics.ListAPIView):
         return StudentCourseEnrollment.objects.filter(user=user).select_related('course').order_by('-created_at')
     
 
-# User coruseWating
-
-
-
-# class WatchCourseView(APIView):
-#     permission_classes = [IsAuthenticated]
-    
-#     def generate_presigned_url(self, s3_url):
-#         try:
-#             # Extract the key from the full S3 URL
-#             if not s3_url or 'amazonaws.com' not in s3_url:
-#                 return None
-            
-#             # Get the path after the bucket name
-#             key = s3_url.split(f'{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/')[-1]
-            
-#             s3_client = boto3.client(
-#                 's3',
-#                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-#                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-#                 region_name=settings.AWS_S3_REGION_NAME
-#             )
-            
-#             url = s3_client.generate_presigned_url(
-#                 'get_object',
-#                 Params={
-#                     'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-#                     'Key': key
-#                 },
-#                 ExpiresIn=3600  # URL expires in 1 hour
-#             )
-#             return url
-#         except Exception as e:
-#             print(f"Error generating presigned URL: {str(e)}")
-#             return None
-
-#     def get(self, request, courseId):  
-#         try:
-#             # Check enrollment
-#             enrollment = StudentCourseEnrollment.objects.get(
-#                 user=request.user, 
-#                 id=courseId, 
-#                 payment_status='completed'
-#             )
-            
-#             course = enrollment.course
-#             course_data = CourseWatchSerializer(course).data
-            
-#             # Generate presigned URL for course preview video
-#             if course_data.get('video_url'):
-#                 course_data['video_url'] = self.generate_presigned_url(course_data['video_url'])
-            
-#             # Generate presigned URLs for lesson videos
-#             for lesson in course_data.get('lessons', []):
-#                 if lesson.get('lesson_video_url'):
-#                     lesson['lesson_video_url'] = self.generate_presigned_url(
-#                         lesson['lesson_video_url']
-#                     )
-            
-#             return Response(course_data, status=status.HTTP_200_OK)
-            
-#         except StudentCourseEnrollment.DoesNotExist:
-#             return Response(
-#                 {"error": "You are not enrolled in this course or payment is pending."}, 
-#                 status=status.HTTP_403_FORBIDDEN
-#             )
-#         except Course.DoesNotExist:
-#             return Response(
-#                 {"error": "Course not found"}, 
-#                 status=status.HTTP_404_NOT_FOUND
-#             )
-#         except Exception as e:
-#             return Response(
-#                 {"error": f"An error occurred: {str(e)}"}, 
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
 class WatchCourseView(APIView):
     permission_classes = [IsAuthenticated]
     
