@@ -155,16 +155,15 @@ const TutorDetailForm = () => {
        if (response.status === 201) {
         setIsModalOpen(true);
       }
+      localStorage.setItem('hasSubmittedDetails',true)
        toast.success("Details saved successfully!");
    
      
  
     } catch (error) {
-      console.log(error)
       toast.error('Details is already submited');
       navigate('/waiting-for-approval')
  
-       
     } 
  };
 
