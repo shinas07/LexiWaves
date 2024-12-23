@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import TutorApprovalView, AdminLoginView,StudentListView,ApprovedTutorListView,TutorRequests, TutorRequestDetails, TutorApprovalUpdateView, LanguageCreateView, EnrolledCoursesListView,BlockUserView,ApprovedCoursesListView,NewCourseCountView,NewCoursesView, CourseApprovalView,AdminLogoutView,AdminDashboardView,AdminReportsView,AdminRevenueView
 
+
+app_name = 'lexi_admin'
+
 urlpatterns = [
     path('admin-login/',AdminLoginView.as_view(), name='admin_login'),
     path('dashboard-view/',AdminDashboardView.as_view()),
@@ -19,7 +22,7 @@ urlpatterns = [
     path('course-approval/<int:pk>/', CourseApprovalView.as_view(), name='course-approval'),
     path('reports/', AdminReportsView.as_view(), name='admin-reports'),
     path('logout/',AdminLogoutView.as_view()),
-     path('revenue-details/', AdminRevenueView.as_view(), name='admin-revenue-details'),
+    path('revenue-details/', AdminRevenueView.as_view(), name='admin-revenue-details'),
 ]
 
 
