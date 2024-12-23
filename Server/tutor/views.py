@@ -36,7 +36,6 @@ def generate_otp():
 
 
 def send_otp_email(email, otp):
-    print(otp)
     subject = 'Verify you email'
     html_message = render_to_string('otp_temp.html', {'otp': otp})
     plain_message = strip_tags(html_message)
@@ -62,6 +61,15 @@ def create_or_resend_otp(email):
     else:
         return {"error":"Falid to send OTP"}
 
+class TutorResendOtpView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error':'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        response = create_or_resend_otp(email)
+        if 'error' in response:
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class TutorSignUpView(APIView):
@@ -126,7 +134,6 @@ class TutorVerifyEmailView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(str(e))
             return Response({"error": 'server error, try again'}, status=status.HTTP_400_BAD_REQUEST)
 
 class TutorResendOtpView(APIView):
@@ -183,7 +190,7 @@ class TutorDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-
+        
         serializer = TutorDetailsSerializer(data=request.data, context={'request': request})
         
         if serializer.is_valid():
@@ -198,7 +205,31 @@ class TutorDetailsView(APIView):
                 "details": serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
         
-    
+
+class TutorApprovalStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            tutor_details = TutorDetails.objects.get(tutor__user=request.user)
+            data = {
+                'is_approved': tutor_details.admin_approved,
+                'status': 'approved' if tutor_details.admin_approved else 'pending',
+                'submission_date': tutor_details.created_at,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except TutorDetails.DoesNotExist:
+            return Response(
+                {'error':'Tutor details not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error':str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 
 
@@ -241,7 +272,6 @@ class TutorProfileView(APIView):
             tutor = Tutor.objects.select_related('user').get(user=request.user)
             course_count = Course.objects.filter(tutor=tutor.user,is_approved=True).count()
             student_count = StudentCourseEnrollment.objects.filter(course__tutor=tutor.user,payment_status='completed').values('user').distinct().count()
-            print(student_count)
             serializer = TutorProfileSerializer(tutor)
             data = serializer.data
             data.update({
@@ -250,7 +280,6 @@ class TutorProfileView(APIView):
             })
             return Response(data)
         except Tutor.DoesNotExist as e:
-            print(str(e))
             return Response({"error": "Tutor profile not found"}, status=404)
 
 class CourseCreationViewSet(viewsets.ModelViewSet):
@@ -310,14 +339,12 @@ class CourseCreationViewSet(viewsets.ModelViewSet):
 
             serializer = CourseSerializer(data=course_data, context={'request': request})
             if not serializer.is_valid():
-                print('serializer error',serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             course = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         except ClientError as e:
-            print('error', str(e))
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -381,14 +408,14 @@ class CompletedLessonsView(generics.ListAPIView):
 
     def get_queryset(self):
         course_id = self.kwargs['course_id']
-        print(course_id)
         return LessonCompletion.objects.filter(
             user=self.request.user,
             lesson__course_id=course_id
         )
 
-# Quiz Functions
 
+
+# Quiz Functions
 class QuizCreationView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = QuestionSerializer
@@ -398,7 +425,7 @@ class QuizCreationView(generics.CreateAPIView):
         course = get_object_or_404(Course, id=courseId, tutor=request.user)
         questions = Question.objects.filter(course=course)
         serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         courseId = self.kwargs.get('courseId')  # Get courseId from URL parameters
@@ -534,7 +561,7 @@ class TutorSlotView(APIView):
 
 
 # Dashboard Revenue details
-class TutorRevenueView(APIView):
+class TutorDashboardDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -547,7 +574,24 @@ class TutorRevenueView(APIView):
                 total=Sum('amount')
             )['total'] or 0
 
-            six_months_ago = datetime.now() - timedelta(days=180)
+            # Calculate current month's earnings using timezone-aware dates
+            now = timezone.now()
+            month_start = timezone.make_aware(
+                datetime(now.year, now.month, 1)
+            )
+            monthly_earnings = TutorRevenue.objects.filter(
+                tutor=tutor,
+                created_at__gte=month_start,
+                created_at__lte=now
+            ).aggregate(
+                total=Sum('amount')
+            )['total'] or 0
+
+            active_courses = Course.objects.filter(tutor=tutor, is_approved=True).count()
+
+            # For the six months calculation
+            six_months_ago = now - timezone.timedelta(days=180)
+
             monthly_revenue = TutorRevenue.objects.filter(
                 tutor=tutor,
                 created_at__gte=six_months_ago
@@ -569,11 +613,12 @@ class TutorRevenueView(APIView):
                 'status': 'success',
                 'total_revenue': float(total_revenue),
                 'revenue_labels': revenue_labels,
-                'revenue_data': revenue_data
+                'revenue_data': revenue_data,
+                'active_courses_count': active_courses,
+                'monthly_earnings': float(monthly_earnings)
             })
 
         except Exception as e:
-            print(f"Error in TutorRevenueView: {str(e)}")
             return Response({
                 'status': 'error',
                 'message': str(e)
@@ -661,7 +706,6 @@ class TutorRevenueDetailsView(APIView):
             })
 
         except Exception as e:
-            print(f"Error in tutor revenue: {str(e)}")
             return Response(
                 {'error': 'Failed to fetch revenue details'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
