@@ -11,9 +11,9 @@ import Login from "./pages/UserPages/SignInPage";
 import OtpVerification from "./pages/UserPages/UserOtpPage";
 import { useSelector } from "react-redux";
 import { Toaster, toast } from 'sonner';
-import { ProtectedRouted } from "./ProtextedRoute";
 import VideoCallRoom from "./pages/VideoCall/StudentVideoRoom";
 import PageNotFound from "./pages/PageNotFound";
+import StudentProtectedRoute from "./ProtextedRoute";
 
 
 //User page imports
@@ -135,7 +135,6 @@ const App = () => {
 const isTutorAllowed = () => {
   const isAuthenticatedUser = localStorage.getItem('accessToken') ;
   const hasSubmittedDetails = localStorage.getItem('hasSubmittedDetails') === 'true';
-
   return isAuthenticatedUser && hasSubmittedDetails;
 };
 
@@ -149,42 +148,125 @@ const isTutorAllowed = () => {
       <Router>
         <Routes>
           {/* student routes here */}
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={isAuthenticatedUser ? <Navigate to="/" /> : <SignUPForm />}/>
-          <Route path="/signin" element={isAuthenticatedUser ? <Navigate to="/" /> : <Login />}/>
-          <Route path="/otp" element={isAuthenticatedUser ? <Navigate to="/" /> : <OtpVerification />}/>
-          <Route path="/profile" element={<ProfilePage/>}/>
-          <Route path='/forgot-password' element={<ForgotPassword/>}/>
-          {/* <Route path="/user-account" element={<ProtectedRouted allowedRoles={['student']}><UserAccountPage /> </ProtectedRouted>}/> */}
-          <Route path="/user-account" element={<UserAccountPage/>}/>
-          <Route path="/settings" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <SettingsPage />} />
-          <Route path="/courses" element={<ProtectedRouted allowedRoles={['student']}><CourseList/></ProtectedRouted>}></Route>
-          <Route path="/course/:id" element={<CourseDetail/>}/>
-          <Route path='course-enroll/:id' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseVideo/>}/>
-          <Route path='/success' element={<SuccessPage/>}/>
-          <Route path='/cancel' element={<PaymentCancel/>}/>
-          <Route path='/enrolled-courses' element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <UserEnrolledCoursesPage/>}/>
-            <Route path="/watch-course/:courseId"  element={!isAuthenticatedUser ? <Navigate to="/signin "/> : <CourseWatchingPage/>}/>
-          <Route path="/community-chat" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <CommunitySelection />}/>
-          <Route path="/chat/:language" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <ChatRoom />} />
-          <Route path="/quiz/:courseId" element={!isAuthenticatedUser ? <Navigate to="/signin" /> : <QuizPage />} />
-          <Route path='/student/unauthorized' element={<StudentUnauthorized/>}/>
-          <Route path='/docs' element={!isAuthenticatedUser ? <Navigate to='/signin'/> : <DocsPage/>}/>
-          <Route path='/lexi-support' element={<LexiSupportPage/>}/>
+           {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/signup"
+          element={isAuthenticatedUser ? <Navigate to="/" /> : <SignUPForm />}
+        />
+        <Route
+          path="/signin"
+          element={isAuthenticatedUser ? <Navigate to="/" /> : <Login />}
+        />
+        <Route
+          path="/otp"
+          element={isAuthenticatedUser ? <Navigate to="/" /> : <OtpVerification />}
+        />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/success" element={<SuccessPage />} />
+        <Route path="/cancel" element={<PaymentCancel />} />
+        <Route path="/lexi-support" element={<LexiSupportPage />} />
+      
 
-          {/* {Chat with Tutor} */}
-          <Route path='/connect-tutor' element={<UserConnection/>}/>
+        {/* Student Routes */}
+        <Route path="/courses" element={
+          <StudentProtectedRoute>
+            <CourseList />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/course/:id" element={
+          <StudentProtectedRoute>
+            <CourseDetail />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/course-enroll/:id" element={
+          <StudentProtectedRoute>
+            <CourseVideo />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/enrolled-courses" element={
+          <StudentProtectedRoute>
+            <UserEnrolledCoursesPage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/watch-course/:courseId" element={
+          <StudentProtectedRoute>
+            <CourseWatchingPage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/community-chat" element={
+          <StudentProtectedRoute>
+            <CommunitySelection />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/chat/:language" element={
+          <StudentProtectedRoute>
+            <ChatRoom />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/quiz/:courseId" element={
+          <StudentProtectedRoute>
+            <QuizPage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/connect-tutor" element={
+          <StudentProtectedRoute>
+            <UserConnection />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/student/certificates" element={
+          <StudentProtectedRoute>
+            <StudentCertificates />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/certificate/download/:courseId" element={
+          <StudentProtectedRoute>
+            <CertificateDownload />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <StudentProtectedRoute>
+            <SettingsPage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <StudentProtectedRoute>
+            <ProfilePage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/user-account" element={
+          <StudentProtectedRoute>
+            <UserAccountPage />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/docs" element={
+          <StudentProtectedRoute>
+            <DocsPage />
+          </StudentProtectedRoute>
+        } />
 
-          {/* Video call route */}
-          <Route path="/video-call-room/:requestId" element={<VideoCallRoom/>}/>
-          <Route path='/review-session/:requestId' element={<ReviewSession/>}/>
-          <Route path="/tutor/video-call-room/:requestId" element={<TutorVideoRoom />} />
+        {/* Video Call Routes */}
+        <Route path="/video-call-room/:requestId" element={
+       <StudentProtectedRoute>
+         <VideoCallRoom />
+       </StudentProtectedRoute>
+        } />
+        <Route path="/review-session/:requestId" element={
+          <StudentProtectedRoute>
+            <ReviewSession />
+          </StudentProtectedRoute>
+        } />
+        <Route path="/tutor/video-call-room/:requestId" element={
+          <StudentProtectedRoute>
+            <TutorVideoRoom />
+          </StudentProtectedRoute>
+        }/>
+       
 
-          {/* Quiz certificates */}
-          <Route path="/certificate/download/:courseId" element={<CertificateDownload/>}/>
-          <Route path="/student/certificates" element={<StudentCertificates/>}/>
-          
-          
+        {/* Unauthorized Route */}
+        <Route path="/student/unauthorized" element={<StudentUnauthorized />} />
+
+
 
           {/* Tutors routes here */}
         <Route path="/tutor-signup" element={<ProtectedRoute><TutorSignUP /></ProtectedRoute>}/>
@@ -206,7 +288,7 @@ const isTutorAllowed = () => {
           <Route path="/course/:courseId/edit" element={isTutorAllowed() ? <CourseEdit /> : <Navigate to='/waiting-for-approval'/>} />
           <Route path="/tutor/courses/details/:courseId" element={isTutorAllowed() ? <CourseAndQuizDetails/> : <Navigate to='waiting-for-approval'/>}/>
           <Route path='/tutor-unauthorized' element={<TutorUnauthorized/>}/>
-          <Route path='/tutor/students' element={<StudentsList/>}/>
+          <Route path='/tutor/students' element={ <StudentsList/>}/>
           <Route path='/tutor/revenue-report' element={<RevenueReport/>}/>
           <Route path='/tutor/interaction/student-list' element={<InteractionStudentsList/>}/>
           <Route path='/tutor/students/course-chats/:studentId' element={<StudentCourseChats/>}/>
@@ -219,7 +301,7 @@ const isTutorAllowed = () => {
 
 
           {/* Admin routes here */}
-          <Route path="/admin-login" element={<AdminSignin />} />
+          <Route path="/admin-access" element={<AdminSignin />} />
           <Route path="/admin-dashboard" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
           <Route path="/admin-students-list" element={<AdminProtectedRoute><StudentsPage/></AdminProtectedRoute>} />
           <Route path="/admin-tutor-list" element={<AdminProtectedRoute><Tutorlist /></AdminProtectedRoute>} />
