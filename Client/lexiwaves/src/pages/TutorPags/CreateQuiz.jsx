@@ -28,7 +28,6 @@ const CreateQuiz = () => {
                 if (response.data && response.data.length > 0){
                     setExistingQuiz({questions: response.data});
                 }
-                console.log(response.data)
             } catch(error){
                 return
             }finally{

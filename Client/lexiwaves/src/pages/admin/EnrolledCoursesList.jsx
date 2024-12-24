@@ -29,7 +29,6 @@ const EnrolledCoursesList = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response.data)
         setEnrolledCourses(response.data);
       } catch (error) {
         toast.error('Failed to load enrolled courses. Please check your credentials.');

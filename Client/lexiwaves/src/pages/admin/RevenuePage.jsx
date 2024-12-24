@@ -16,7 +16,6 @@ const AdminRevenuePage = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setRevenueData(response.data);
-        console.log(response.data)
       } catch (error) {
         toast.error("Failed to fetch revenue data");
       } finally {
