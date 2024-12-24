@@ -296,9 +296,15 @@ class UserProfileView(generics.RetrieveAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    def partial_update(self, request, *args, **kwargs):
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.serializer_class(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 # Password Change
 class ChangePasswordView(APIView):
