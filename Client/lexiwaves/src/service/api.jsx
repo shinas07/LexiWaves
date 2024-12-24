@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { logout } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
+// import.meta.env.VITE_API_BASE_URL
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: backend.lexiwaves.online,
     withCredentials: true,
 });
 
