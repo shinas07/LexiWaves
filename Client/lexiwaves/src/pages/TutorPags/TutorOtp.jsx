@@ -68,7 +68,6 @@ const TutorOtpVerification = () => {
     setLoading(true);
   
     const email = localStorage.getItem('userEmail');
-    console.log(email)
   
     try {
       const response = await api.post('/tutor/resend-otp/', { email });
@@ -88,7 +87,6 @@ const TutorOtpVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const tutorData = JSON.parse(sessionStorage.getItem('tempTutorData'));
-    console.log('userdata', tutorData)
     setLoading(true);
 
     const email = localStorage.getItem("tutorEmail")
