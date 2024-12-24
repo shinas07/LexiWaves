@@ -58,12 +58,58 @@ const TutorDetailForm = () => {
     }
   },[])
 
+  const validateDateOfBirth = (dateString) => {
+    const today = new Date();
+    const birthDate = new Date(dateString);
+    
+    // Calculate age
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    // Check if date is in future
+    if (birthDate > today) {
+      return "Date of birth cannot be in the future";
+    }
+    
+    // Check minimum age (18)
+    if (age < 18) {
+      return "You must be at least 18 years old";
+    }
+    
+    // Check maximum age (100)
+    if (age > 100) {
+      return "Please enter a valid date of birth";
+    }
+    
+    return null; // Return null if validation passes
+  };
 
   const handleChange = (e) => {
     const { id, value, type, checked, files } = e.target;
 
-     // Validate Profile Picture
-     if (id === "profile_picture" && files.length > 0) {
+    // Add date validation
+    if (id === "dateOfBirth") {
+      const dateError = validateDateOfBirth(value);
+      if (dateError) {
+        setErrors(prev => ({
+          ...prev,
+          dateOfBirth: dateError
+        }));
+        return;
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          dateOfBirth: null
+        }));
+      }
+    }
+
+    // Validate Profile Picture
+    if (id === "profile_picture" && files.length > 0) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png"]; // Allowed file types
       const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
@@ -121,13 +167,23 @@ const TutorDetailForm = () => {
 
   const validate = () => {
     const errors = {};
+    
+    // Add date validation to the validate function
+    if (!formData.dateOfBirth) {
+      errors.dateOfBirth = 'Date of birth is required';
+    } else {
+      const dateError = validateDateOfBirth(formData.dateOfBirth);
+      if (dateError) {
+        errors.dateOfBirth = dateError;
+      }
+    }
+
     if (!formData.phone_number) errors.phone_number = 'Phone number is required';
     if (!formData.address) errors.address = 'Address is required';
     if (!formData.biography) errors.biography = 'Biography is required';
     if (!formData.gender) errors.gender = 'gender is required';
     if (!formData.hourly_rate) errors.hourly_rate = 'Hourly rate is required';
     if (!formData.terms_of_service) errors.terms_of_service = 'You must accept the Terms of Service';
-    if (!formData.dateOfBirth) errors.dateOfBirth = 'Data of birth is required';
     if (!formData.identity_proof) errors.identity_proof = 'Identity proof is required';
     setErrors(errors);
     return Object.keys(errors).length === 0;
@@ -209,6 +265,8 @@ const TutorDetailForm = () => {
             onChange={handleChange}
             placeholder="Your date of birth"
             type="date"
+            max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+            min={new Date(new Date().setFullYear(new Date().getFullYear() - 100)).toISOString().split('T')[0]}
         />
         {errors.dateOfBirth && <p className='text-red-500 text-sm'>{errors.dateOfBirth}</p>}
     </LabelInputContainer>
