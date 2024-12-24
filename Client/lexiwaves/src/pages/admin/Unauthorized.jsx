@@ -44,14 +44,6 @@ const AdminUnauthorized = () => {
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             Return to Homepage
                         </button>
-                        
-                        <button
-                            onClick={() => navigate('/admin-login')}
-                            className="w-full group flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl transition-all duration-300"
-                        >
-                            <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            Admin Login
-                        </button>
                     </div>
 
                     {/* Support Information */}
