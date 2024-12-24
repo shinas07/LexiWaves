@@ -20,7 +20,6 @@ const TutorProfile = () => {
                 const response = await api.get('tutor/profile/', {
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
-                console.log(response.data)
                 setProfile(response.data);
             } catch (error) {
                 toast.error('Failed to load profile');

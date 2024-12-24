@@ -36,7 +36,6 @@ const VideoCallManagement = () => {
 
   const handleAcceptClick = (request) => {
     setSelectedRequest(request);
-    console.log(request.id)
     setActiveRequestId(request.id);
     setShowTimeModal(true);
   };
@@ -73,7 +72,6 @@ const VideoCallManagement = () => {
   };
 
   const handleJoinCall = (requestId) => {
-    console.log(requestId)
     navigate(`/tutor/video-call-room/${requestId}`);
   };
   
@@ -148,7 +146,6 @@ const VideoCallManagement = () => {
                   {request.status === 'accepted' && (
                     <button
                         onClick={() => {
-                            console.log('Joining call for request:', request);
                             handleJoinCall(request.id);
                         }}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"

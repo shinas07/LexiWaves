@@ -76,7 +76,6 @@ const TutorDashboard = () => {
           },
         });
         setData(studentResponse.data); // Setting the response data to state
-        console.log('student details', studentResponse)
 
         // Fetch revenue details
         const revenueResponse = await api.get('tutor/dashboard-details/', { // Adjusted endpoint
