@@ -30,7 +30,6 @@ export default function AdminDashboard() {
       const response = await api.get('/lexi-admin/dashboard-view/', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log(response.data)
       setStats(response.data.stats);
       setRevenueData(response.data.revenueData);
       setEnrollmentData(response.data.enrollmentData);

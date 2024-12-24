@@ -94,7 +94,6 @@ const ChatSection = ({ roomId }) => {
       websocket.current = new WebSocket(`wss://api.lexiwaves.online/ws/classchat/${roomId}/`);
       
       websocket.current.onopen = () => {
-        console.log('WebSocket Connected');
         setIsConnected(true);
         setConnectionStatus('connected');
         if (reconnectTimeoutRef.current) {
@@ -103,7 +102,6 @@ const ChatSection = ({ roomId }) => {
       };
 
       websocket.current.onclose = (event) => {
-        console.log('WebSocket Closed:', event.code);
         setIsConnected(false);
         setConnectionStatus('disconnected');
         

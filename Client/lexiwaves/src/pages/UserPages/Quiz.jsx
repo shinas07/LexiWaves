@@ -160,7 +160,6 @@ const QuizPage = () => {
                 setQuizStarted(false);
                 
             } catch (error) {
-                console.error('Failed to submit quiz:', error);
                 toast.error("Failed to submit quiz. Please try again.");
             }
         } else {
@@ -252,7 +251,6 @@ const QuizPage = () => {
                     {correctAnswers >= passingScore ? (
                         <div className="text-green-500 mt-4">
                             <h3>Congratulations! 🎉 You passed!</h3>
-                            {/* Add certificate generation logic here */}
                         </div>
                     ) : (
                         <div className="text-red-500 mt-4">
@@ -260,10 +258,10 @@ const QuizPage = () => {
                         </div>
                     )}
                     <button 
-                        onClick={() => navigate('/')} 
+                        onClick={() => navigate('/enrolled-courses')} 
                         className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
-                        Go to Dashboard
+                        Return to Course
                     </button>
                 </div>
             </DotBackground>

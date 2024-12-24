@@ -24,7 +24,6 @@ export default function ApprovedCoursesPage() {
           },
         });
         setCoursesData(response.data);
-        console.log(response.data);
       } catch (error) {
         setErrors("Failed to fetch courses data");
       } finally {
@@ -40,7 +39,6 @@ export default function ApprovedCoursesPage() {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response.data)
         setNewRequestsCount(response.data.new_course_count); // Assume the response contains a count field
       } catch (error) {
         console.error("Failed to fetch new requests count", error);

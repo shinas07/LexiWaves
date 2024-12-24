@@ -19,7 +19,6 @@ export default function Tutorlist() {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log(response.data)
         setTutorsData(response.data);
         setLoading(false);
       } catch (error) {

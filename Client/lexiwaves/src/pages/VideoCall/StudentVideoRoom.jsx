@@ -10,8 +10,8 @@ import api from '../../service/api';
 import { toast } from 'sonner';
 
 
+
 const appid = import.meta.env.VITE_AGORA_APP_ID;
-console.log(appid)
 
 const client = AgoraRTC.createClient({ 
   mode: "rtc", 
@@ -33,7 +33,6 @@ const VideoCallRoom = () => {
   const [layout, setLayout] = useState('grid'); 
   const [showChat, setShowChat] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  console.log(requestId)
 
   useEffect(() => {
     let tracks = { audio: null, video: null };
@@ -42,7 +41,6 @@ const VideoCallRoom = () => {
       try {
         
         const { data } = await api.get(`/video-call/agora-token/${requestId}`);
-        console.log(data)
         
         if (!data.token || !data.channelName) {
           throw new Error('Invalid token or channel name');
@@ -73,7 +71,6 @@ const VideoCallRoom = () => {
         setConnectionStatus('connected');
 
       } catch (error) {
-        console.error("Error:", error);
         toast.error('Failed to join video call');
       }
     };
@@ -103,7 +100,6 @@ const VideoCallRoom = () => {
         user.audioTrack?.play();
       }
     } catch (error) {
-      console.error('Subscribe error:', error);
       toast.error('Failed to connect to remote user');
     }
   };
@@ -218,7 +214,6 @@ const VideoCallRoom = () => {
       toast.success('Call ended');
       navigate(`/review-session/${requestId}`);
     } catch (error) {
-      console.error('Error ending call:', error);
       toast.error('Error ending call');
       // Force navigate even if there's an error
       navigate(`/review-session/${requestId}`);
