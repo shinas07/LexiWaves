@@ -86,11 +86,11 @@ const TutorDashboardLayout = ({ children }) => {
 
       await dispatch(logout());
       toast.success('Logout Successful!');
-      navigate('/tutor-signin');
+      navigate('/');
     } catch (error) {
       await dispatch(logout());
       toast.success('Logged out Successfully!');
-      navigate('/tutor-signin');
+      navigate('/');
     }
   };
 
