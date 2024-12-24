@@ -1,4 +1,5 @@
 import axios from "axios";
+import { store } from "../redux/Store";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { logout } from "../redux/authSlice";
@@ -48,8 +49,7 @@ api.interceptors.response.use(
                 error.config.headers['Authorization'] = `Bearer ${accessToken}`;
                 return api(error.config);
             } catch (refreshError) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                store.dispatch(logout())
                 toast.info('Session expired. Please log in again.');
                 window.history.pushState({}, '', '/signin');
                 window.dispatchEvent(new PopStateEvent('popstate'));
