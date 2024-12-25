@@ -56,7 +56,7 @@ const Login = () => {
             newErrors.password = 'Password is required';
             isValid = false;
         } else if (password.length < 6) {
-            newErrors.password = 'Password is worng';
+            newErrors.password = 'Password is wrong';
             isValid = false;
         }
 
