@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { Toaster, toast } from 'sonner';
 import VideoCallRoom from "./pages/VideoCall/StudentVideoRoom";
 import PageNotFound from "./pages/PageNotFound";
-import StudentProtectedRoute from "./ProtextedRoute";
+import StudentProtectedRoute from "./pages/UserPages/ProtectedRoute";
 
 
 //User page imports
