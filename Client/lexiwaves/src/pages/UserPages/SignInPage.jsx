@@ -23,12 +23,57 @@ const Login = () => {
     const dispatch = useDispatch()
     // const location = useLocation();
     // const navigate = useNavigate();
+    const [errors, setErrors] = useState({
+        email: '',
+        password: ''
+    });
 
+    // Add email validation function
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Add form validation
+    const validateForm = () => {
+        let isValid = true;
+        const newErrors = {
+            email: '',
+            password: ''
+        };
+
+        // Email validation
+        if (!email.trim()) {
+            newErrors.email = 'Email is required';
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            newErrors.email = 'Please enter a valid email';
+            isValid = false;
+        }
+
+        // Password validation
+        if (!password.trim()) {
+            newErrors.password = 'Password is required';
+            isValid = false;
+        } else if (password.length < 6) {
+            newErrors.password = 'Password is worng';
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true)
-        try{
+        
+        // Validate form before making API call
+        if (!validateForm()) {
+            return;
+        }
+
+        setLoading(true);
+        try {
             const response = await api.post('/user/login/', {
                 email,
                 password
@@ -136,12 +181,17 @@ const Login = () => {
                 <Label htmlFor="email">Email Address</Label>
                 <Input id="email" placeholder="student@example.com" type="email"  value={email}
                             onChange={(e) => setEmail(e.target.value)}/>
-
+                {errors.email && (
+                    <span className="text-red-500 text-xs mt-1">{errors.email}</span>
+                )}
               </LabelInputContainer>
               <LabelInputContainer className="mb-4">
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" placeholder="••••••••" type="password"  value={password}
                             onChange={(e) => setPassword(e.target.value)}/>
+                {errors.password && (
+                    <span className="text-red-500 text-xs mt-1">{errors.password}</span>
+                )}
               </LabelInputContainer>
               <button
                 className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
