@@ -13,16 +13,59 @@ const TutorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Add email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
+  // Add form validation
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      email: '',
+      password: ''
+    };
 
+    // Email validation
+    if (!email.trim()) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Please enter a valid email';
+      isValid = false;
+    }
+
+    // Password validation
+    if (!password.trim()) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = 'Password  is wrong';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    
+    // Validate form before making API call
+    if (!validateForm()) {
+      return;
+    }
+    
+    setLoading(true);
     try {
       const response = await api.post("/tutor/login/", {
         email,
@@ -89,6 +132,9 @@ const TutorLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            {errors.email && (
+              <span className="text-red-500 text-xs mt-1">{errors.email}</span>
+            )}
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
@@ -99,10 +145,14 @@ const TutorLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            {errors.password && (
+              <span className="text-red-500 text-xs mt-1">{errors.password}</span>
+            )}
           </LabelInputContainer>
           <button
             className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-base text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
+            disabled={loading}
           >
             {loading ? 'Sign In.....' : 'Sign In'}
             <BottomGradient />
