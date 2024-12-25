@@ -172,7 +172,8 @@ const Login = () => {
                     </div>
                 </div>
 
-                <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+                <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+                redirect_uri="https://api.lexiwaves.online/user/google-signin/">
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={() => {
