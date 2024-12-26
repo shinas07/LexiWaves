@@ -8,7 +8,7 @@ import {
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import api from '../../service/api';
 import { toast } from 'sonner';
-
+AgoraRTC.setLogLevel(4);
 
 
 const appid = import.meta.env.VITE_AGORA_APP_ID;
@@ -16,7 +16,7 @@ const appid = import.meta.env.VITE_AGORA_APP_ID;
 const client = AgoraRTC.createClient({ 
   mode: "rtc", 
   codec: "vp8",
-  role: "host"
+  role: "host",
 });
 
 const VideoCallRoom = () => {
