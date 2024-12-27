@@ -484,78 +484,184 @@ class CreateCheckoutSession(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+from django.db import transaction
+import logging
+
 
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
-    payload = request.body.decode('utf-8')
+    # Add logging to help debug webhook issues
+    logger = logging.getLogger(__name__)
+    logger.info("Received webhook request")
+    
+    payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
     
+    if not sig_header:
+        logger.error("No Stripe signature header found")
+        return HttpResponse(status=400)
+
     try:
-        # Construct the event
+        # Don't decode the payload - use raw bytes
         event = stripe.Webhook.construct_event(
-            payload.encode('utf-8'),  # Encode back to bytes
+            payload,
             sig_header,
             settings.STRIPE_WEBHOOK_SECRET
         )
+        
+        logger.info(f"Successfully constructed Stripe event: {event['type']}")
         
         # Handle the checkout.session.completed event
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
             
-            # Get data from session
-            course_id = session['metadata']['course_id']
-            user_id = session['metadata']['user_id']
-            amount = float(session['metadata']['course_price'])
-            
-      
+            # Validate required metadata
+            required_metadata = ['course_id', 'user_id', 'course_price']
+            if not all(key in session['metadata'] for key in required_metadata):
+                logger.error("Missing required metadata in session")
+                return HttpResponse(status=400)
             
             try:
-                # Your existing processing code...
+                # Get data from session
+                course_id = session['metadata']['course_id']
+                user_id = session['metadata']['user_id']
+                amount = float(session['metadata']['course_price'])
+                
+                # Validate objects exist before processing
                 course = Course.objects.get(id=course_id)
                 user = User.objects.get(id=user_id)
                 
-                # Calculate shares correctly
-                admin_share = amount * 0.20  # 10% of amount
-                tutor_share = amount - admin_share
-
-                enrollment = StudentCourseEnrollment.objects.create(
-                    user=user,
-                    course=course,
-                    payment_status='completed',
-                    amount_paid=amount,
-                    session_id=session['id']
-                )
+                # Use transaction to ensure all database operations succeed or fail together
+                with transaction.atomic():
+                    # Calculate shares
+                    admin_share = amount * 0.20  # 20% of amount
+                    tutor_share = amount - admin_share
+                    
+                    # Check for existing enrollment to prevent duplicates
+                    enrollment, created = StudentCourseEnrollment.objects.get_or_create(
+                        user=user,
+                        course=course,
+                        defaults={
+                            'payment_status': 'completed',
+                            'amount_paid': amount,
+                            'session_id': session['id']
+                        }
+                    )
+                    
+                    if not created:
+                        logger.warning(f"Duplicate enrollment detected for session {session['id']}")
+                        return HttpResponse(status=200)  # Return 200 to acknowledge receipt
+                    
+                    # Create revenue records
+                    AdminRevenue.objects.create(
+                        course=course,
+                        amount=admin_share,
+                        payment_id=session['id']
+                    )
+                    
+                    TutorRevenue.objects.create(
+                        course=course,
+                        tutor=course.tutor,
+                        amount=tutor_share,
+                        payment_id=session['id']
+                    )
                 
-                # Create revenue records
-                AdminRevenue.objects.create(
-                    course=course,
-                    amount=admin_share,
-                    payment_id=session['id']
-                )
-                
-                TutorRevenue.objects.create(
-                    course=course,
-                    tutor=course.tutor,
-                    amount=tutor_share,
-                    payment_id=session['id']
-                )
-                
-                # Create enrollment and revenue records...
-                
+                logger.info(f"Successfully processed payment for session {session['id']}")
                 return HttpResponse(status=200)
                 
+            except Course.DoesNotExist:
+                logger.error(f"Course not found: {course_id}")
+                return HttpResponse(status=400)
+            except User.DoesNotExist:
+                logger.error(f"User not found: {user_id}")
+                return HttpResponse(status=400)
             except Exception as e:
+                logger.error(f"Error processing payment: {str(e)}")
                 return HttpResponse(status=500)
                 
     except ValueError as e:
+        logger.error(f"Invalid payload: {str(e)}")
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Invalid signature: {str(e)}")
         return HttpResponse(status=400)
     except Exception as e:
-        return HttpResponse(status=400)
+        logger.error(f"Unexpected error: {str(e)}")
+        return HttpResponse(status=500)
 
     return HttpResponse(status=200)
+# @csrf_exempt
+# @require_POST
+# def stripe_webhook(request):
+#     payload = request.body.decode('utf-8')
+#     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    
+#     try:
+#         # Construct the event
+#         event = stripe.Webhook.construct_event(
+#             payload.encode('utf-8'),  # Encode back to bytes
+#             sig_header,
+#             settings.STRIPE_WEBHOOK_SECRET
+#         )
+        
+#         # Handle the checkout.session.completed event
+#         if event['type'] == 'checkout.session.completed':
+#             session = event['data']['object']
+            
+#             # Get data from session
+#             course_id = session['metadata']['course_id']
+#             user_id = session['metadata']['user_id']
+#             amount = float(session['metadata']['course_price'])
+            
+      
+            
+#             try:
+#                 # Your existing processing code...
+#                 course = Course.objects.get(id=course_id)
+#                 user = User.objects.get(id=user_id)
+                
+#                 # Calculate shares correctly
+#                 admin_share = amount * 0.20  # 10% of amount
+#                 tutor_share = amount - admin_share
+
+#                 enrollment = StudentCourseEnrollment.objects.create(
+#                     user=user,
+#                     course=course,
+#                     payment_status='completed',
+#                     amount_paid=amount,
+#                     session_id=session['id']
+#                 )
+                
+#                 # Create revenue records
+#                 AdminRevenue.objects.create(
+#                     course=course,
+#                     amount=admin_share,
+#                     payment_id=session['id']
+#                 )
+                
+#                 TutorRevenue.objects.create(
+#                     course=course,
+#                     tutor=course.tutor,
+#                     amount=tutor_share,
+#                     payment_id=session['id']
+#                 )
+                
+#                 # Create enrollment and revenue records...
+                
+#                 return HttpResponse(status=200)
+                
+#             except Exception as e:
+#                 return HttpResponse(status=500)
+                
+#     except ValueError as e:
+#         return HttpResponse(status=400)
+#     except stripe.error.SignatureVerificationError as e:
+#         return HttpResponse(status=400)
+#     except Exception as e:
+#         return HttpResponse(status=400)
+
+#     return HttpResponse(status=200)
 
 # User Enrolled Courses
 class UserEnrolledCourses(generics.ListAPIView):
