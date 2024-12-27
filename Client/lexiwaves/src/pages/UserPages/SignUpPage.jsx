@@ -111,7 +111,7 @@ const SignUPForm = () => {
       navigate('/')
       }
     }catch(error){
-      toast.error('Google sign in faild')
+      toast.error('Google sign in failed')
     }
 
   }
