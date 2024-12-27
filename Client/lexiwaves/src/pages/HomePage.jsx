@@ -1,17 +1,21 @@
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { FlipWords } from "../components/ui/flip-words";
 import TypewriterEffect from "./TutorPags/TypeWriterEffect";
 import { useSelector } from "react-redux";
 import LatestCourses from "./UserPages/LatestCourse";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
+import { DotBackground } from "../components/Background";
 
 
 function Home() {
   const isAuthenticatedUser = useSelector((state) => state.auth.isAuthenticated);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 300);
     const  userRole = localStorage.getItem('userRole')
     if(isAuthenticatedUser && userRole){
       switch (userRole){
@@ -25,7 +29,7 @@ function Home() {
         break;
       }
     }
-
+    return () => clearTimeout(timer);
   },[isAuthenticatedUser])
 
   
@@ -36,6 +40,14 @@ function Home() {
 
   const handleGetStart  = () => {
     navigate('/courses')
+  }
+
+  if (isLoading) {
+    return (
+      <DotBackground>
+      <Loader/>
+      </DotBackground>
+    );
   }
 
   return (
