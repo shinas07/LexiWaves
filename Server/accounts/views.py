@@ -280,6 +280,7 @@ class RefreshTokenView(APIView):
         refresh = request.data.get('refresh')
         try:
             token  = RefreshToken(refresh)
+            
             access_token = str(token.access_token)
             return Response({"access": access_token}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -564,7 +565,6 @@ class UserEnrolledCourses(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return StudentCourseEnrollment.objects.filter(user=user).select_related('course').order_by('-created_at')
-    
 
 class WatchCourseView(APIView):
     permission_classes = [IsAuthenticated]
@@ -595,7 +595,7 @@ class CheckEnrollmentView(generics.RetrieveAPIView):
     def get(self, request, courseId):
         enrollment = StudentCourseEnrollment.objects.filter(user=request.user, course__id=courseId).first()
         if enrollment:
-            return Response({'enrolled':True}, status=200)
+            return Response({'enrolled':True, 'enrollment_id': enrollment.id}, status=200)
         return Response({'enrolled':False}, status=200)
 
 
