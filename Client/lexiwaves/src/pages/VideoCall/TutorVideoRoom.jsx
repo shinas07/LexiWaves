@@ -47,7 +47,6 @@ const TutorVideoRoom = () => {
           // Stop the test stream immediately
           stream.getTracks().forEach(track => track.stop());
         } catch (permError) {
-          console.error('Permission error:', permError);
           toast.error('Please allow camera and microphone access');
           return;
         }
@@ -132,7 +131,6 @@ const TutorVideoRoom = () => {
         user.audioTrack?.play();
       }
     } catch (error) {
-      console.error('Subscribe error:', error);
       toast.error('Failed to connect to student');
     }
   };
