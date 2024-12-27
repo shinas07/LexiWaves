@@ -256,11 +256,7 @@ const isTutorAllowed = () => {
             <ReviewSession />
           </StudentProtectedRoute>
         } />
-        <Route path="/tutor/video-call-room/:requestId" element={
-          <StudentProtectedRoute>
-            <TutorVideoRoom />
-          </StudentProtectedRoute>
-        }/>
+    
        
 
         {/* Unauthorized Route */}
@@ -293,8 +289,11 @@ const isTutorAllowed = () => {
           <Route path='/tutor/interaction/student-list' element={<InteractionStudentsList/>}/>
           <Route path='/tutor/students/course-chats/:studentId' element={<StudentCourseChats/>}/>
           <Route path='/tutor/chat/:roomId' element={<TutorChatRoom/>}/>
-          <Route path="/tutor/video-call-request/:studentId/:courseId" element={<VideoCallManagement />} />
           <Route path='/tutor/revenue' element={<TutorRevenue/>}/>
+      
+          {/* Video Call Routes */}
+          <Route path="/tutor/video-call-request/:studentId/:courseId" element={<VideoCallManagement />} />
+          <Route path="/tutor/video-call-room/:requestId" element={<TutorVideoRoom />}/>
 
             
 
