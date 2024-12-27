@@ -4,9 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react'
 import api from '../../service/api';
 import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/authSlice';
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = async () => {
@@ -16,17 +19,12 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         refreshToken: refreshToken
       });
     
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userRole');
+    dispatch(logout())
     setShowLogoutModal(false);
     toast.success('logout successful!')
     navigate('/')
     }catch(error){
-      console.log('Server Logout Faild')
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('userRole');
+      dispatch(logout())
       navigate('/')
     }
   };
