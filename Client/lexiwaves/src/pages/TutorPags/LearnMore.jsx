@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { DotBackground } from '../../components/Background';
 import { BookOpen, Clock, DollarSign, Users, Award, ChevronRight } from 'lucide-react';
@@ -39,6 +39,9 @@ const TutorLearnMore = () => {
      description: "Access training and development opportunities."
    }
  ];
+ useEffect(() => {
+  window.scroll(0 , 0)
+ },[])
   return (
    <DotBackground>
      <div className="max-w-6xl mx-auto p-6  lg:p-8 space-y-16 py-16">
