@@ -77,7 +77,7 @@ const CourseWatchingPage = () => {
                     });
                 }
             } catch (error) {
-                console.error('Failed to fetch quiz status:', error);
+                console.error('No Quiz Available');
             }
         };
          checkQuizStatus()
