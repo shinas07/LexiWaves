@@ -8,58 +8,53 @@
 
 ![LexiWaves Logo](Server/media/website-previews/preview.png)
 
-## 🌟 Overview
+## 📚 Overview
 
-LexiWaves is a comprehensive online language learning platform that connects students with expert tutors. Built with modern technologies, it offers real-time classes, interactive learning experiences, and robust administrative controls.
+LexiWaves is an innovative online language learning platform that bridges the gap between learners and expert tutors. Our platform facilitates interactive learning experiences through live sessions, comprehensive courses, and a supportive community environment.
 
-## ✨ Key Features
+## 🌟 Key Features
 
-### For Students
-- **Course Discovery & Enrollment**
-  - Browse available courses
-  - Filter by language, level, and price
-  - Secure payment integration with Stripe
+### For Learners
+- **Interactive Learning**
+  - One-on-one sessions with expert tutors
+  - Community chat for collaborative learning
+  - Progress tracking and assessments
+  - Downloadable achievement certificates
 
 ### For Tutors
 - **Course Management**
-  - Create and manage course content
-  - Schedule live classes
-  - Track student progress
+  - Create and customize course content
+  - Track student progress and engagement
+  - Revenue sharing model
+  - Performance analytics dashboard
 
-### Live Learning
-- **Real-time Video Classes**
-  - Integrated Agora.io video platform
-  - Interactive whiteboard
-  - Screen sharing capabilities
-
-### Administrative Tools
-- **Comprehensive Dashboard**
-  - User management
-  - Course oversight
-  - Revenue tracking
-  - Performance analytics
+### Administrative Features
+- **Platform Management**
+  - Course approval workflow
+  - User management system
+  - Revenue tracking and distribution
+  - Quality assurance monitoring
 
 ## 🛠 Tech Stack
 
 ### Backend
-- **Framework**: Django 4.x
-- **API**: Django REST Framework
-- **Database**: PostgreSQL
-- **Cache**: Redis
-- **Task Queue**: Celery
-- **Storage**: AWS S3
+- Django 4.x with REST Framework
+- PostgreSQL for database
+- Redis for caching
+- Celery for task management
+- AWS S3 for storage
 
 ### Frontend
-- **Framework**: React 18
-- **State Management**: Redux Toolkit
-- **Styling**: Tailwind CSS
-- **API Client**: Axios
+- React 18 with Redux Toolkit
+- Tailwind CSS for styling
+- Axios for API communication
+- WebSocket for real-time features
 
-### Infrastructure
-- **Containerization**: Docker
-- **CI/CD**: GitHub Actions
-- **Cloud**: AWS
-- **Monitoring**: SonarCloud
+### DevOps & Infrastructure
+- Docker containerization
+- GitHub Actions for CI/CD
+- AWS cloud infrastructure
+- SonarCloud for code quality
 
 ## 🚀 Getting Started
 
@@ -70,71 +65,112 @@ LexiWaves is a comprehensive online language learning platform that connects stu
 - Node.js 16+
 - PostgreSQL
 - Redis
+- Docker 
 ```
 
-### Backend Setup
+### Development Setup
+
+1. **Clone Repository**
 ```bash
-# Clone repository
-git clone https://github.com/shinas07/LexiWaves.git
-cd LexiWaves/Server
+git clone <repository-url>
+cd LexiWaves
+```
 
-# Create virtual environment
-python -m venv env
-source env/bin/activate  # Linux/Mac
-env\Scripts\activate     # Windows
-
-# Install dependencies
+2. **Backend Setup**
+```bash
+cd server
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 pip install -r requirements.txt
-
-# # Environment setup
-# cp .env.example .env    # Configure your environment variables
-
-# Database setup
 python manage.py migrate
-
-# Start server
 python manage.py runserver
 ```
 
-### Frontend Setup
+3. **Frontend Setup**
 ```bash
-# Navigate to frontend
-cd Client/lexiwaves
-
-# Install dependencies
+cd client
 npm install
-
-# Start development server
 npm run dev
 ```
 
-## 🔒 Environment Variables
+## 📁 Project Structure
 
-```env
-# Backend (.env)
-SECRET_KEY=your_secret_key
-DB_NAME=lexiwaves
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-STRIPE_SECRET_KEY=your_stripe_key
-AWS_ACCESS_KEY_ID=your_aws_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret
-AGORA_APP_ID=your_agora_id
+```
+LexiWaves/
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/        # Page components
+│   │   ├── services/     # API services
+│   │   └── store/        # Redux store
+│   └── public/           # Static assets
+├── server/                           # Backend Django application
+│   ├── apps/
+│   │   ├── accounts/                 # User authentication
+│   │   ├── classchat/                # Class chat functionality
+│   │   ├── community_chat/           # Community chat functionality
+│   │   ├── lexit_admin/              # Admin panel for Lexit
+│   │   ├── student/                  # Student-specific features
+│   │   ├── tutor/                    # Tutor-specific features
+│   │   └── video_call/               # Video call functionality
+│   └── config/                       # Project configuration (settings, urls, wsgi, etc.)
+├── docker/                           # Docker-related files
+├── pytest.ini                        # Pytest configuration file
+└── Dockerfile                        # Dockerfile for the backend container
 ```
 
-## 📚 API Documentation
+```
+LexiWaves/
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/        # Page components
+│   │   ├── services/     # API services
+│   │   └── store/        # Redux store
+│   └── public/           # Static assets
+├── server/                # Backend Django application
+│   ├── apps/
+│   │   ├── courses/      # Course management
+│   │   ├── users/        # User authentication
+│   │   └── payments/     # Payment processing
+│   └── config/           # Project configuration
+└── docker/               # Docker configuration
+```
 
-API documentation is available at:
-- Development: `http://localhost:8000/api/docs/`
-- Production: `https://api.lexiwaves.com/docs/`
+## 🔒 Security Features
 
+- JWT authentication
+- CORS protection
+- Request rate limiting
+- Input validation
 
+## 🌐 API Features
 
-<!-- ## 🤝 Contributing
+- RESTful architecture
+- Comprehensive documentation
+- Rate limiting
+- Token-based authentication
+- Versioning support
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add: AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
- -->
+## 📊 Monitoring & Analytics
+
+- SonarCloud integration
+- Error tracking
+- User analytics
+
+## 🤝 Community and Support
+
+- Detailed documentation
+- Issue tracking
+- Community guidelines
+- Support channels
+
+## 📫 Contact
+
+For questions or support, please reach out:
+- Email: support@lexiwaves.com
+- Website: [www.lexiwaves.com](https://www.lexiwaves.com)
+
+🙌 Acknowledgments
+Made with ❤️ by shinas
