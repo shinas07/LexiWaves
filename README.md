@@ -151,7 +151,6 @@ LexiWaves/
 - Comprehensive documentation
 - Rate limiting
 - Token-based authentication
-- Versioning support
 
 ## 📊 Monitoring & Analytics
 
@@ -169,7 +168,7 @@ LexiWaves/
 ## 📫 Contact
 
 For questions or support, please reach out:
-- Email: support@lexiwaves.com
+- Email: shinasaman07@gmail.com
 - Website: [www.lexiwaves.com](https://www.lexiwaves.com)
 
 🙌 Acknowledgments
