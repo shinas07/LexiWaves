@@ -72,7 +72,7 @@ LexiWaves is an innovative online language learning platform that bridges the ga
 
 1. **Clone Repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/shinas07/LexiWaves 
 cd LexiWaves
 ```
 
