@@ -65,7 +65,7 @@ class GoogleSignInView(APIView):
             user, created = User.objects.get_or_create(
                 email=email,
                 defaults={
-                    'goggle_id': google_id,
+                    'google_id': google_id,
                     'first_name': first_name,
                     'last_name': last_name,
                     'user_type': 'student',  
