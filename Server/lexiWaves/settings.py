@@ -34,7 +34,17 @@ SECRET_KEY = config('SECRET_KEY')
 # DEBUG = os.getenv('DEBUG') == 'True'
 DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
+# ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
+
+ALLOWED_HOSTS = [
+    'api.lexiwaves.online',
+    'www.lexiwaves.online',
+    'lexiwaves.online',
+    'localhost',
+    '127.0.0.1',
+    '16.171.151.79',  # Add this IP
+]
+
 
 
 
