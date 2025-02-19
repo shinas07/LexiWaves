@@ -35,7 +35,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from google.oauth2 import id_token
 from google.auth.transport import requests
-
+import logging
+logger = logging.getLogger(__name__)
 
 class GoogleSignInView(APIView):
     def post(self, request):
@@ -95,8 +96,10 @@ class GoogleSignInView(APIView):
             }, status=status.HTTP_200_OK)
             
         except ValueError as e:
+            logger.error(f"Invalid token error: {e}")
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            logger.exception(f"Unexpected error in Google Sign-In: {e}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -485,7 +488,7 @@ class CreateCheckoutSession(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 from django.db import transaction
-import logging
+
 
 
 @csrf_exempt
@@ -550,7 +553,7 @@ def stripe_webhook(request):
                     )
                     
                     if not created:
-                        logger.warning(f"Duplicate enrollment detected for session {session['id']}")
+                        logger.warning(f"Duplicate enrollment detected for session")
                         return HttpResponse(status=200)  # Return 200 to acknowledge receipt
                     
                     # Create revenue records
@@ -567,7 +570,6 @@ def stripe_webhook(request):
                         payment_id=session['id']
                     )
                 
-                logger.info(f"Successfully processed payment for session {session['id']}")
                 return HttpResponse(status=200)
                 
             except Course.DoesNotExist:
@@ -591,77 +593,7 @@ def stripe_webhook(request):
         return HttpResponse(status=500)
 
     return HttpResponse(status=200)
-# @csrf_exempt
-# @require_POST
-# def stripe_webhook(request):
-#     payload = request.body.decode('utf-8')
-#     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-    
-#     try:
-#         # Construct the event
-#         event = stripe.Webhook.construct_event(
-#             payload.encode('utf-8'),  # Encode back to bytes
-#             sig_header,
-#             settings.STRIPE_WEBHOOK_SECRET
-#         )
-        
-#         # Handle the checkout.session.completed event
-#         if event['type'] == 'checkout.session.completed':
-#             session = event['data']['object']
-            
-#             # Get data from session
-#             course_id = session['metadata']['course_id']
-#             user_id = session['metadata']['user_id']
-#             amount = float(session['metadata']['course_price'])
-            
-      
-            
-#             try:
-#                 # Your existing processing code...
-#                 course = Course.objects.get(id=course_id)
-#                 user = User.objects.get(id=user_id)
-                
-#                 # Calculate shares correctly
-#                 admin_share = amount * 0.20  # 10% of amount
-#                 tutor_share = amount - admin_share
 
-#                 enrollment = StudentCourseEnrollment.objects.create(
-#                     user=user,
-#                     course=course,
-#                     payment_status='completed',
-#                     amount_paid=amount,
-#                     session_id=session['id']
-#                 )
-                
-#                 # Create revenue records
-#                 AdminRevenue.objects.create(
-#                     course=course,
-#                     amount=admin_share,
-#                     payment_id=session['id']
-#                 )
-                
-#                 TutorRevenue.objects.create(
-#                     course=course,
-#                     tutor=course.tutor,
-#                     amount=tutor_share,
-#                     payment_id=session['id']
-#                 )
-                
-#                 # Create enrollment and revenue records...
-                
-#                 return HttpResponse(status=200)
-                
-#             except Exception as e:
-#                 return HttpResponse(status=500)
-                
-#     except ValueError as e:
-#         return HttpResponse(status=400)
-#     except stripe.error.SignatureVerificationError as e:
-#         return HttpResponse(status=400)
-#     except Exception as e:
-#         return HttpResponse(status=400)
-
-#     return HttpResponse(status=200)
 
 # User Enrolled Courses
 class UserEnrolledCourses(generics.ListAPIView):
