@@ -13,13 +13,31 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'chat_{self.room_id}'
-
+        
+        # Get authenticated user from scope
+        if self.scope['user'].is_anonymous:
+            logger.error("Anonymous user tried to connect, authentication required")
+            await self.close()
+            return
+            
+        self.user = self.scope['user']
+        logger.info(f"User {self.user.email} attempting to connect to room {self.room_id}")
+        
         # Verify room exists before proceeding
         room_exists = await self.get_room()
         if not room_exists:
             logger.error(f"Room {self.room_id} does not exist")
             await self.close()
             return
+            
+        # Validate user access to the room
+        has_access = await self.user_can_access_room()
+        if not has_access:
+            logger.error(f"User {self.user.email} is not allowed to join room {self.room_id}")
+            await self.close()
+            return
+            
+        logger.info(f"User {self.user.email} authenticated and authorized for room {self.room_id}")
 
         # Join room group
         await self.channel_layer.group_add(
@@ -40,8 +58,7 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
         if self.room_id not in self.connected_users:
             self.connected_users[self.room_id] = set()
         self.connected_users[self.room_id].add(self.channel_name)
-        # Send updated user count
-        # await self.update_user_count()
+        logger.info(f"User {self.user.email} connected to room {self.room_id}")
 
     async def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
@@ -55,18 +72,25 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
             self.connected_users[self.room_id].discard(self.channel_name)
             if not self.connected_users[self.room_id]:
                 del self.connected_users[self.room_id]
-
-       
+        
+        if hasattr(self, 'user'):
+            logger.info(f"User {self.user.email} disconnected from room {self.room_id}")
 
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
             message_content = data['message']
             email = data['email']
+            
+            # Verify the email matches the authenticated user
+            if email != self.user.email:
+                logger.warning(f"Email mismatch in message: {email} vs authenticated {self.user.email}")
+                return
 
             # Save message first
             saved = await self.save_message(email, message_content)
             if saved:
+                logger.info(f"Message from {email} saved and broadcasting to room {self.room_id}")
                 # Then broadcast to group
                 await self.channel_layer.group_send(
                     self.room_group_name,
@@ -74,7 +98,6 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
                         'type': 'chat_message',
                         'message': message_content,
                         'email': email,
-                    
                     }
                 )
         except Exception as e:
@@ -85,9 +108,17 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
             'type': 'chat_message',
             'message': event['message'],
             'email': event['email'],
-         
         }))
 
+    @database_sync_to_async
+    def user_can_access_room(self):
+        try:
+            room = ClassChatRoom.objects.get(room_id=self.room_id)
+            # Check if user is either the tutor or the student in this room
+            return (room.tutor_id == self.user.id or room.user_id == self.user.id)
+        except Exception as e:
+            logger.error(f"Error checking room access: {e}")
+            return False
 
     @database_sync_to_async
     def get_room(self):
@@ -122,7 +153,6 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
                 user=user,
                 content=message
             )
-         
             return True
         except Exception as e:
             logger.error(f"Error saving message: {e}")
