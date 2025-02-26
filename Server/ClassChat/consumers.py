@@ -1,5 +1,8 @@
 import json
 import logging
+import jwt
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ClassChatRoom, ClassChatMessage
 from accounts.models import User
@@ -16,11 +19,30 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
         
         # Get authenticated user from scope
         if self.scope['user'].is_anonymous:
-            logger.error("Anonymous user tried to connect, authentication required")
-            await self.close()
-            return
-            
-        self.user = self.scope['user']
+            # Try to authenticate with token from query string
+            logger.info("Attempting to authenticate with token")
+            try:
+                # Parse query string for token
+                query_string = self.scope['query_string'].decode()
+                if 'token=' in query_string:
+                    token = query_string.split('token=')[1].split('&')[0]
+                    self.user = await self.authenticate_with_token(token)
+                    if not self.user:
+                        logger.error("Token authentication failed")
+                        await self.close()
+                        return
+                    logger.info(f"User authenticated with token: {self.user.email}")
+                else:
+                    logger.error("No token provided in query string")
+                    await self.close()
+                    return
+            except Exception as e:
+                logger.error(f"Authentication error: {e}")
+                await self.close()
+                return
+        else:
+            self.user = self.scope['user']
+        
         logger.info(f"User {self.user.email} attempting to connect to room {self.room_id}")
         
         # Verify room exists before proceeding
@@ -109,6 +131,25 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
             'message': event['message'],
             'email': event['email'],
         }))
+
+    @database_sync_to_async
+    def authenticate_with_token(self, token):
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user = get_user_model().objects.get(id=payload['user_id'])
+            return user
+        except jwt.ExpiredSignatureError:
+            logger.error("Token expired")
+            return None
+        except jwt.InvalidTokenError:
+            logger.error("Invalid token")
+            return None
+        except get_user_model().DoesNotExist:
+            logger.error("User not found")
+            return None
+        except Exception as e:
+            logger.error(f"Token authentication error: {e}")
+            return None
 
     @database_sync_to_async
     def user_can_access_room(self):
