@@ -90,8 +90,8 @@ const ChatSection = ({ roomId }) => {
       const token = localStorage.getItem('accessToken');
       if (!token || !roomId) return;
 
-      // websocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/classchat/${roomId}/`);
-      websocket.current = new WebSocket(`wss://api.lexiwaves.online/ws/classchat/${roomId}/`);
+      // websocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/classchat/${roomId}/?token=${token}`);
+      websocket.current = new WebSocket(`wss://api.lexiwaves.online/ws/classchat/${roomId}/?token=${token}`);
       
       websocket.current.onopen = () => {
         setIsConnected(true);
