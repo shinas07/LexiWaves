@@ -44,9 +44,10 @@ const TutorChatRoom = () => {
   useEffect(() => {
     const connectWebSocket = () => {
       try {
+        const token = localStorage.getItem('accessToken');
         // Create WebSocket connection
-        // const wsUrl = `ws://127.0.0.1:8000/ws/classchat/${roomId}/`;
-        const wsUrl = `wss://api.lexiwaves.online/ws/classchat/${roomId}/`;
+        // const wsUrl = `ws://127.0.0.1:8000/ws/classchat/${roomId}/?token=${token}`;
+        const wsUrl = `wss://api.lexiwaves.online/ws/classchat/${roomId}/?token=${token}`;
         websocket.current = new WebSocket(wsUrl);
 
         websocket.current.onopen = () => {
