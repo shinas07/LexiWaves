@@ -1,12 +1,12 @@
 import json
 import logging
 import jwt
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ClassChatRoom, ClassChatMessage
 from accounts.models import User
 from channels.db import database_sync_to_async
+from django.contrib.auth import get_user_model
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -15,51 +15,21 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
+        self.user = await self.authenticate_user()
+        logger.info(f'User is connected: {self.user}')
+        if self.user is None:
+            await self.close()
+            return
+        
+        self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'chat_{self.room_id}'
-        
-        # Get authenticated user from scope
-        if self.scope['user'].is_anonymous:
-            # Try to authenticate with token from query string
-            logger.info("Attempting to authenticate with token")
-            try:
-                # Parse query string for token
-                query_string = self.scope['query_string'].decode()
-                if 'token=' in query_string:
-                    token = query_string.split('token=')[1].split('&')[0]
-                    self.user = await self.authenticate_with_token(token)
-                    if not self.user:
-                        logger.error("Token authentication failed")
-                        await self.close()
-                        return
-                    logger.info(f"User authenticated with token: {self.user.email}")
-                else:
-                    logger.error("No token provided in query string")
-                    await self.close()
-                    return
-            except Exception as e:
-                logger.error(f"Authentication error: {e}")
-                await self.close()
-                return
-        else:
-            self.user = self.scope['user']
-        
-        logger.info(f"User {self.user.email} attempting to connect to room {self.room_id}")
-        
+
         # Verify room exists before proceeding
         room_exists = await self.get_room()
         if not room_exists:
             logger.error(f"Room {self.room_id} does not exist")
             await self.close()
             return
-            
-        # Validate user access to the room
-        has_access = await self.user_can_access_room()
-        if not has_access:
-            logger.error(f"User {self.user.email} is not allowed to join room {self.room_id}")
-            await self.close()
-            return
-            
-        logger.info(f"User {self.user.email} authenticated and authorized for room {self.room_id}")
 
         # Join room group
         await self.channel_layer.group_add(
@@ -80,7 +50,8 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
         if self.room_id not in self.connected_users:
             self.connected_users[self.room_id] = set()
         self.connected_users[self.room_id].add(self.channel_name)
-        logger.info(f"User {self.user.email} connected to room {self.room_id}")
+        # Send updated user count
+        # await self.update_user_count()
 
     async def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
@@ -94,25 +65,23 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
             self.connected_users[self.room_id].discard(self.channel_name)
             if not self.connected_users[self.room_id]:
                 del self.connected_users[self.room_id]
-        
-        if hasattr(self, 'user'):
-            logger.info(f"User {self.user.email} disconnected from room {self.room_id}")
+
+       
 
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
-            message_content = data['message']
-            email = data['email']
-            
-            # Verify the email matches the authenticated user
-            if email != self.user.email:
-                logger.warning(f"Email mismatch in message: {email} vs authenticated {self.user.email}")
+            message_content = data.get('message')
+            email = data.get('email')
+        
+
+            if message_content is None:
+                logger.warning("Received data does not containg ''")
                 return
 
             # Save message first
             saved = await self.save_message(email, message_content)
             if saved:
-                logger.info(f"Message from {email} saved and broadcasting to room {self.room_id}")
                 # Then broadcast to group
                 await self.channel_layer.group_send(
                     self.room_group_name,
@@ -120,9 +89,11 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
                         'type': 'chat_message',
                         'message': message_content,
                         'email': email,
+                    
                     }
                 )
         except Exception as e:
+
             logger.error(f"Error in receive: {e}")
 
     async def chat_message(self, event):
@@ -130,36 +101,41 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
             'type': 'chat_message',
             'message': event['message'],
             'email': event['email'],
+         
         }))
 
-    @database_sync_to_async
-    def authenticate_with_token(self, token):
+           
+    async def authenticate_user(self):
+        token = self.scope['query_string'].decode().split('=')[1]
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-            user = get_user_model().objects.get(id=payload['user_id'])
+            user = await database_sync_to_async(get_user_model().objects.get)(id=payload['user_id'])
+
+
+            is_authorized = await self.is_user_allowed(user)
+            if not is_authorized:
+                logger.warning(f"Unauthorized user {user.email} tried to access room {self.room_id}")
+                await self.close()
+                return None
             return user
         except jwt.ExpiredSignatureError:
-            logger.error("Token expired")
+            await self.close()
             return None
         except jwt.InvalidTokenError:
-            logger.error("Invalid token")
+            await self.close()
             return None
-        except get_user_model().DoesNotExist:
-            logger.error("User not found")
-            return None
-        except Exception as e:
-            logger.error(f"Token authentication error: {e}")
-            return None
+        
 
     @database_sync_to_async
-    def user_can_access_room(self):
+    def is_user_allowed(self, user):
+        """Check if the user is the tutor or the assigned user for the chat room."""
         try:
             room = ClassChatRoom.objects.get(room_id=self.room_id)
-            # Check if user is either the tutor or the student in this room
-            return (room.tutor_id == self.user.id or room.user_id == self.user.id)
-        except Exception as e:
-            logger.error(f"Error checking room access: {e}")
-            return False
+            logger.info('room is ready')
+            return user == room.tutor or user == room.user 
+        except ClassChatRoom.DoesNotExist:
+            logger.info('getting error from here')
+            return False 
 
     @database_sync_to_async
     def get_room(self):
@@ -194,7 +170,11 @@ class ClassChatConsumer(AsyncWebsocketConsumer):
                 user=user,
                 content=message
             )
+         
             return True
         except Exception as e:
             logger.error(f"Error saving message: {e}")
             return False
+ 
+
+   
