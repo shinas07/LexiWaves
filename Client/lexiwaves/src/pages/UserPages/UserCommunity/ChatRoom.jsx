@@ -52,10 +52,9 @@ const ChatRoom = () => {
             return;
         }
         const token = localStorage.getItem('accessToken')
-        socket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${language}/?token=${token}`);
+        // socket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${language}/?token=${token}`);
 
-
-         // socket.current = new WebSocket(`wss://api.lexiwaves.online/ws/chat/${language}/?token=${token}`);
+         socket.current = new WebSocket(`wss://api.lexiwaves.online/ws/chat/${language}/?token=${token}`);
          
         // const wsUrl = process.env.NODE_ENV === 'production' 
         // ? `wss://api.lexiwaves.online/ws/chat/${language}/?token=${token}`
