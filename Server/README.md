@@ -1,1 +1,1 @@
-Testing CI/CD workflow 
+lexiwaves server 
